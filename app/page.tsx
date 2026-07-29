@@ -1,6 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import GradualBlur from "@/components/GradualBlur";
+
+const MagicRings = dynamic(() => import("@/components/MagicRings"), {
+  ssr: false,
+});
 
 type Product = {
   brand: string;
@@ -272,14 +278,48 @@ export default function Home() {
 
           <figure className="hero-visual" aria-label="Relógio em destaque">
             <div className="visual-halo" aria-hidden="true" />
-            <div className="visual-ring visual-ring-outer" aria-hidden="true" />
-            <div className="visual-ring visual-ring-inner" aria-hidden="true" />
+            <div className="hero-magic-rings" aria-hidden="true">
+              <MagicRings
+                color="#53b8a9"
+                colorTwo="#195b55"
+                ringCount={7}
+                speed={0.34}
+                attenuation={13}
+                lineThickness={1.15}
+                baseRadius={0.2}
+                radiusStep={0.072}
+                scaleRate={0.055}
+                opacity={0.58}
+                blur={0.2}
+                noiseAmount={0.018}
+                rotation={-12}
+                ringGap={1.38}
+                fadeIn={0.85}
+                fadeOut={1.08}
+                followMouse={false}
+                hoverScale={1}
+                parallax={0.02}
+                clickBurst={false}
+              />
+            </div>
             <img
               src="https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=1800&q=92"
               alt="Relógio de aço com mostrador verde sobre superfície escura"
               fetchPriority="high"
             />
             <div className="image-vignette" aria-hidden="true" />
+            <GradualBlur
+              className="hero-gradual-blur"
+              target="parent"
+              position="bottom"
+              height="10rem"
+              strength={2.4}
+              divCount={7}
+              curve="bezier"
+              exponential
+              opacity={0.82}
+              zIndex={4}
+            />
 
             <div className="hero-index">
               <span>01</span>

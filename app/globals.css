@@ -413,6 +413,8 @@ img {
 }
 
 .hero-visual img {
+  position: relative;
+  z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -425,6 +427,7 @@ img {
 .story-image-overlay {
   position: absolute;
   inset: 0;
+  z-index: 3;
   background:
     linear-gradient(90deg, var(--obsidian) 0%, transparent 28%),
     linear-gradient(0deg, rgba(11, 13, 15, 0.86) 0%, transparent 36%),
@@ -449,47 +452,36 @@ img {
   pointer-events: none;
 }
 
-.visual-ring {
+.hero-magic-rings {
   position: absolute;
-  top: 48%;
-  left: 50%;
+  inset: -8%;
   z-index: 2;
-  aspect-ratio: 1;
-  border: 1px solid rgba(244, 241, 234, 0.13);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
+  opacity: 0.82;
   pointer-events: none;
+  mix-blend-mode: screen;
+  mask-image: radial-gradient(
+    circle at 52% 48%,
+    black 0%,
+    rgba(0, 0, 0, 0.9) 46%,
+    transparent 78%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at 52% 48%,
+    black 0%,
+    rgba(0, 0, 0, 0.9) 46%,
+    transparent 78%
+  );
 }
 
-.visual-ring::after {
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vyne-teal-bright);
-  box-shadow: 0 0 18px var(--vyne-teal-bright);
-  content: "";
-}
-
-.visual-ring-outer {
-  width: 84%;
-  animation: rotate-ring 34s linear infinite;
-}
-
-.visual-ring-inner {
-  width: 58%;
-  border-style: dashed;
-  opacity: 0.58;
-  animation: rotate-ring-reverse 42s linear infinite;
+.hero-gradual-blur {
+  bottom: -1px !important;
 }
 
 .hero-index {
   position: absolute;
   top: 42px;
   right: 38px;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -509,7 +501,7 @@ img {
   right: 34px;
   bottom: 34px;
   left: 34px;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -1898,12 +1890,9 @@ img {
     display: none;
   }
 
-  .visual-ring-outer {
-    width: 110%;
-  }
-
-  .visual-ring-inner {
-    width: 76%;
+  .hero-magic-rings {
+    inset: -4% -22%;
+    opacity: 0.7;
   }
 
   .brand-list {
