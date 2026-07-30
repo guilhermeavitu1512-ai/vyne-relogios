@@ -390,8 +390,8 @@ export default function Home() {
 
                 <iframe
                   className="signature-hero-sketchfab"
-                  title="Relógio cronógrafo 3D interativo"
-                  src="https://sketchfab.com/models/a94357292cd64fdbb1714935798ca991/embed?autostart=1&camera=0&scrollwheel=0&ui_stop=0&dnt=1&max_texture_size=2048&ui_theme=dark"
+                  title="Relógio Seiko Coutura 3D interativo"
+                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=1024&ui_theme=dark"
                   loading="eager"
                   allow="autoplay; fullscreen; xr-spatial-tracking"
                   allowFullScreen
@@ -671,11 +671,11 @@ export default function Home() {
             <span>
               Modelo 3D:{" "}
               <a
-                href="https://sketchfab.com/3d-models/chronograph-watch-a94357292cd64fdbb1714935798ca991"
+                href="https://sketchfab.com/3d-models/seiko-watch-0796e23ab5c0448c9bdf3fe5c3b3e362"
                 target="_blank"
                 rel="noreferrer"
               >
-                graphiccompressor (@tityus) / Sketchfab
+                carloshisserich / Sketchfab
               </a>{" "}
               · CC BY 4.0
             </span>
