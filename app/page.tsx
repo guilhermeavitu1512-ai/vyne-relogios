@@ -1,7 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import {
+  AnimatePresence,
+  LazyMotion,
+  domAnimation,
+  m,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { useEffect, useState, type ReactNode } from "react";
 import GradualBlur from "@/components/GradualBlur";
 
 const MagicRings = dynamic(() => import("@/components/MagicRings"), {
@@ -25,7 +36,7 @@ const products: Product[] = [
     descriptor: "Automático · presença esportiva",
     price: "R$ 2.490*",
     image:
-      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1400&q=88",
+      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1800&q=88",
     tag: "Escolha do curador",
     specs: ["Movimento automático", "Caixa em aço", "Estilo versátil"],
   },
@@ -45,7 +56,7 @@ const products: Product[] = [
     descriptor: "Automático · cor e precisão",
     price: "R$ 2.790*",
     image:
-      "https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=1400&q=88",
+      "https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=1600&q=88",
     tag: "Novo ritmo",
     specs: ["Movimento automático", "Mostrador marcante", "Aço integrado"],
   },
@@ -55,7 +66,7 @@ const products: Product[] = [
     descriptor: "Clássico · elegância sem excesso",
     price: "R$ 1.890*",
     image:
-      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1400&q=88&sat=-25",
+      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1500&q=88&sat=-22",
     tag: "Essencial clássico",
     specs: ["Estética clássica", "Perfil refinado", "Uso social"],
   },
@@ -65,664 +76,720 @@ const products: Product[] = [
     descriptor: "Quartzo · herança reinterpretada",
     price: "R$ 1.290*",
     image:
-      "https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1400&q=88",
+      "https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1500&q=88",
     tag: "Design de arquivo",
     specs: ["Movimento a quartzo", "Caixa em aço", "Visual atemporal"],
   },
 ];
 
+const brandNames = ["SEIKO", "CASIO", "CITIZEN", "ORIENT", "TIMEX"];
+
 const trustPoints = [
   {
     index: "01",
-    title: "Originalidade sem atalhos",
-    text: "Somente relógios originais. Nunca réplicas, cópias ou procedência ambígua.",
+    title: "Procedência clara",
+    text: "Relógios originais, selecionados com critérios de procedência e informações apresentadas sem ambiguidade.",
   },
   {
     index: "02",
-    title: "Informação que orienta",
-    text: "Detalhes importantes explicados com clareza, sem jargão para impressionar.",
+    title: "Garantia explicada",
+    text: "Condições de garantia, conservação e suporte comunicadas antes da decisão de compra.",
   },
   {
     index: "03",
-    title: "Preço com contexto",
-    text: "Condições transparentes e comparação responsável — sem urgência artificial.",
+    title: "Preço inteligente",
+    text: "Uma curadoria que aproxima modelos reconhecidos sem transformar sofisticação em exagero.",
   },
   {
     index: "04",
-    title: "Responsabilidade real",
-    text: "Uma experiência pensada para continuar coerente depois da compra.",
+    title: "Atendimento humano",
+    text: "Orientação para comparar mecanismos, proporções e estilos com segurança e tranquilidade.",
   },
 ];
 
-const benefits = [
-  {
-    number: "01",
-    title: "Curadoria, não acúmulo",
-    text: "Modelos selecionados por estilo, ocasião e qualidade — não apenas por volume de catálogo.",
-  },
-  {
-    number: "02",
-    title: "Técnica traduzida",
-    text: "Mecanismo, proporção e materiais explicados pelo impacto que fazem no seu uso.",
-  },
-  {
-    number: "03",
-    title: "Sofisticação próxima",
-    text: "Uma experiência premium que respeita seu repertório, seu tempo e seu orçamento.",
-  },
-  {
-    number: "04",
-    title: "Escolha com significado",
-    text: "O relógio certo não é necessariamente o mais caro. É aquele que acompanha o seu ritmo.",
-  },
-];
+const editorialEase = [0.16, 1, 0.3, 1] as const;
 
-const brandNames = ["SEIKO", "CASIO", "CITIZEN", "ORIENT", "TIMEX"];
+function Reveal({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <m.div
+      className={className}
+      initial={
+        reduceMotion
+          ? false
+          : { opacity: 0, y: 38, filter: "blur(10px)" }
+      }
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.18 }}
+      transition={{ duration: 0.9, delay, ease: editorialEase }}
+    >
+      {children}
+    </m.div>
+  );
+}
+
+function ImageReveal({
+  src,
+  alt,
+  className = "",
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  priority?: boolean;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <m.div
+      className={`image-reveal ${className}`}
+      initial={reduceMotion ? false : { opacity: 0, scale: 1.035 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 1.2, ease: editorialEase }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
+      />
+      {!reduceMotion && (
+        <m.span
+          className="image-reveal-curtain"
+          aria-hidden="true"
+          initial={{ scaleY: 1 }}
+          whileInView={{ scaleY: 0 }}
+          viewport={{ once: true, amount: 0.12 }}
+          transition={{ duration: 1.05, delay: 0.08, ease: editorialEase }}
+        />
+      )}
+    </m.div>
+  );
+}
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [enhancedMotion, setEnhancedMotion] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollY, scrollYProgress } = useScroll();
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.25,
+  });
+  const heroImageY = useTransform(scrollY, [0, 900], [0, 150]);
+  const heroContentY = useTransform(scrollY, [0, 700], [0, 82]);
+  const heroContentOpacity = useTransform(scrollY, [0, 620], [1, 0.2]);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const nextState = latest > 54;
+    setScrolled((current) => (current === nextState ? current : nextState));
+  });
 
   useEffect(() => {
-    const revealItems = document.querySelectorAll<HTMLElement>(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 },
+    const motionQuery = window.matchMedia(
+      "(min-width: 901px) and (prefers-reduced-motion: no-preference)",
     );
+    const syncMotionPreference = () => setEnhancedMotion(motionQuery.matches);
 
-    revealItems.forEach((item) => observer.observe(item));
-
-    const updateProgress = () => {
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
-      document.documentElement.style.setProperty(
-        "--scroll-progress",
-        String(progress),
-      );
-    };
-
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", updateProgress);
-    };
+    syncMotionPreference();
+    motionQuery.addEventListener("change", syncMotionPreference);
+    return () =>
+      motionQuery.removeEventListener("change", syncMotionPreference);
   }, []);
 
   useEffect(() => {
-    if (!selectedProduct) return;
+    const locked = menuOpen || Boolean(selectedProduct);
+    document.body.classList.toggle("is-locked", locked);
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedProduct(null);
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      setSelectedProduct(null);
     };
 
-    document.body.classList.add("modal-open");
     window.addEventListener("keydown", closeOnEscape);
-
     return () => {
-      document.body.classList.remove("modal-open");
+      document.body.classList.remove("is-locked");
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [selectedProduct]);
+  }, [menuOpen, selectedProduct]);
 
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div className="site-shell">
-      <div className="scroll-progress" aria-hidden="true" />
+    <LazyMotion features={domAnimation}>
+      <div className="site-shell">
+        <m.div
+          className="scroll-progress"
+          style={{ scaleX: smoothProgress }}
+          aria-hidden="true"
+        />
 
-      <header className="site-header">
-        <div className="prototype-note">
-          <span>CONCEITO V1.0</span>
-          <span>Catálogo e condições ilustrativos</span>
-        </div>
+        <header
+          className={`site-header ${scrolled ? "is-scrolled" : ""} ${
+            menuOpen ? "menu-active" : ""
+          }`}
+        >
+          <nav className="nav-wrap" aria-label="Navegação principal">
+            <button
+              className={`menu-toggle ${menuOpen ? "is-open" : ""}`}
+              type="button"
+              aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((current) => !current)}
+            >
+              <span />
+              <span />
+              <small>Menu</small>
+            </button>
 
-        <nav className="nav-wrap" aria-label="Navegação principal">
-          <a className="wordmark" href="#inicio" aria-label="VYNE — início">
-            VYNE
-          </a>
+            <a className="wordmark" href="#inicio" aria-label="VYNE — início">
+              VYNE
+            </a>
 
-          <div className="desktop-nav">
-            <a href="#colecao">Coleção</a>
-            <a href="#marcas">Marcas</a>
-            <a href="#confianca">Confiança</a>
-            <a href="#sobre">A VYNE</a>
-          </div>
-
-          <a className="nav-cta" href="#colecao">
-            Explorar relógios
-            <span aria-hidden="true">↗</span>
-          </a>
-
-          <button
-            className={`menu-toggle ${menuOpen ? "is-open" : ""}`}
-            type="button"
-            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((current) => !current)}
-          >
-            <span />
-            <span />
-          </button>
-        </nav>
-
-        <div className={`mobile-menu ${menuOpen ? "is-open" : ""}`}>
-          <a href="#colecao" onClick={closeMenu}>
-            Coleção
-          </a>
-          <a href="#marcas" onClick={closeMenu}>
-            Marcas
-          </a>
-          <a href="#confianca" onClick={closeMenu}>
-            Confiança
-          </a>
-          <a href="#sobre" onClick={closeMenu}>
-            A VYNE
-          </a>
-        </div>
-      </header>
-
-      <main>
-        <section className="hero" id="inicio">
-          <div className="hero-grid-overlay" aria-hidden="true" />
-          <div className="hero-orb hero-orb-one" aria-hidden="true" />
-          <div className="hero-orb hero-orb-two" aria-hidden="true" />
-
-          <div className="hero-copy">
-            <div className="eyebrow hero-enter hero-enter-one">
-              <span className="eyebrow-line" />
-              Relojoaria digital multimarcas
+            <div className="desktop-nav">
+              <a href="#colecao">Relógios</a>
+              <a href="#confianca">Autenticidade</a>
+              <a href="#sobre">A VYNE</a>
             </div>
 
-            <h1 className="hero-title hero-enter hero-enter-two">
-              O tempo passa.
-              <br />
-              <em>Seu estilo fica.</em>
-            </h1>
+            <a className="nav-cta" href="#colecao">
+              Explorar
+              <span aria-hidden="true">↗</span>
+            </a>
+          </nav>
 
-            <p className="hero-lead hero-enter hero-enter-three">
-              Relógios originais de marcas reconhecidas, escolhidos com
-              critério para quem busca sofisticação real e preço inteligente.
-            </p>
+          <AnimatePresence>
+            {menuOpen && (
+              <m.div
+                className="menu-panel"
+                initial={{ opacity: 0, y: "-100%" }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: "-100%" }}
+                transition={{ duration: reduceMotion ? 0 : 0.65, ease: editorialEase }}
+              >
+                <div className="menu-panel-inner">
+                  <span className="menu-kicker">Navegue pela VYNE</span>
+                  <div className="menu-links">
+                    {[
+                      ["01", "Início", "#inicio"],
+                      ["02", "Coleção", "#colecao"],
+                      ["03", "Autenticidade", "#confianca"],
+                      ["04", "A VYNE", "#sobre"],
+                    ].map(([number, label, href], index) => (
+                      <m.a
+                        key={href}
+                        href={href}
+                        onClick={closeMenu}
+                        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.65,
+                          delay: reduceMotion ? 0 : 0.18 + index * 0.08,
+                          ease: editorialEase,
+                        }}
+                      >
+                        <small>{number}</small>
+                        <span>{label}</span>
+                        <i aria-hidden="true">↗</i>
+                      </m.a>
+                    ))}
+                  </div>
+                  <div className="menu-foot">
+                    <span>Relógios originais</span>
+                    <span>Preço inteligente</span>
+                    <span>Curadoria independente</span>
+                  </div>
+                </div>
+              </m.div>
+            )}
+          </AnimatePresence>
+        </header>
 
-            <div className="hero-actions hero-enter hero-enter-four">
-              <a className="button button-primary" href="#colecao">
-                Conhecer a seleção
-                <span aria-hidden="true">↗</span>
-              </a>
-              <a className="text-link" href="#confianca">
-                Como construímos confiança
-                <span aria-hidden="true">→</span>
-              </a>
-            </div>
-
-            <div className="hero-proof hero-enter hero-enter-five">
-              <div className="proof-stamp">
-                <span className="proof-dot" />
-                Compromisso VYNE
-              </div>
-              <p>
-                Originalidade, clareza e responsabilidade em cada escolha.
-              </p>
-            </div>
-          </div>
-
-          <figure className="hero-visual" aria-label="Relógio em destaque">
-            <div className="visual-halo" aria-hidden="true" />
-            <div className="hero-magic-rings" aria-hidden="true">
-              <MagicRings
-                color="#53b8a9"
-                colorTwo="#195b55"
-                ringCount={7}
-                speed={0.34}
-                attenuation={13}
-                lineThickness={1.15}
-                baseRadius={0.2}
-                radiusStep={0.072}
-                scaleRate={0.055}
-                opacity={0.58}
-                blur={0.2}
-                noiseAmount={0.018}
-                rotation={-12}
-                ringGap={1.38}
-                fadeIn={0.85}
-                fadeOut={1.08}
-                followMouse={false}
-                hoverScale={1}
-                parallax={0.02}
-                clickBurst={false}
+        <main>
+          <section className="hero" id="inicio">
+            <m.div
+              className="hero-media"
+              style={reduceMotion ? undefined : { y: heroImageY }}
+              aria-hidden="true"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=2200&q=92"
+                alt=""
+                fetchPriority="high"
+                decoding="async"
               />
+            </m.div>
+            <div className="hero-shade" aria-hidden="true" />
+            {enhancedMotion && (
+              <div className="hero-magic-rings" aria-hidden="true">
+                <MagicRings
+                  color="#3a9f78"
+                  colorTwo="#0e4d36"
+                  ringCount={6}
+                  speed={0.22}
+                  attenuation={14}
+                  lineThickness={0.85}
+                  baseRadius={0.2}
+                  radiusStep={0.08}
+                  scaleRate={0.04}
+                  opacity={0.26}
+                  blur={0.25}
+                  noiseAmount={0.01}
+                  rotation={-10}
+                  ringGap={1.45}
+                  fadeIn={0.88}
+                  fadeOut={1.1}
+                  followMouse={false}
+                  hoverScale={1}
+                  parallax={0.01}
+                  clickBurst={false}
+                />
+              </div>
+            )}
+
+            <m.div
+              className="hero-content"
+              style={
+                reduceMotion
+                  ? undefined
+                  : { y: heroContentY, opacity: heroContentOpacity }
+              }
+            >
+              <m.span
+                className="eyebrow hero-eyebrow"
+                initial={reduceMotion ? false : { opacity: 0, y: 22, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.85, delay: 0.15, ease: editorialEase }}
+              >
+                Relojoaria multimarcas · Brasil
+              </m.span>
+              <m.h1
+                initial={reduceMotion ? false : { opacity: 0, y: 34, filter: "blur(12px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 1.05, delay: 0.28, ease: editorialEase }}
+              >
+                Elegância que permanece.
+                <em>Valor que faz sentido.</em>
+              </m.h1>
+              <m.p
+                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.48, ease: editorialEase }}
+              >
+                Relógios originais de marcas reconhecidas, selecionados para
+                unir presença, confiança e preço inteligente.
+              </m.p>
+              <m.div
+                className="hero-actions"
+                initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.62, ease: editorialEase }}
+              >
+                <a className="button button-primary" href="#colecao">
+                  Descobrir a seleção
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a className="text-link" href="#confianca">
+                  Nosso compromisso
+                  <span aria-hidden="true">→</span>
+                </a>
+              </m.div>
+            </m.div>
+
+            <div className="hero-meta">
+              <span>Originalidade</span>
+              <i />
+              <span>Curadoria</span>
+              <i />
+              <span>Preço justo</span>
             </div>
-            <img
-              src="https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=1800&q=92"
-              alt="Relógio de aço com mostrador verde sobre superfície escura"
-              fetchPriority="high"
-            />
-            <div className="image-vignette" aria-hidden="true" />
+
+            <a className="scroll-cue" href="#essencia" aria-label="Continuar">
+              <span>Continuar</span>
+              <i aria-hidden="true" />
+            </a>
+
             <GradualBlur
               className="hero-gradual-blur"
               target="parent"
               position="bottom"
-              height="10rem"
-              strength={2.4}
-              divCount={7}
-              curve="bezier"
-              exponential
-              opacity={0.82}
-              zIndex={4}
-            />
-
-            <div className="hero-index">
-              <span>01</span>
-              <span className="index-line" />
-              <span>05</span>
-            </div>
-
-            <figcaption>
-              <span>Ritmo autêntico</span>
-              <span>Precisão que acompanha a vida real</span>
-            </figcaption>
-          </figure>
-
-          <a className="scroll-cue" href="#marcas" aria-label="Rolar para marcas">
-            <span>Descobrir</span>
-            <span className="scroll-line" aria-hidden="true" />
-          </a>
-        </section>
-
-        <section className="trust-ribbon" aria-label="Compromissos da VYNE">
-          <div className="trust-ribbon-inner">
-            <span>100% originais</span>
-            <i />
-            <span>Marcas reconhecidas</span>
-            <i />
-            <span>Curadoria especializada</span>
-            <i />
-            <span>Condições transparentes</span>
-          </div>
-        </section>
-
-        <section className="brands-section section-pad" id="marcas">
-          <div className="section-heading reveal">
-            <div>
-              <span className="section-number">01</span>
-              <span className="eyebrow">Marcas que atravessam o tempo</span>
-            </div>
-            <p>
-              Cinco nomes reconhecidos. Uma curadoria independente para ajudar
-              você a escolher pelo que realmente importa.
-            </p>
-          </div>
-
-          <div className="brand-list reveal">
-            {brandNames.map((brand, index) => (
-              <div className="brand-name" key={brand}>
-                <span>{brand}</span>
-                <small>0{index + 1}</small>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="collection-section section-pad" id="colecao">
-          <div className="collection-intro reveal">
-            <div>
-              <span className="section-number">02</span>
-              <span className="eyebrow">Seleção em destaque</span>
-            </div>
-            <h2>
-              Relógios com presença.
-              <br />
-              <em>Escolhas com critério.</em>
-            </h2>
-            <p>
-              Uma prévia conceitual de como a VYNE organiza modelos por
-              intenção, estilo e momento — não apenas por preço.
-            </p>
-          </div>
-
-          <div className="product-grid">
-            {products.map((product, index) => (
-              <article
-                className={`product-card reveal ${
-                  index === 0 || index === 3 ? "product-card-wide" : ""
-                }`}
-                key={`${product.brand}-${product.model}`}
-              >
-                <div className="product-image">
-                  <img
-                    src={product.image}
-                    alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
-                    loading="lazy"
-                  />
-                  <div className="product-shade" aria-hidden="true" />
-                  <span className="product-tag">{product.tag}</span>
-                  <span className="image-note">Imagem ilustrativa</span>
-                </div>
-
-                <div className="product-info">
-                  <div>
-                    <span className="product-brand">{product.brand}</span>
-                    <h3>{product.model}</h3>
-                    <p>{product.descriptor}</p>
-                  </div>
-                  <div className="product-price-wrap">
-                    <span>A partir de</span>
-                    <strong>{product.price}</strong>
-                  </div>
-                </div>
-
-                <button
-                  className="product-action"
-                  type="button"
-                  onClick={() => setSelectedProduct(product)}
-                >
-                  Ver referência
-                  <span aria-hidden="true">↗</span>
-                </button>
-              </article>
-            ))}
-          </div>
-
-          <p className="catalog-disclaimer reveal">
-            * Produtos, preços e disponibilidade apresentados apenas para
-            demonstração do conceito visual. A publicação comercial depende do
-            catálogo real e das condições aprovadas pela VYNE.
-          </p>
-        </section>
-
-        <section className="story-section">
-          <div className="story-image reveal">
-            <img
-              src="https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1800&q=90"
-              alt="Detalhe de relógio sobre superfície escura"
-              loading="lazy"
-            />
-            <div className="story-image-overlay" aria-hidden="true" />
-            <GradualBlur
-              className="story-gradual-blur story-gradual-blur-desktop"
-              target="parent"
-              position="right"
-              width="10rem"
-              strength={2.1}
+              height="9rem"
+              strength={2.3}
               divCount={7}
               curve="bezier"
               exponential
               opacity={0.72}
-              zIndex={4}
+              zIndex={3}
             />
-            <GradualBlur
-              className="story-gradual-blur story-gradual-blur-mobile"
-              target="parent"
-              position="bottom"
-              height="9rem"
-              strength={2.1}
-              divCount={7}
-              curve="bezier"
-              exponential
-              opacity={0.76}
-              zIndex={4}
+          </section>
+
+          <section className="editorial-intro" id="essencia">
+            <Reveal className="editorial-intro-copy">
+              <span className="section-index">01 / Essência</span>
+              <h2>
+                Luxo acessível não é parecer mais.
+                <em>É escolher melhor.</em>
+              </h2>
+              <p>
+                A VYNE aproxima você de relógios originais de marcas que já
+                conquistaram confiança, com uma experiência serena, clara e
+                visualmente precisa.
+              </p>
+            </Reveal>
+          </section>
+
+          <section className="brand-rail" aria-label="Marcas disponíveis">
+            <span className="brand-rail-label">Marcas selecionadas</span>
+            <div className="brand-rail-list">
+              {brandNames.map((brand, index) => (
+                <m.span
+                  key={brand}
+                  initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    delay: reduceMotion ? 0 : index * 0.08,
+                    ease: editorialEase,
+                  }}
+                >
+                  {brand}
+                </m.span>
+              ))}
+            </div>
+          </section>
+
+          <section className="collection-section" id="colecao">
+            <Reveal className="collection-heading">
+              <div>
+                <span className="section-index">02 / Coleção</span>
+                <span className="eyebrow">Uma curadoria para cada ritmo</span>
+              </div>
+              <h2>
+                Relógios com história.
+                <em>Escolhas com intenção.</em>
+              </h2>
+              <p>
+                Modelos organizados por presença, mecanismo e ocasião — para
+                você comparar menos ruído e mais significado.
+              </p>
+            </Reveal>
+
+            <div className="product-grid">
+              {products.map((product, index) => (
+                <m.article
+                  className={`product-card ${index === 0 ? "product-featured" : ""}`}
+                  key={`${product.brand}-${product.model}`}
+                  initial={reduceMotion ? false : { opacity: 0, y: 44 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.14 }}
+                  transition={{
+                    duration: 0.9,
+                    delay: reduceMotion ? 0 : (index % 2) * 0.1,
+                    ease: editorialEase,
+                  }}
+                >
+                  <button
+                    className="product-card-button"
+                    type="button"
+                    onClick={() => setSelectedProduct(product)}
+                    aria-label={`Ver detalhes de ${product.brand} ${product.model}`}
+                  >
+                    <m.div
+                      className="product-image"
+                      layoutId={`watch-image-${product.brand}-${product.model}`}
+                    >
+                      <img
+                        src={product.image}
+                        alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+                      <span className="product-shade" aria-hidden="true" />
+                      <span className="product-tag">{product.tag}</span>
+                      <span className="image-note">Imagem ilustrativa</span>
+                    </m.div>
+                    <div className="product-info">
+                      <div>
+                        <span className="product-brand">{product.brand}</span>
+                        <h3>{product.model}</h3>
+                        <p>{product.descriptor}</p>
+                      </div>
+                      <div className="product-price-wrap">
+                        <span>A partir de</span>
+                        <strong>{product.price}</strong>
+                      </div>
+                      <span className="product-arrow" aria-hidden="true">
+                        ↗
+                      </span>
+                    </div>
+                  </button>
+                </m.article>
+              ))}
+            </div>
+
+            <p className="catalog-disclaimer">
+              * Produtos, valores e disponibilidade são ilustrativos. A versão
+              comercial deve refletir catálogo, estoque, garantia e condições
+              reais da VYNE.
+            </p>
+          </section>
+
+          <section className="manifesto-section">
+            <m.div
+              className="manifesto-media"
+              initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 1.25, ease: editorialEase }}
+            >
+              <img
+                src="https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=2200&q=92"
+                alt="Detalhe editorial de um relógio de aço"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="manifesto-shade" aria-hidden="true" />
+            </m.div>
+            <Reveal className="manifesto-copy">
+              <span className="section-index section-index-light">03 / Perspectiva</span>
+              <span className="eyebrow">O detalhe muda tudo</span>
+              <h2>
+                O relógio certo não exibe uma vida.
+                <em>Ele acompanha a sua.</em>
+              </h2>
+              <p>
+                No trabalho, nos encontros e nas conquistas, a escolha ideal
+                equilibra proporção, materiais e personalidade. A VYNE torna
+                essa decisão mais simples — sem tornar o produto comum.
+              </p>
+              <a className="text-link" href="#sobre">
+                Conheça nossa visão
+                <span aria-hidden="true">→</span>
+              </a>
+            </Reveal>
+          </section>
+
+          <section className="confidence-section" id="confianca">
+            <Reveal className="confidence-heading">
+              <span className="section-index">04 / Autenticidade</span>
+              <h2>
+                Confiança não é um selo visual.
+                <em>É uma prática verificável.</em>
+              </h2>
+              <p>
+                Antes do acabamento, vem a clareza. Cada ponto da experiência
+                deve reduzir dúvidas e sustentar a decisão.
+              </p>
+            </Reveal>
+
+            <div className="trust-grid">
+              {trustPoints.map((point, index) => (
+                <m.article
+                  className="trust-card"
+                  key={point.index}
+                  initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    duration: 0.75,
+                    delay: reduceMotion ? 0 : index * 0.09,
+                    ease: editorialEase,
+                  }}
+                >
+                  <span>{point.index}</span>
+                  <h3>{point.title}</h3>
+                  <p>{point.text}</p>
+                  <i aria-hidden="true" />
+                </m.article>
+              ))}
+            </div>
+          </section>
+
+          <section className="about-section" id="sobre">
+            <ImageReveal
+              className="about-image"
+              src="https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1800&q=90"
+              alt="Relógio em composição editorial escura"
             />
-            <span>O detalhe muda tudo.</span>
-          </div>
+            <Reveal className="about-copy">
+              <span className="section-index section-index-light">05 / A VYNE</span>
+              <span className="eyebrow">Relojoaria digital independente</span>
+              <h2>Reconhecimento de marca. Liberdade de escolha.</h2>
+              <p>
+                A VYNE não fabrica relógios. Seleciona originais de Seiko,
+                Casio, Citizen, Orient e Timex para quem busca elegância
+                autêntica e uma relação mais inteligente entre produto e preço.
+              </p>
+              <div className="about-signals" aria-label="Compromissos da VYNE">
+                <div>
+                  <strong>5</strong>
+                  <span>marcas reconhecidas</span>
+                </div>
+                <div>
+                  <strong>0</strong>
+                  <span>réplicas no catálogo</span>
+                </div>
+                <div>
+                  <strong>100%</strong>
+                  <span>foco em originalidade</span>
+                </div>
+              </div>
+            </Reveal>
+          </section>
 
-          <div className="story-copy reveal">
-            <span className="section-number">03</span>
-            <span className="eyebrow">Ritmo autêntico</span>
-            <h2>
-              O relógio certo não exibe uma vida.
-              <br />
-              <em>Ele acompanha a sua.</em>
-            </h2>
-            <p>
-              Trabalho, movimento, encontros, conquistas. A VYNE aproxima você
-              de relógios originais que combinam com a sua intenção — sem
-              transformar conhecimento ou renda em códigos de exclusão.
-            </p>
-            <a className="text-link text-link-light" href="#sobre">
-              Conheça a nossa visão
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </section>
+          <section className="final-cta">
+            <div className="final-cta-glow" aria-hidden="true" />
+            <Reveal className="final-cta-inner">
+              <span className="eyebrow">A escolha certa começa com confiança</span>
+              <h2>
+                Sofisticação real.
+                <em>Preço inteligente.</em>
+              </h2>
+              <p>
+                Descubra relógios originais escolhidos para acompanhar o seu
+                estilo, o seu momento e o seu ritmo.
+              </p>
+              <a className="button button-primary button-large" href="#colecao">
+                Explorar a coleção
+                <span aria-hidden="true">↗</span>
+              </a>
+            </Reveal>
+          </section>
+        </main>
 
-        <section className="confidence-section section-pad" id="confianca">
-          <div className="confidence-header reveal">
-            <div>
-              <span className="section-number">04</span>
-              <span className="eyebrow">Confiança acima do discurso</span>
-            </div>
-            <h2>
-              Originalidade precisa de evidência.
-              <br />
-              <em>Não de repetição.</em>
-            </h2>
-          </div>
-
-          <div className="trust-grid">
-            {trustPoints.map((point) => (
-              <article className="trust-card reveal" key={point.index}>
-                <span>{point.index}</span>
-                <h3>{point.title}</h3>
-                <p>{point.text}</p>
-                <div className="trust-card-line" />
-              </article>
-            ))}
-          </div>
-
-          <div className="confidence-statement reveal">
-            <div className="statement-mark" aria-hidden="true">
-              V
-            </div>
-            <p>
-              “A VYNE não usa sofisticação para esconder informação. O cuidado
-              percebido antes da compra precisa continuar depois dela.”
-            </p>
-            <span>Padrão de experiência VYNE</span>
-          </div>
-        </section>
-
-        <section className="benefits-section section-pad">
-          <div className="benefits-title reveal">
-            <span className="section-number">05</span>
-            <span className="eyebrow">Por que escolher a VYNE</span>
-            <h2>
-              Menos dúvida.
-              <br />
-              <em>Mais intenção.</em>
-            </h2>
-          </div>
-
-          <div className="benefit-list">
-            {benefits.map((benefit) => (
-              <article className="benefit-item reveal" key={benefit.number}>
-                <span>{benefit.number}</span>
-                <h3>{benefit.title}</h3>
-                <p>{benefit.text}</p>
-                <span className="benefit-arrow" aria-hidden="true">
-                  ↗
-                </span>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="about-section section-pad" id="sobre">
-          <div className="about-copy reveal">
-            <span className="section-number">06</span>
-            <span className="eyebrow">A VYNE</span>
-            <h2>
-              Uma relojoaria digital para quem escolhe com os próprios
-              critérios.
-            </h2>
-            <p>
-              A VYNE seleciona relógios originais de marcas reconhecidas para
-              tornar uma compra cercada de dúvidas em uma escolha clara,
-              contemporânea e confiável.
-            </p>
-          </div>
-
-          <div className="signal-grid reveal" aria-label="Indicadores da VYNE">
-            <div className="signal-card signal-card-accent">
-              <strong>5</strong>
-              <span>marcas em foco</span>
-            </div>
-            <div className="signal-card">
-              <strong>1</strong>
-              <span>especialidade: relógios</span>
-            </div>
-            <div className="signal-card">
-              <strong>0</strong>
-              <span>réplicas no catálogo</span>
-            </div>
-            <div className="signal-card">
-              <strong>100%</strong>
-              <span>produtos originais</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="final-cta">
-          <div className="cta-glow" aria-hidden="true" />
-          <div className="cta-rings" aria-hidden="true" />
-          <div className="final-cta-inner reveal">
-            <span className="eyebrow">Seu próximo relógio começa pela escolha certa</span>
-            <h2>
-              Sofisticação real.
-              <br />
-              <em>Preço inteligente.</em>
-            </h2>
-            <p>
-              Descubra uma seleção de relógios originais pensada para o seu
-              estilo, o seu momento e o seu ritmo.
-            </p>
-            <a className="button button-primary button-large" href="#colecao">
-              Explorar a seleção
-              <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <div className="footer-top">
-          <div>
+        <footer className="site-footer">
+          <div className="footer-brand">
             <a className="footer-logo" href="#inicio">
               VYNE
             </a>
-            <p>Relógios originais. Ritmo autêntico.</p>
+            <p>Relógios originais. Escolhas com intenção.</p>
           </div>
-
           <div className="footer-links">
             <div>
               <span>Explorar</span>
               <a href="#colecao">Coleção</a>
-              <a href="#marcas">Marcas</a>
-              <a href="#confianca">Confiança</a>
+              <a href="#confianca">Autenticidade</a>
+              <a href="#sobre">A VYNE</a>
             </div>
             <div>
-              <span>Institucional</span>
-              <a href="#sobre">A VYNE</a>
-              <a href="#confianca">Autenticidade</a>
-              <a href="#inicio">Atendimento</a>
+              <span>Marcas</span>
+              <a href="#colecao">Seiko</a>
+              <a href="#colecao">Casio</a>
+              <a href="#colecao">Citizen · Orient · Timex</a>
             </div>
           </div>
-        </div>
+          <div className="footer-bottom">
+            <span>© 2026 VYNE. Experiência digital independente.</span>
+            <span>Imagens editoriais: Unsplash · Produtos ilustrativos</span>
+          </div>
+        </footer>
 
-        <div className="footer-bottom">
-          <span>© 2026 VYNE. Conceito de experiência digital.</span>
-          <span>
-            Imagens editoriais: Unsplash · Produtos e condições ilustrativos
-          </span>
-        </div>
-      </footer>
+        <GradualBlur
+          className="page-gradual-blur"
+          target="page"
+          position="bottom"
+          height="5.5rem"
+          mobileHeight="4rem"
+          tabletHeight="4.5rem"
+          desktopHeight="5.5rem"
+          strength={3.1}
+          divCount={8}
+          curve="bezier"
+          exponential
+          opacity={0.86}
+          responsive
+          gpuOptimized
+          zIndex={-25}
+        />
 
-      <GradualBlur
-        className="page-gradual-blur"
-        target="page"
-        position="bottom"
-        height="6rem"
-        mobileHeight="4.5rem"
-        tabletHeight="5rem"
-        desktopHeight="6rem"
-        strength={3.4}
-        divCount={8}
-        curve="bezier"
-        exponential
-        opacity={0.94}
-        responsive
-        gpuOptimized
-        zIndex={-25}
-      />
-
-      {selectedProduct && (
-        <div
-          className="product-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-          onClick={() => setSelectedProduct(null)}
-        >
-          <div className="modal-panel" onClick={(event) => event.stopPropagation()}>
-            <button
-              className="modal-close"
-              type="button"
-              aria-label="Fechar detalhes do produto"
+        <AnimatePresence>
+          {selectedProduct && (
+            <m.div
+              className="product-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-title"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.3 }}
               onClick={() => setSelectedProduct(null)}
             >
-              ×
-            </button>
-
-            <div className="modal-image">
-              <img
-                src={selectedProduct.image}
-                alt={`Imagem ilustrativa do ${selectedProduct.brand} ${selectedProduct.model}`}
-              />
-              <span>Imagem ilustrativa</span>
-            </div>
-
-            <div className="modal-copy">
-              <span className="product-brand">{selectedProduct.brand}</span>
-              <h2 id="modal-title">{selectedProduct.model}</h2>
-              <p>{selectedProduct.descriptor}</p>
-
-              <ul>
-                {selectedProduct.specs.map((spec) => (
-                  <li key={spec}>{spec}</li>
-                ))}
-              </ul>
-
-              <div className="modal-price">
-                <span>Condição demonstrativa</span>
-                <strong>{selectedProduct.price}</strong>
-              </div>
-
-              <a
-                className="button button-primary"
-                href="#confianca"
-                onClick={() => setSelectedProduct(null)}
+              <m.div
+                className="modal-panel"
+                initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 24, scale: 0.99 }}
+                transition={{ duration: reduceMotion ? 0 : 0.55, ease: editorialEase }}
+                onClick={(event) => event.stopPropagation()}
               >
-                Ver padrão de confiança
-                <span aria-hidden="true">↗</span>
-              </a>
-
-              <small>
-                Confirme modelo, especificações, estoque, garantia e condições
-                antes da publicação comercial.
-              </small>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+                <button
+                  className="modal-close"
+                  type="button"
+                  aria-label="Fechar detalhes do produto"
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  <span />
+                  <span />
+                </button>
+                <m.div
+                  className="modal-image"
+                  layoutId={`watch-image-${selectedProduct.brand}-${selectedProduct.model}`}
+                >
+                  <img
+                    src={selectedProduct.image}
+                    alt={`Imagem ilustrativa do ${selectedProduct.brand} ${selectedProduct.model}`}
+                  />
+                  <span>Imagem ilustrativa</span>
+                </m.div>
+                <div className="modal-copy">
+                  <span className="product-brand">{selectedProduct.brand}</span>
+                  <h2 id="modal-title">{selectedProduct.model}</h2>
+                  <p>{selectedProduct.descriptor}</p>
+                  <ul>
+                    {selectedProduct.specs.map((spec) => (
+                      <li key={spec}>{spec}</li>
+                    ))}
+                  </ul>
+                  <div className="modal-price">
+                    <span>Condição demonstrativa</span>
+                    <strong>{selectedProduct.price}</strong>
+                  </div>
+                  <a
+                    className="button button-primary"
+                    href="#confianca"
+                    onClick={() => setSelectedProduct(null)}
+                  >
+                    Ver compromisso VYNE
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  <small>
+                    Confirme modelo, especificações, estoque, garantia e
+                    condições antes da publicação comercial.
+                  </small>
+                </div>
+              </m.div>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </LazyMotion>
   );
 }
