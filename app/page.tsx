@@ -684,17 +684,18 @@ export default function Home() {
 
         <GradualBlur
           className="page-gradual-blur"
+          preset="intense"
           target="page"
           position="bottom"
-          height="5.5rem"
-          mobileHeight="4rem"
-          tabletHeight="4.5rem"
-          desktopHeight="5.5rem"
-          strength={3.1}
-          divCount={8}
-          curve="bezier"
+          height="8.5rem"
+          mobileHeight="6rem"
+          tabletHeight="7rem"
+          desktopHeight="8.5rem"
+          strength={5.4}
+          divCount={10}
+          curve="ease-in-out"
           exponential
-          opacity={0.86}
+          opacity={0.94}
           responsive
           gpuOptimized
           zIndex={-25}
