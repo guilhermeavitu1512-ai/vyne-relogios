@@ -23,6 +23,10 @@ const CircularGallery = dynamic(() => import("@/components/CircularGallery"), {
   ssr: false,
 });
 
+const ModelViewer = dynamic(() => import("@/components/ModelViewer"), {
+  ssr: false,
+});
+
 type Product = {
   brand: string;
   model: string;
@@ -368,6 +372,44 @@ export default function Home() {
                 decoding="async"
               />
             </m.div>
+
+            <div className="signature-hero-model-shade" aria-hidden="true" />
+
+            <div className="signature-hero-model-positioner">
+              <m.div
+                className="signature-hero-model-stage"
+                initial={
+                  reduceMotion
+                    ? false
+                    : { opacity: 0, y: 24, filter: "blur(12px)" }
+                }
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 1.25, delay: 0.28, ease: editorialEase }}
+              >
+                <div className="signature-hero-model-label">
+                  <span>Visualização 3D</span>
+                  <i />
+                  <small>Arraste para explorar</small>
+                </div>
+
+                <ModelViewer
+                  url="https://samples.threepipe.org/demos/classic-watch.glb"
+                  width="100%"
+                  height="100%"
+                  modelXOffset={0.5}
+                  modelYOffset={0}
+                  enableMouseParallax={!reduceMotion}
+                  enableHoverRotation={!reduceMotion}
+                  enableManualRotation
+                  enableManualZoom
+                  environmentPreset="forest"
+                  fadeIn={false}
+                  autoRotate={false}
+                  autoRotateSpeed={0.35}
+                  showScreenshotButton
+                />
+              </m.div>
+            </div>
 
             <div className="signature-mobile-copy" aria-hidden="true">
               <strong>VYNE</strong>

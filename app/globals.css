@@ -363,6 +363,95 @@ img {
   object-position: center;
 }
 
+.signature-hero-model-shade {
+  position: absolute;
+  inset: 0 0 0 46%;
+  z-index: 2;
+  background:
+    radial-gradient(circle at 68% 49%, rgba(22, 80, 52, 0.25), transparent 33%),
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.72) 17%,
+      rgba(1, 5, 3, 0.96) 43%,
+      #010302 100%
+    );
+  pointer-events: none;
+}
+
+.signature-hero-model-positioner {
+  position: absolute;
+  top: 50%;
+  right: clamp(24px, 4.6vw, 94px);
+  z-index: 4;
+  width: clamp(390px, 43vw, 680px);
+  height: min(78svh, 680px);
+  transform: translateY(-47%);
+}
+
+.signature-hero-model-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(143, 181, 161, 0.11);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(17, 84, 54, 0.22), transparent 43%),
+    radial-gradient(circle at 50% 62%, rgba(1, 8, 5, 0.88), transparent 68%);
+  box-shadow:
+    inset 0 0 90px rgba(84, 173, 129, 0.035),
+    0 0 100px rgba(0, 0, 0, 0.42);
+}
+
+.signature-hero-model-stage::before,
+.signature-hero-model-stage::after {
+  position: absolute;
+  z-index: 2;
+  border: 1px solid rgba(84, 173, 129, 0.14);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.signature-hero-model-stage::before {
+  inset: 7%;
+}
+
+.signature-hero-model-stage::after {
+  inset: 14%;
+  border-color: rgba(241, 239, 232, 0.05);
+}
+
+.signature-hero-model-label {
+  position: absolute;
+  top: 11%;
+  left: 9%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(241, 239, 232, 0.5);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.signature-hero-model-label span {
+  color: var(--emerald-bright);
+}
+
+.signature-hero-model-label i {
+  width: 28px;
+  height: 1px;
+  background: rgba(241, 239, 232, 0.19);
+}
+
+.signature-hero-model-label small {
+  font: inherit;
+}
+
 .signature-mobile-copy {
   display: none;
 }
@@ -1546,12 +1635,32 @@ img {
     object-position: 72% center;
   }
 
+  .signature-hero-model-shade {
+    inset: 0;
+    background:
+      radial-gradient(circle at 68% 36%, rgba(11, 57, 36, 0.88), transparent 42%),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.96) 0%, transparent 45%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.8));
+  }
+
+  .signature-hero-model-positioner {
+    top: 7.5svh;
+    right: -4vw;
+    width: min(82vw, 620px);
+    height: min(62svh, 620px);
+    transform: none;
+  }
+
+  .signature-hero-model-stage {
+    border-color: rgba(143, 181, 161, 0.09);
+  }
+
   .signature-mobile-copy {
     position: absolute;
     right: 24px;
     bottom: 10svh;
     left: 24px;
-    z-index: 3;
+    z-index: 5;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1761,6 +1870,24 @@ img {
 
   .signature-hero {
     min-height: 100svh;
+  }
+
+  .signature-hero-model-positioner {
+    top: 70px;
+    right: -30px;
+    width: calc(100vw + 16px);
+    height: min(55svh, 520px);
+  }
+
+  .signature-hero-model-label {
+    top: 10%;
+    left: 14%;
+  }
+
+  .signature-hero-model-label small,
+  .signature-hero-model-label i,
+  .signature-hero-model-stage .model-viewer-screenshot {
+    display: none;
   }
 
   .signature-mobile-copy {
