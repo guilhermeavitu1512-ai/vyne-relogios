@@ -451,6 +451,18 @@ function FloatingLines({
 
     const handlePointerMove = (event: PointerEvent) => {
       const bounds = renderer.domElement.getBoundingClientRect();
+
+      const isInside =
+        event.clientX >= bounds.left &&
+        event.clientX <= bounds.right &&
+        event.clientY >= bounds.top &&
+        event.clientY <= bounds.bottom;
+
+      if (!isInside) {
+        targetInfluenceRef.current = 0;
+        return;
+      }
+
       const x = event.clientX - bounds.left;
       const y = event.clientY - bounds.top;
       const pixelRatio = renderer.getPixelRatio();
@@ -474,14 +486,11 @@ function FloatingLines({
     };
 
     if (interactive) {
-      renderer.domElement.addEventListener(
-        "pointermove",
-        handlePointerMove,
-      );
-      renderer.domElement.addEventListener(
-        "pointerleave",
-        handlePointerLeave,
-      );
+      window.addEventListener("pointermove", handlePointerMove, {
+        passive: true,
+      });
+      window.addEventListener("pointercancel", handlePointerLeave);
+      window.addEventListener("blur", handlePointerLeave);
     }
 
     let animationFrame = 0;
@@ -527,14 +536,9 @@ function FloatingLines({
       resizeObserver?.disconnect();
 
       if (interactive) {
-        renderer.domElement.removeEventListener(
-          "pointermove",
-          handlePointerMove,
-        );
-        renderer.domElement.removeEventListener(
-          "pointerleave",
-          handlePointerLeave,
-        );
+        window.removeEventListener("pointermove", handlePointerMove);
+        window.removeEventListener("pointercancel", handlePointerLeave);
+        window.removeEventListener("blur", handlePointerLeave);
       }
 
       geometry.dispose();

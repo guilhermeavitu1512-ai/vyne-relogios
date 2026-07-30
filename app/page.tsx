@@ -392,8 +392,12 @@ export default function Home() {
                   middleWavePosition={heroMiddleWavePosition}
                   bottomWavePosition={heroBottomWavePosition}
                   animationSpeed={0.55}
-                  interactive={false}
-                  parallax={false}
+                  interactive
+                  bendRadius={4.6}
+                  bendStrength={-0.65}
+                  mouseDamping={0.075}
+                  parallax
+                  parallaxStrength={0.12}
                   mixBlendMode="screen"
                 />
               </div>
