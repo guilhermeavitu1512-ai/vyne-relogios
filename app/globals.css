@@ -393,6 +393,7 @@ img {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   border: 1px solid rgba(143, 181, 161, 0.11);
   border-radius: 50%;
   background:
@@ -401,6 +402,26 @@ img {
   box-shadow:
     inset 0 0 90px rgba(84, 173, 129, 0.035),
     0 0 100px rgba(0, 0, 0, 0.42);
+}
+
+.signature-hero-sketchfab {
+  position: absolute;
+  inset: -8%;
+  z-index: 1;
+  width: 116%;
+  height: 116%;
+  border: 0;
+  background: #010302;
+  filter: saturate(0.84) contrast(1.08);
+  opacity: 0.78;
+  transition:
+    filter 600ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.signature-hero-model-stage:hover .signature-hero-sketchfab {
+  filter: saturate(0.94) contrast(1.06);
+  opacity: 0.84;
 }
 
 .signature-hero-model-stage::before,
@@ -1668,6 +1689,10 @@ img {
     border-color: rgba(143, 181, 161, 0.09);
   }
 
+  .signature-hero-sketchfab {
+    opacity: 0.74;
+  }
+
   .signature-mobile-copy {
     position: absolute;
     right: 24px;
@@ -1901,6 +1926,13 @@ img {
   .signature-hero-model-label i,
   .signature-hero-model-stage .model-viewer-screenshot {
     display: none;
+  }
+
+  .signature-hero-sketchfab {
+    inset: -12%;
+    width: 124%;
+    height: 124%;
+    opacity: 0.72;
   }
 
   .signature-mobile-copy {

@@ -23,10 +23,6 @@ const CircularGallery = dynamic(() => import("@/components/CircularGallery"), {
   ssr: false,
 });
 
-const ModelViewer = dynamic(() => import("@/components/ModelViewer"), {
-  ssr: false,
-});
-
 type Product = {
   brand: string;
   model: string;
@@ -392,24 +388,13 @@ export default function Home() {
                   <small>Arraste para explorar</small>
                 </div>
 
-                <ModelViewer
-                  url="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ChronographWatch/glTF-Binary/ChronographWatch.glb"
-                  width="100%"
-                  height="100%"
-                  modelXOffset={0.38}
-                  modelYOffset={-0.04}
-                  defaultRotationX={-12}
-                  defaultRotationY={-18}
-                  enableMouseParallax={!reduceMotion}
-                  enableHoverRotation={!reduceMotion}
-                  enableManualRotation
-                  enableManualZoom
-                  environmentPreset="forest"
-                  fadeIn={false}
-                  autoRotate={false}
-                  autoRotateSpeed={0.35}
-                  showScreenshotButton
-                  materialFinish="silver"
+                <iframe
+                  className="signature-hero-sketchfab"
+                  title="Relógio cronógrafo 3D interativo"
+                  src="https://sketchfab.com/models/a94357292cd64fdbb1714935798ca991/embed?autostart=1&camera=0&scrollwheel=0&ui_stop=0&dnt=1&max_texture_size=2048&ui_theme=dark"
+                  loading="eager"
+                  allow="autoplay; fullscreen; xr-spatial-tracking"
+                  allowFullScreen
                 />
               </m.div>
             </div>
@@ -686,11 +671,11 @@ export default function Home() {
             <span>
               Modelo 3D:{" "}
               <a
-                href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ChronographWatch"
+                href="https://sketchfab.com/3d-models/chronograph-watch-a94357292cd64fdbb1714935798ca991"
                 target="_blank"
                 rel="noreferrer"
               >
-                DGG / Eric Chadwick
+                graphiccompressor (@tityus) / Sketchfab
               </a>{" "}
               · CC BY 4.0
             </span>
