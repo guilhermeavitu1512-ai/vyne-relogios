@@ -15,6 +15,11 @@
   pointer-events: none;
 }
 
+.gradual-blur-content {
+  position: relative;
+  z-index: 1;
+}
+
 @supports not (backdrop-filter: blur(1px)) {
   .gradual-blur-inner > div {
     background: rgba(0, 0, 0, 0.3);

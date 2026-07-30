@@ -323,6 +323,9 @@ function GradualBlur(props: PropsWithChildren<GradualBlurProps>) {
       }
     >
       <div className="gradual-blur-inner">{blurDivs}</div>
+      {props.children ? (
+        <div className="gradual-blur-content">{props.children}</div>
+      ) : null}
     </div>
   );
 }

@@ -448,6 +448,30 @@ export default function Home() {
               loading="lazy"
             />
             <div className="story-image-overlay" aria-hidden="true" />
+            <GradualBlur
+              className="story-gradual-blur story-gradual-blur-desktop"
+              target="parent"
+              position="right"
+              width="10rem"
+              strength={2.1}
+              divCount={7}
+              curve="bezier"
+              exponential
+              opacity={0.72}
+              zIndex={4}
+            />
+            <GradualBlur
+              className="story-gradual-blur story-gradual-blur-mobile"
+              target="parent"
+              position="bottom"
+              height="9rem"
+              strength={2.1}
+              divCount={7}
+              curve="bezier"
+              exponential
+              opacity={0.76}
+              zIndex={4}
+            />
             <span>O detalhe muda tudo.</span>
           </div>
 

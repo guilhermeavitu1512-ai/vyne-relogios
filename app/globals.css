@@ -928,11 +928,19 @@ img {
     linear-gradient(0deg, rgba(11, 13, 15, 0.58), transparent 42%);
 }
 
+.story-gradual-blur {
+  pointer-events: none;
+}
+
+.story-gradual-blur-mobile {
+  display: none;
+}
+
 .story-image > span {
   position: absolute;
   bottom: 36px;
   left: 38px;
-  z-index: 2;
+  z-index: 5;
   font-family: var(--font-serif);
   font-size: 14px;
   font-style: italic;
@@ -1799,6 +1807,14 @@ img {
     background:
       linear-gradient(180deg, transparent 60%, var(--graphite) 100%),
       linear-gradient(0deg, rgba(11, 13, 15, 0.4), transparent 40%);
+  }
+
+  .story-gradual-blur-desktop {
+    display: none;
+  }
+
+  .story-gradual-blur-mobile {
+    display: block;
   }
 
   .story-copy {
