@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import {
   AnimatePresence,
   LazyMotion,
@@ -10,14 +9,9 @@ import {
   useReducedMotion,
   useScroll,
   useSpring,
-  useTransform,
 } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
 import GradualBlur from "@/components/GradualBlur";
-
-const MagicRings = dynamic(() => import("@/components/MagicRings"), {
-  ssr: false,
-});
 
 type Product = {
   brand: string;
@@ -182,7 +176,6 @@ function ImageReveal({
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [enhancedMotion, setEnhancedMotion] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const reduceMotion = useReducedMotion();
   const { scrollY, scrollYProgress } = useScroll();
@@ -191,26 +184,10 @@ export default function Home() {
     damping: 30,
     mass: 0.25,
   });
-  const heroImageY = useTransform(scrollY, [0, 900], [0, 150]);
-  const heroContentY = useTransform(scrollY, [0, 700], [0, 82]);
-  const heroContentOpacity = useTransform(scrollY, [0, 620], [1, 0.2]);
-
   useMotionValueEvent(scrollY, "change", (latest) => {
     const nextState = latest > 54;
     setScrolled((current) => (current === nextState ? current : nextState));
   });
-
-  useEffect(() => {
-    const motionQuery = window.matchMedia(
-      "(min-width: 901px) and (prefers-reduced-motion: no-preference)",
-    );
-    const syncMotionPreference = () => setEnhancedMotion(motionQuery.matches);
-
-    syncMotionPreference();
-    motionQuery.addEventListener("change", syncMotionPreference);
-    return () =>
-      motionQuery.removeEventListener("change", syncMotionPreference);
-  }, []);
 
   useEffect(() => {
     const locked = menuOpen || Boolean(selectedProduct);
@@ -322,121 +299,26 @@ export default function Home() {
         </header>
 
         <main>
-          <section className="hero" id="inicio">
+          <section className="hero signature-hero" id="inicio">
             <m.div
-              className="hero-media"
-              style={reduceMotion ? undefined : { y: heroImageY }}
-              aria-hidden="true"
+              className="signature-hero-media"
+              initial={reduceMotion ? false : { opacity: 0, scale: 1.012 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.2, ease: editorialEase }}
             >
               <img
-                src="https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=2200&q=92"
-                alt=""
+                src="/og.png"
+                alt="VYNE — Relógios originais. Escolhas com intenção."
                 fetchPriority="high"
                 decoding="async"
               />
             </m.div>
-            <div className="hero-shade" aria-hidden="true" />
-            {enhancedMotion && (
-              <div className="hero-magic-rings" aria-hidden="true">
-                <MagicRings
-                  color="#3a9f78"
-                  colorTwo="#0e4d36"
-                  ringCount={6}
-                  speed={0.22}
-                  attenuation={14}
-                  lineThickness={0.85}
-                  baseRadius={0.2}
-                  radiusStep={0.08}
-                  scaleRate={0.04}
-                  opacity={0.26}
-                  blur={0.25}
-                  noiseAmount={0.01}
-                  rotation={-10}
-                  ringGap={1.45}
-                  fadeIn={0.88}
-                  fadeOut={1.1}
-                  followMouse={false}
-                  hoverScale={1}
-                  parallax={0.01}
-                  clickBurst={false}
-                />
-              </div>
-            )}
 
-            <m.div
-              className="hero-content"
-              style={
-                reduceMotion
-                  ? undefined
-                  : { y: heroContentY, opacity: heroContentOpacity }
-              }
-            >
-              <m.span
-                className="eyebrow hero-eyebrow"
-                initial={reduceMotion ? false : { opacity: 0, y: 22, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.85, delay: 0.15, ease: editorialEase }}
-              >
-                Relojoaria multimarcas · Brasil
-              </m.span>
-              <m.h1
-                initial={reduceMotion ? false : { opacity: 0, y: 34, filter: "blur(12px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 1.05, delay: 0.28, ease: editorialEase }}
-              >
-                Elegância que permanece.
-                <em>Valor que faz sentido.</em>
-              </m.h1>
-              <m.p
-                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.48, ease: editorialEase }}
-              >
-                Relógios originais de marcas reconhecidas, selecionados para
-                unir presença, confiança e preço inteligente.
-              </m.p>
-              <m.div
-                className="hero-actions"
-                initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.62, ease: editorialEase }}
-              >
-                <a className="button button-primary" href="#colecao">
-                  Descobrir a seleção
-                  <span aria-hidden="true">↗</span>
-                </a>
-                <a className="text-link" href="#confianca">
-                  Nosso compromisso
-                  <span aria-hidden="true">→</span>
-                </a>
-              </m.div>
-            </m.div>
-
-            <div className="hero-meta">
-              <span>Originalidade</span>
+            <div className="signature-mobile-copy" aria-hidden="true">
+              <strong>VYNE</strong>
               <i />
-              <span>Curadoria</span>
-              <i />
-              <span>Preço justo</span>
+              <span>Relógios originais. Escolhas com intenção.</span>
             </div>
-
-            <a className="scroll-cue" href="#essencia" aria-label="Continuar">
-              <span>Continuar</span>
-              <i aria-hidden="true" />
-            </a>
-
-            <GradualBlur
-              className="hero-gradual-blur"
-              target="parent"
-              position="bottom"
-              height="9rem"
-              strength={2.3}
-              divCount={7}
-              curve="bezier"
-              exponential
-              opacity={0.72}
-              zIndex={3}
-            />
           </section>
 
           <section className="editorial-intro" id="essencia">
