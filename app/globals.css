@@ -418,16 +418,16 @@ img {
   height: 116%;
   border: 0;
   background: transparent;
-  filter: saturate(0.9) contrast(1.12) brightness(1.06);
-  opacity: 0.9;
+  filter: saturate(0.96) contrast(1.1) brightness(1.08);
+  opacity: 0.96;
   transition:
     filter 600ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .signature-hero-model-stage:hover .signature-hero-sketchfab {
-  filter: saturate(0.96) contrast(1.1) brightness(1.08);
-  opacity: 0.98;
+  filter: saturate(1) contrast(1.1) brightness(1.1);
+  opacity: 1;
 }
 
 .signature-hero-viewer-mask {
@@ -479,6 +479,34 @@ img {
 
 .signature-mobile-copy {
   display: none;
+}
+
+.cinematic-section {
+  position: relative;
+  transform-origin: center top;
+  backface-visibility: hidden;
+}
+
+.cinematic-section-boundary {
+  position: absolute;
+  top: 0;
+  right: clamp(22px, 6vw, 110px);
+  left: clamp(22px, 6vw, 110px);
+  z-index: 8;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(84, 173, 129, 0.14) 18%,
+    rgba(112, 188, 145, 0.68) 50%,
+    rgba(84, 173, 129, 0.14) 82%,
+    transparent
+  );
+  box-shadow:
+    0 -16px 46px rgba(47, 143, 100, 0.12),
+    0 16px 46px rgba(47, 143, 100, 0.08);
+  transform-origin: center;
+  pointer-events: none;
 }
 
 .page-gradual-blur {
@@ -1694,7 +1722,8 @@ img {
   }
 
   .signature-hero-sketchfab {
-    opacity: 0.88;
+    filter: saturate(0.94) contrast(1.1) brightness(1.08);
+    opacity: 0.94;
   }
 
   .signature-mobile-copy {
@@ -1948,7 +1977,16 @@ img {
     inset: -12%;
     width: 124%;
     height: 124%;
-    opacity: 0.86;
+    filter: saturate(0.92) contrast(1.08) brightness(1.06);
+    opacity: 0.92;
+  }
+
+  .cinematic-section-boundary {
+    right: 18px;
+    left: 18px;
+    box-shadow:
+      0 -12px 32px rgba(47, 143, 100, 0.1),
+      0 12px 32px rgba(47, 143, 100, 0.06);
   }
 
   .signature-hero-viewer-mask {

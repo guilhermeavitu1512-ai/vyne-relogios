@@ -168,6 +168,50 @@ function Reveal({
   );
 }
 
+function CinematicSection({
+  children,
+  className,
+  id,
+  ariaLabel,
+}: {
+  children: ReactNode;
+  className: string;
+  id?: string;
+  ariaLabel?: string;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <m.section
+      className={`cinematic-section ${className}`}
+      id={id}
+      aria-label={ariaLabel}
+      initial={
+        reduceMotion
+          ? false
+          : { opacity: 0, y: 52, scale: 0.996 }
+      }
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.06, margin: "-5% 0px -8% 0px" }}
+      transition={{ duration: 0.9, ease: editorialEase }}
+    >
+      <m.span
+        className="cinematic-section-boundary"
+        aria-hidden="true"
+        initial={reduceMotion ? false : { opacity: 0, scaleX: 0.18 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.05,
+          delay: reduceMotion ? 0 : 0.08,
+          ease: editorialEase,
+        }}
+      />
+      {children}
+    </m.section>
+  );
+}
+
 function ImageReveal({
   src,
   alt,
@@ -423,7 +467,7 @@ export default function Home() {
                 <iframe
                   className="signature-hero-sketchfab"
                   title="Relógio Seiko Coutura 3D interativo"
-                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=1024&ui_theme=dark"
+                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=2048&ui_theme=dark"
                   loading="eager"
                   allow="autoplay; fullscreen; xr-spatial-tracking"
                   allowFullScreen
@@ -439,7 +483,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="editorial-intro" id="essencia">
+          <CinematicSection className="editorial-intro" id="essencia">
             <Reveal className="editorial-intro-copy">
               <span className="section-index">01 / Essência</span>
               <h2>
@@ -452,9 +496,12 @@ export default function Home() {
                 visualmente precisa.
               </p>
             </Reveal>
-          </section>
+          </CinematicSection>
 
-          <section className="brand-rail" aria-label="Marcas disponíveis">
+          <CinematicSection
+            className="brand-rail"
+            ariaLabel="Marcas disponíveis"
+          >
             <span className="brand-rail-label">Marcas selecionadas</span>
             <div className="brand-rail-list">
               {brandNames.map((brand, index) => (
@@ -473,9 +520,9 @@ export default function Home() {
                 </m.span>
               ))}
             </div>
-          </section>
+          </CinematicSection>
 
-          <section className="collection-section" id="colecao">
+          <CinematicSection className="collection-section" id="colecao">
             <Reveal className="collection-heading">
               <div>
                 <span className="section-index">02 / Coleção</span>
@@ -551,9 +598,9 @@ export default function Home() {
               comercial deve refletir catálogo, estoque, garantia e condições
               reais da VYNE.
             </p>
-          </section>
+          </CinematicSection>
 
-          <section className="manifesto-section">
+          <CinematicSection className="manifesto-section">
             <m.div
               className="manifesto-media"
               initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
@@ -586,9 +633,9 @@ export default function Home() {
                 <span aria-hidden="true">→</span>
               </a>
             </Reveal>
-          </section>
+          </CinematicSection>
 
-          <section className="confidence-section" id="confianca">
+          <CinematicSection className="confidence-section" id="confianca">
             <Reveal className="confidence-heading">
               <span className="section-index">04 / Autenticidade</span>
               <h2>
@@ -622,9 +669,9 @@ export default function Home() {
                 </m.article>
               ))}
             </div>
-          </section>
+          </CinematicSection>
 
-          <section className="about-section" id="sobre">
+          <CinematicSection className="about-section" id="sobre">
             <ImageReveal
               className="about-image"
               src="https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1800&q=90"
@@ -654,9 +701,9 @@ export default function Home() {
                 </div>
               </div>
             </Reveal>
-          </section>
+          </CinematicSection>
 
-          <section className="final-cta">
+          <CinematicSection className="final-cta">
             <AuroraBackdrop />
             <div className="final-cta-glow" aria-hidden="true" />
             <Reveal className="final-cta-inner">
@@ -674,7 +721,7 @@ export default function Home() {
                 <span aria-hidden="true">↗</span>
               </a>
             </Reveal>
-          </section>
+          </CinematicSection>
         </main>
 
         <footer className="site-footer">
