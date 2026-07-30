@@ -18,6 +18,10 @@ const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
 });
 
+const CircularGallery = dynamic(() => import("@/components/CircularGallery"), {
+  ssr: false,
+});
+
 type Product = {
   brand: string;
   model: string;
@@ -80,6 +84,11 @@ const products: Product[] = [
     specs: ["Movimento a quartzo", "Caixa em aço", "Visual atemporal"],
   },
 ];
+
+const galleryItems = products.map((product) => ({
+  image: product.image,
+  text: `${product.brand} · ${product.model}`,
+}));
 
 const brandNames = ["SEIKO", "CASIO", "CITIZEN", "ORIENT", "TIMEX"];
 
@@ -211,6 +220,71 @@ function AuroraBackdrop() {
         />
       )}
     </div>
+  );
+}
+
+function ProductGalleryShowcase() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element || reduceMotion) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsNearViewport(entry.isIntersecting),
+      { rootMargin: "360px 0px" },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [reduceMotion]);
+
+  return (
+    <Reveal className="collection-gallery-shell">
+      <div className="gallery-caption">
+        <div>
+          <span className="gallery-caption-kicker">Relógios disponíveis</span>
+          <strong>Arraste para explorar</strong>
+        </div>
+        <p>Use o gesto horizontal ou as setas do teclado.</p>
+      </div>
+
+      <div className="gallery-stage" ref={containerRef}>
+        {reduceMotion ? (
+          <div
+            className="gallery-static"
+            role="region"
+            aria-label="Relógios disponíveis"
+          >
+            {products.map((product) => (
+              <article key={`static-${product.brand}-${product.model}`}>
+                <img
+                  src={product.image}
+                  alt={`${product.brand} ${product.model}`}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span>{product.brand}</span>
+                <strong>{product.model}</strong>
+              </article>
+            ))}
+          </div>
+        ) : isNearViewport ? (
+          <CircularGallery
+            items={galleryItems}
+            bend={2.7}
+            textColor="#f1efe8"
+            borderRadius={0.055}
+            scrollSpeed={2}
+            scrollEase={0.065}
+          />
+        ) : (
+          <div className="gallery-placeholder" aria-hidden="true" />
+        )}
+      </div>
+    </Reveal>
   );
 }
 
@@ -413,6 +487,8 @@ export default function Home() {
                 você comparar menos ruído e mais significado.
               </p>
             </Reveal>
+
+            <ProductGalleryShowcase />
 
             <div className="product-grid">
               {products.map((product, index) => (
