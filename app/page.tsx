@@ -646,6 +646,24 @@ export default function Home() {
         </div>
       </footer>
 
+      <GradualBlur
+        className="page-gradual-blur"
+        target="page"
+        position="bottom"
+        height="6rem"
+        mobileHeight="4.5rem"
+        tabletHeight="5rem"
+        desktopHeight="6rem"
+        strength={3.4}
+        divCount={8}
+        curve="bezier"
+        exponential
+        opacity={0.94}
+        responsive
+        gpuOptimized
+        zIndex={-25}
+      />
+
       {selectedProduct && (
         <div
           className="product-modal"

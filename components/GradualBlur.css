@@ -6,8 +6,7 @@
 }
 
 .gradual-blur-inner > div {
-  -webkit-backdrop-filter: inherit;
-  backdrop-filter: inherit;
+  transform-origin: center;
 }
 
 .gradual-blur {

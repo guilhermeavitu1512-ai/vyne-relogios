@@ -66,6 +66,7 @@ const DEFAULT_CONFIG: Partial<GradualBlurProps> = {
   opacity: 1,
   curve: "linear",
   responsive: false,
+  gpuOptimized: true,
   target: "parent",
   className: "",
   style: {},
@@ -254,7 +255,10 @@ function GradualBlur(props: PropsWithChildren<GradualBlurProps>) {
         WebkitMaskImage: `linear-gradient(${direction}, ${gradient})`,
         backdropFilter: `blur(${blurValue.toFixed(3)}rem)`,
         WebkitBackdropFilter: `blur(${blurValue.toFixed(3)}rem)`,
+        backgroundColor: "rgba(11, 13, 15, 0.018)",
         opacity: config.opacity,
+        transform: config.gpuOptimized ? "translate3d(0, 0, 0)" : undefined,
+        willChange: config.gpuOptimized ? "backdrop-filter" : undefined,
         transition:
           config.animated && config.animated !== "scroll"
             ? `backdrop-filter ${config.duration} ${config.easing}`

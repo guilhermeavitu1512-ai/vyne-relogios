@@ -477,6 +477,10 @@ img {
   bottom: -1px !important;
 }
 
+.page-gradual-blur {
+  filter: drop-shadow(0 -18px 30px rgba(25, 91, 85, 0.05));
+}
+
 .hero-index {
   position: absolute;
   top: 42px;
