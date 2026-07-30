@@ -379,6 +379,40 @@ img {
   pointer-events: none;
 }
 
+.signature-hero-floating-lines {
+  position: absolute;
+  inset: 4% 0 0 42%;
+  z-index: 3;
+  overflow: hidden;
+  opacity: 0.68;
+  pointer-events: none;
+  mask-image: radial-gradient(
+    ellipse at 55% 48%,
+    black 0%,
+    rgba(0, 0, 0, 0.94) 48%,
+    transparent 82%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse at 55% 48%,
+    black 0%,
+    rgba(0, 0, 0, 0.94) 48%,
+    transparent 82%
+  );
+}
+
+.signature-hero-floating-lines::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 58% 48%,
+    transparent 0 30%,
+    rgba(0, 0, 0, 0.2) 68%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+  content: "";
+  pointer-events: none;
+}
+
 .signature-hero-model-positioner {
   position: absolute;
   top: 50%;
@@ -1677,6 +1711,23 @@ img {
       linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.8));
   }
 
+  .signature-hero-floating-lines {
+    inset: 5svh -16vw 27svh 14vw;
+    opacity: 0.56;
+    mask-image: radial-gradient(
+      ellipse at 62% 42%,
+      black 0%,
+      rgba(0, 0, 0, 0.92) 52%,
+      transparent 84%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse at 62% 42%,
+      black 0%,
+      rgba(0, 0, 0, 0.92) 52%,
+      transparent 84%
+    );
+  }
+
   .signature-hero-model-positioner {
     top: 7.5svh;
     right: -4vw;
@@ -1915,6 +1966,11 @@ img {
     right: -30px;
     width: calc(100vw + 16px);
     height: min(55svh, 520px);
+  }
+
+  .signature-hero-floating-lines {
+    inset: 58px -34vw 40svh 4vw;
+    opacity: 0.48;
   }
 
   .signature-hero-model-label {

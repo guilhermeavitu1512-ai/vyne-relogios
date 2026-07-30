@@ -23,6 +23,17 @@ const CircularGallery = dynamic(() => import("@/components/CircularGallery"), {
   ssr: false,
 });
 
+const FloatingLines = dynamic(() => import("@/components/FloatingLines"), {
+  ssr: false,
+});
+
+const heroLineGradient = ["#071f17", "#2f8f64", "#54ad81", "#d8d7d0"];
+const heroEnabledWaves: Array<"middle" | "bottom"> = ["middle", "bottom"];
+const heroLineCount = [7, 6];
+const heroLineDistance = [4.5, 5.5];
+const heroMiddleWavePosition = { x: 1.7, y: -0.05, rotate: 0.28 };
+const heroBottomWavePosition = { x: 1.1, y: -0.75, rotate: -0.52 };
+
 type Product = {
   brand: string;
   model: string;
@@ -370,6 +381,23 @@ export default function Home() {
             </m.div>
 
             <div className="signature-hero-model-shade" aria-hidden="true" />
+
+            {!reduceMotion && (
+              <div className="signature-hero-floating-lines">
+                <FloatingLines
+                  linesGradient={heroLineGradient}
+                  enabledWaves={heroEnabledWaves}
+                  lineCount={heroLineCount}
+                  lineDistance={heroLineDistance}
+                  middleWavePosition={heroMiddleWavePosition}
+                  bottomWavePosition={heroBottomWavePosition}
+                  animationSpeed={0.55}
+                  interactive={false}
+                  parallax={false}
+                  mixBlendMode="screen"
+                />
+              </div>
+            )}
 
             <div className="signature-hero-model-positioner">
               <m.div
