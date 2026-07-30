@@ -367,15 +367,15 @@ img {
 
 .signature-hero-model-shade {
   position: absolute;
-  inset: 0 0 0 46%;
+  inset: 0 0 0 42%;
   z-index: 2;
   background:
-    radial-gradient(circle at 68% 49%, rgba(22, 80, 52, 0.25), transparent 33%),
+    radial-gradient(circle at 62% 49%, rgba(22, 80, 52, 0.2), transparent 34%),
     linear-gradient(
       90deg,
       transparent 0%,
-      rgba(0, 0, 0, 0.72) 17%,
-      rgba(1, 5, 3, 0.96) 43%,
+      rgba(0, 0, 0, 0.94) 10%,
+      #010302 24%,
       #010302 100%
     );
   pointer-events: none;
@@ -428,6 +428,23 @@ img {
 .signature-hero-model-stage:hover .signature-hero-sketchfab {
   filter: saturate(0.96) contrast(1.1) brightness(1.08);
   opacity: 0.98;
+}
+
+.signature-hero-viewer-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: min(62%, 360px);
+  height: 88px;
+  background: linear-gradient(
+    112deg,
+    #010302 0%,
+    rgba(1, 5, 3, 0.98) 52%,
+    rgba(1, 5, 3, 0.76) 76%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .signature-hero-model-label {
@@ -1652,16 +1669,15 @@ img {
   }
 
   .signature-hero-media img {
-    object-fit: cover;
-    object-position: 72% center;
+    opacity: 0;
   }
 
   .signature-hero-model-shade {
     inset: 0;
     background:
-      radial-gradient(circle at 68% 36%, rgba(11, 57, 36, 0.88), transparent 42%),
+      radial-gradient(circle at 68% 36%, rgba(11, 57, 36, 0.72), transparent 42%),
       linear-gradient(0deg, rgba(0, 0, 0, 0.96) 0%, transparent 45%),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.8));
+      #000;
   }
 
   .signature-hero-floating-lines {
@@ -1932,6 +1948,11 @@ img {
     width: 124%;
     height: 124%;
     opacity: 0.86;
+  }
+
+  .signature-hero-viewer-mask {
+    width: min(68%, 300px);
+    height: 74px;
   }
 
   .signature-mobile-copy {

@@ -428,6 +428,7 @@ export default function Home() {
                   allow="autoplay; fullscreen; xr-spatial-tracking"
                   allowFullScreen
                 />
+                <div className="signature-hero-viewer-mask" aria-hidden="true" />
               </m.div>
             </div>
 
