@@ -50,6 +50,7 @@ type ModelViewerProps = {
   autoRotate?: boolean;
   autoRotateSpeed?: number;
   showScreenshotButton?: boolean;
+  materialFinish?: "original" | "silver";
   className?: string;
 };
 
@@ -64,6 +65,7 @@ type PreparedModelProps = Pick<
   | "enableHoverRotation"
   | "autoRotate"
   | "autoRotateSpeed"
+  | "materialFinish"
 > & {
   onReady: () => void;
 };
@@ -92,6 +94,7 @@ function PreparedModel({
   enableHoverRotation = true,
   autoRotate = false,
   autoRotateSpeed = 0.35,
+  materialFinish = "original",
   onReady,
 }: PreparedModelProps) {
   const rootRef = useRef<THREE.Group>(null);
@@ -114,7 +117,28 @@ function PreparedModel({
       const clonedMaterials = materials.map((material) => {
         const clonedMaterial = material.clone();
         if (clonedMaterial instanceof THREE.MeshStandardMaterial) {
-          clonedMaterial.envMapIntensity = 1.35;
+          const materialName = clonedMaterial.name.toLowerCase();
+          const isPlastic = materialName.includes("plastic");
+          const shouldUseSilver =
+            materialFinish === "silver" &&
+            !isPlastic &&
+            [
+              "gold",
+              "metal",
+              "carbon fiber",
+              "backplate",
+              "clasp",
+              "bezel",
+            ].some((token) => materialName.includes(token));
+
+          if (shouldUseSilver) {
+            clonedMaterial.color.set("#d9ddde");
+            clonedMaterial.metalness = 0.96;
+            clonedMaterial.roughness = 0.24;
+            clonedMaterial.envMapIntensity = 1.7;
+          } else {
+            clonedMaterial.envMapIntensity = 1.35;
+          }
         }
         return clonedMaterial;
       });
@@ -134,7 +158,7 @@ function PreparedModel({
       center,
       scale: 2.55 / longestSide,
     };
-  }, [scene]);
+  }, [materialFinish, scene]);
 
   useEffect(() => {
     onReady();
@@ -243,6 +267,7 @@ export default function ModelViewer({
   autoRotate = false,
   autoRotateSpeed = 0.35,
   showScreenshotButton = false,
+  materialFinish = "original",
   className = "",
 }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -335,6 +360,7 @@ export default function ModelViewer({
             enableHoverRotation={enableHoverRotation}
             autoRotate={autoRotate}
             autoRotateSpeed={autoRotateSpeed}
+            materialFinish={materialFinish}
             onReady={handleReady}
           />
           <Environment preset={environmentPreset} />

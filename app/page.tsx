@@ -393,11 +393,13 @@ export default function Home() {
                 </div>
 
                 <ModelViewer
-                  url="https://samples.threepipe.org/demos/classic-watch.glb"
+                  url="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ChronographWatch/glTF-Binary/ChronographWatch.glb"
                   width="100%"
                   height="100%"
-                  modelXOffset={0.5}
-                  modelYOffset={0}
+                  modelXOffset={0.38}
+                  modelYOffset={-0.04}
+                  defaultRotationX={-12}
+                  defaultRotationY={-18}
                   enableMouseParallax={!reduceMotion}
                   enableHoverRotation={!reduceMotion}
                   enableManualRotation
@@ -407,6 +409,7 @@ export default function Home() {
                   autoRotate={false}
                   autoRotateSpeed={0.35}
                   showScreenshotButton
+                  materialFinish="silver"
                 />
               </m.div>
             </div>
@@ -680,6 +683,17 @@ export default function Home() {
           <div className="footer-bottom">
             <span>© 2026 VYNE. Experiência digital independente.</span>
             <span>Imagens editoriais: Unsplash · Produtos ilustrativos</span>
+            <span>
+              Modelo 3D:{" "}
+              <a
+                href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ChronographWatch"
+                target="_blank"
+                rel="noreferrer"
+              >
+                DGG / Eric Chadwick
+              </a>{" "}
+              · CC BY 4.0
+            </span>
           </div>
         </footer>
 

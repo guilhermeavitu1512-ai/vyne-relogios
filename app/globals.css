@@ -1368,6 +1368,7 @@ img {
 .footer-bottom {
   grid-column: 1 / 3;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 30px;
   margin-top: 20px;
@@ -1378,6 +1379,18 @@ img {
   letter-spacing: 0.09em;
   line-height: 1.6;
   text-transform: uppercase;
+}
+
+.footer-bottom a {
+  color: rgba(241, 239, 232, 0.42);
+  text-decoration: underline;
+  text-decoration-color: rgba(84, 173, 129, 0.4);
+  text-underline-offset: 3px;
+  transition: color 220ms ease;
+}
+
+.footer-bottom a:hover {
+  color: var(--ivory);
 }
 
 .product-modal {
