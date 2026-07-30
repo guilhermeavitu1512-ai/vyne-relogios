@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   AnimatePresence,
   LazyMotion,
@@ -10,8 +11,12 @@ import {
   useScroll,
   useSpring,
 } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import GradualBlur from "@/components/GradualBlur";
+
+const Aurora = dynamic(() => import("@/components/Aurora"), {
+  ssr: false,
+});
 
 type Product = {
   brand: string;
@@ -170,6 +175,42 @@ function ImageReveal({
         />
       )}
     </m.div>
+  );
+}
+
+function AuroraBackdrop() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element || reduceMotion) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsNearViewport(entry.isIntersecting),
+      { rootMargin: "320px 0px" },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [reduceMotion]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="final-cta-aurora"
+      style={{ width: "1080px", height: "1080px", position: "absolute" }}
+      aria-hidden="true"
+    >
+      {isNearViewport && !reduceMotion && (
+        <Aurora
+          colorStops={["#ffffff", "#508000", "#bab1ff"]}
+          amplitude={1.1}
+          blend={0.5}
+        />
+      )}
+    </div>
   );
 }
 
@@ -537,6 +578,7 @@ export default function Home() {
           </section>
 
           <section className="final-cta">
+            <AuroraBackdrop />
             <div className="final-cta-glow" aria-hidden="true" />
             <Reveal className="final-cta-inner">
               <span className="eyebrow">A escolha certa começa com confiança</span>
