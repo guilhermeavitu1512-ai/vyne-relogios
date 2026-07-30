@@ -1651,7 +1651,7 @@ img {
 
 @media (max-width: 900px) {
   .signature-hero {
-    min-height: 100svh;
+    min-height: max(760px, 100svh);
   }
 
   .signature-hero-media {
@@ -1686,9 +1686,9 @@ img {
   }
 
   .signature-hero-model-positioner {
-    top: 7.5svh;
-    right: -4vw;
-    width: min(82vw, 620px);
+    top: clamp(280px, 35svh, 350px);
+    right: -6vw;
+    width: min(88vw, 620px);
     height: min(62svh, 620px);
     transform: none;
   }
@@ -1699,8 +1699,9 @@ img {
 
   .signature-mobile-copy {
     position: absolute;
+    top: clamp(96px, 12svh, 124px);
     right: 24px;
-    bottom: 10svh;
+    bottom: auto;
     left: 24px;
     z-index: 5;
     display: flex;
@@ -1917,11 +1918,11 @@ img {
   }
 
   .signature-hero {
-    min-height: 100svh;
+    min-height: max(720px, 100svh);
   }
 
   .signature-hero-model-positioner {
-    top: 70px;
+    top: clamp(270px, 38svh, 315px);
     right: -30px;
     width: calc(100vw + 16px);
     height: min(55svh, 520px);
@@ -1956,8 +1957,9 @@ img {
   }
 
   .signature-mobile-copy {
+    top: 94px;
     right: 18px;
-    bottom: 9svh;
+    bottom: auto;
     left: 18px;
   }
 
