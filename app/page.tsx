@@ -423,7 +423,7 @@ export default function Home() {
                 <iframe
                   className="signature-hero-sketchfab"
                   title="Relógio Seiko Coutura 3D interativo"
-                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=1024&ui_theme=dark"
+                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=1024&ui_theme=dark"
                   loading="eager"
                   allow="autoplay; fullscreen; xr-spatial-tracking"
                   allowFullScreen
@@ -701,15 +701,15 @@ export default function Home() {
             <span>© 2026 VYNE. Experiência digital independente.</span>
             <span>Imagens editoriais: Unsplash · Produtos ilustrativos</span>
             <span>
-              Modelo 3D:{" "}
+              Modelo 3D “Seiko Watch” por{" "}
               <a
                 href="https://sketchfab.com/3d-models/seiko-watch-0796e23ab5c0448c9bdf3fe5c3b3e362"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
-                carloshisserich / Sketchfab
+                carloshisserich, via Sketchfab
               </a>{" "}
-              · CC BY 4.0
+              · Licença CC BY 4.0
             </span>
           </div>
         </footer>
