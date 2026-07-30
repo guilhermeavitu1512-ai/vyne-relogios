@@ -13,6 +13,7 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import GradualBlur from "@/components/GradualBlur";
+import StaggeredMenu from "@/components/StaggeredMenu";
 
 const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
@@ -89,6 +90,17 @@ const galleryItems = products.map((product) => ({
   image: product.image,
   text: `${product.brand} · ${product.model}`,
 }));
+
+const menuItems = [
+  { label: "Início", ariaLabel: "Ir para o início", link: "#inicio" },
+  { label: "Coleção", ariaLabel: "Ver a coleção", link: "#colecao" },
+  {
+    label: "Autenticidade",
+    ariaLabel: "Conhecer os compromissos de autenticidade",
+    link: "#confianca",
+  },
+  { label: "A VYNE", ariaLabel: "Conhecer a VYNE", link: "#sobre" },
+];
 
 const brandNames = ["SEIKO", "CASIO", "CITIZEN", "ORIENT", "TIMEX"];
 
@@ -289,7 +301,6 @@ function ProductGalleryShowcase() {
 }
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const reduceMotion = useReducedMotion();
@@ -305,12 +316,10 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const locked = menuOpen || Boolean(selectedProduct);
-    document.body.classList.toggle("is-locked", locked);
+    document.body.classList.toggle("is-locked", Boolean(selectedProduct));
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setMenuOpen(false);
       setSelectedProduct(null);
     };
 
@@ -319,9 +328,7 @@ export default function Home() {
       document.body.classList.remove("is-locked");
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [menuOpen, selectedProduct]);
-
-  const closeMenu = () => setMenuOpen(false);
+  }, [selectedProduct]);
 
   return (
     <LazyMotion features={domAnimation}>
@@ -332,86 +339,19 @@ export default function Home() {
           aria-hidden="true"
         />
 
-        <header
-          className={`site-header ${scrolled ? "is-scrolled" : ""} ${
-            menuOpen ? "menu-active" : ""
-          }`}
-        >
-          <nav className="nav-wrap" aria-label="Navegação principal">
-            <button
-              className={`menu-toggle ${menuOpen ? "is-open" : ""}`}
-              type="button"
-              aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((current) => !current)}
-            >
-              <span />
-              <span />
-              <small>Menu</small>
-            </button>
-
-            <a className="wordmark" href="#inicio" aria-label="VYNE — início">
-              VYNE
-            </a>
-
-            <div className="desktop-nav">
-              <a href="#colecao">Relógios</a>
-              <a href="#confianca">Autenticidade</a>
-              <a href="#sobre">A VYNE</a>
-            </div>
-
-            <a className="nav-cta" href="#colecao">
-              Explorar
-              <span aria-hidden="true">↗</span>
-            </a>
-          </nav>
-
-          <AnimatePresence>
-            {menuOpen && (
-              <m.div
-                className="menu-panel"
-                initial={{ opacity: 0, y: "-100%" }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: "-100%" }}
-                transition={{ duration: reduceMotion ? 0 : 0.65, ease: editorialEase }}
-              >
-                <div className="menu-panel-inner">
-                  <span className="menu-kicker">Navegue pela VYNE</span>
-                  <div className="menu-links">
-                    {[
-                      ["01", "Início", "#inicio"],
-                      ["02", "Coleção", "#colecao"],
-                      ["03", "Autenticidade", "#confianca"],
-                      ["04", "A VYNE", "#sobre"],
-                    ].map(([number, label, href], index) => (
-                      <m.a
-                        key={href}
-                        href={href}
-                        onClick={closeMenu}
-                        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.65,
-                          delay: reduceMotion ? 0 : 0.18 + index * 0.08,
-                          ease: editorialEase,
-                        }}
-                      >
-                        <small>{number}</small>
-                        <span>{label}</span>
-                        <i aria-hidden="true">↗</i>
-                      </m.a>
-                    ))}
-                  </div>
-                  <div className="menu-foot">
-                    <span>Relógios originais</span>
-                    <span>Preço inteligente</span>
-                    <span>Curadoria independente</span>
-                  </div>
-                </div>
-              </m.div>
-            )}
-          </AnimatePresence>
-        </header>
+        <StaggeredMenu
+          items={menuItems}
+          position="right"
+          colors={["#0a3525", "#2f8f64", "#8fb5a1"]}
+          accentColor="#54ad81"
+          menuButtonColor="#f1efe8"
+          openMenuButtonColor="#f1efe8"
+          displayItemNumbering
+          displaySocials={false}
+          closeOnClickAway
+          isFixed
+          scrolled={scrolled}
+        />
 
         <main>
           <section className="hero signature-hero" id="inicio">
