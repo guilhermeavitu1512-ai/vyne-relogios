@@ -128,8 +128,9 @@ export default function Aurora(props: AuroraProps) {
   }, [props]);
 
   useEffect(() => {
-    const ctn = ctnDom.current;
-    if (!ctn) return;
+    const container = ctnDom.current;
+    if (!container) return;
+    const element: HTMLDivElement = container;
     const {
       colorStops = ['#5227FF', '#7cff67', '#5227FF'],
       amplitude = 1.0,
@@ -159,14 +160,14 @@ export default function Aurora(props: AuroraProps) {
         uTime: { value: 0 },
         uAmplitude: { value: amplitude },
         uColorStops: { value: colorStopsArray },
-        uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
+        uResolution: { value: [element.offsetWidth, element.offsetHeight] },
         uBlend: { value: blend }
       }
     });
 
     function resize() {
-      const width = ctn.offsetWidth;
-      const height = ctn.offsetHeight;
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
       renderer.setSize(width, height);
       program.uniforms.uResolution.value = [width, height];
     }
@@ -178,7 +179,7 @@ export default function Aurora(props: AuroraProps) {
     }
 
     const mesh = new Mesh(gl, { geometry, program });
-    ctn.appendChild(gl.canvas);
+    element.appendChild(gl.canvas);
 
     let animateId = 0;
     const update = (t: number) => {
@@ -201,8 +202,8 @@ export default function Aurora(props: AuroraProps) {
     return () => {
       cancelAnimationFrame(animateId);
       window.removeEventListener('resize', resize);
-      if (ctn && gl.canvas.parentNode === ctn) {
-        ctn.removeChild(gl.canvas);
+      if (gl.canvas.parentNode === element) {
+        element.removeChild(gl.canvas);
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
