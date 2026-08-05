@@ -482,30 +482,48 @@ img {
 }
 
 .cinematic-section {
+  --section-transition-from: var(--ink);
+  --section-transition-to: var(--forest-deep);
+  --section-transition-height: clamp(34px, 4.2vw, 62px);
   position: relative;
   transform-origin: center top;
   backface-visibility: hidden;
 }
 
+.section-transition-black-to-black {
+  --section-transition-from: var(--ink);
+  --section-transition-to: var(--ink);
+}
+
+.section-transition-black-to-forest {
+  --section-transition-from: var(--ink);
+  --section-transition-to: var(--forest-deep);
+}
+
+.section-transition-forest-to-black {
+  --section-transition-from: var(--forest-deep);
+  --section-transition-to: var(--ink);
+}
+
+.section-transition-forest-to-forest {
+  --section-transition-from: var(--forest-deep);
+  --section-transition-to: var(--forest-deep);
+}
+
 .cinematic-section-boundary {
   position: absolute;
   top: 0;
-  right: clamp(22px, 6vw, 110px);
-  left: clamp(22px, 6vw, 110px);
+  right: 0;
+  left: 0;
   z-index: 8;
-  height: 1px;
+  height: var(--section-transition-height);
   background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(84, 173, 129, 0.14) 18%,
-    rgba(112, 188, 145, 0.68) 50%,
-    rgba(84, 173, 129, 0.14) 82%,
-    transparent
+    to bottom,
+    var(--section-transition-from) 0 50%,
+    var(--section-transition-to) 50% 100%
   );
-  box-shadow:
-    0 -16px 46px rgba(47, 143, 100, 0.12),
-    0 16px 46px rgba(47, 143, 100, 0.08);
-  transform-origin: center;
+  transform-origin: left center;
+  will-change: transform;
   pointer-events: none;
 }
 
@@ -990,6 +1008,7 @@ img {
   align-items: center;
   min-height: 96svh;
   overflow: hidden;
+  background: var(--forest-deep);
   isolation: isolate;
 }
 
@@ -1059,7 +1078,7 @@ img {
   padding: 160px 6vw 170px;
   background:
     radial-gradient(circle at 88% 5%, rgba(47, 143, 100, 0.1), transparent 24%),
-    var(--ink-soft);
+    var(--ink);
 }
 
 .confidence-heading {
@@ -1982,11 +2001,8 @@ img {
   }
 
   .cinematic-section-boundary {
-    right: 18px;
-    left: 18px;
-    box-shadow:
-      0 -12px 32px rgba(47, 143, 100, 0.1),
-      0 12px 32px rgba(47, 143, 100, 0.06);
+    right: 0;
+    left: 0;
   }
 
   .signature-hero-viewer-mask {

@@ -139,6 +139,7 @@ const trustPoints = [
 ];
 
 const editorialEase = [0.16, 1, 0.3, 1] as const;
+type SectionTone = "black" | "forest";
 
 function Reveal({
   children,
@@ -157,7 +158,7 @@ function Reveal({
       initial={
         reduceMotion
           ? false
-          : { opacity: 0, y: 38, filter: "blur(10px)" }
+          : { opacity: 0, y: 30, filter: "blur(6px)" }
       }
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, amount: 0.18 }}
@@ -173,37 +174,32 @@ function CinematicSection({
   className,
   id,
   ariaLabel,
+  from = "black",
+  to = "forest",
 }: {
   children: ReactNode;
   className: string;
   id?: string;
   ariaLabel?: string;
+  from?: SectionTone;
+  to?: SectionTone;
 }) {
   const reduceMotion = useReducedMotion();
 
   return (
     <m.section
-      className={`cinematic-section ${className}`}
+      className={`cinematic-section section-transition-${from}-to-${to} ${className}`}
       id={id}
       aria-label={ariaLabel}
-      initial={
-        reduceMotion
-          ? false
-          : { opacity: 0, y: 52, scale: 0.996 }
-      }
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.06, margin: "-5% 0px -8% 0px" }}
-      transition={{ duration: 0.9, ease: editorialEase }}
     >
       <m.span
         className="cinematic-section-boundary"
         aria-hidden="true"
-        initial={reduceMotion ? false : { opacity: 0, scaleX: 0.18 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        viewport={{ once: true, amount: 0.1 }}
+        initial={reduceMotion ? false : { scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true, amount: 0.05, margin: "0px 0px -8% 0px" }}
         transition={{
-          duration: reduceMotion ? 0 : 1.05,
-          delay: reduceMotion ? 0 : 0.08,
+          duration: reduceMotion ? 0 : 0.95,
           ease: editorialEase,
         }}
       />
@@ -483,7 +479,12 @@ export default function Home() {
             </div>
           </section>
 
-          <CinematicSection className="editorial-intro" id="essencia">
+          <CinematicSection
+            className="editorial-intro"
+            id="essencia"
+            from="black"
+            to="forest"
+          >
             <Reveal className="editorial-intro-copy">
               <span className="section-index">01 / Essência</span>
               <h2>
@@ -501,6 +502,8 @@ export default function Home() {
           <CinematicSection
             className="brand-rail"
             ariaLabel="Marcas disponíveis"
+            from="forest"
+            to="black"
           >
             <span className="brand-rail-label">Marcas selecionadas</span>
             <div className="brand-rail-list">
@@ -522,7 +525,12 @@ export default function Home() {
             </div>
           </CinematicSection>
 
-          <CinematicSection className="collection-section" id="colecao">
+          <CinematicSection
+            className="collection-section"
+            id="colecao"
+            from="black"
+            to="black"
+          >
             <Reveal className="collection-heading">
               <div>
                 <span className="section-index">02 / Coleção</span>
@@ -600,7 +608,11 @@ export default function Home() {
             </p>
           </CinematicSection>
 
-          <CinematicSection className="manifesto-section">
+          <CinematicSection
+            className="manifesto-section"
+            from="black"
+            to="forest"
+          >
             <m.div
               className="manifesto-media"
               initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
@@ -635,7 +647,12 @@ export default function Home() {
             </Reveal>
           </CinematicSection>
 
-          <CinematicSection className="confidence-section" id="confianca">
+          <CinematicSection
+            className="confidence-section"
+            id="confianca"
+            from="forest"
+            to="black"
+          >
             <Reveal className="confidence-heading">
               <span className="section-index">04 / Autenticidade</span>
               <h2>
@@ -671,7 +688,12 @@ export default function Home() {
             </div>
           </CinematicSection>
 
-          <CinematicSection className="about-section" id="sobre">
+          <CinematicSection
+            className="about-section"
+            id="sobre"
+            from="black"
+            to="forest"
+          >
             <ImageReveal
               className="about-image"
               src="https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1800&q=90"
@@ -703,7 +725,11 @@ export default function Home() {
             </Reveal>
           </CinematicSection>
 
-          <CinematicSection className="final-cta">
+          <CinematicSection
+            className="final-cta"
+            from="forest"
+            to="black"
+          >
             <AuroraBackdrop />
             <div className="final-cta-glow" aria-hidden="true" />
             <Reveal className="final-cta-inner">
