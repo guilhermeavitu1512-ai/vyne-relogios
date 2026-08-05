@@ -511,6 +511,7 @@ img {
   scroll-margin-top: calc(88px + env(safe-area-inset-top));
   transform-origin: center top;
   backface-visibility: hidden;
+  isolation: isolate;
 }
 
 .section-transition {
@@ -518,17 +519,33 @@ img {
   top: 0;
   right: 0;
   left: 0;
-  z-index: 7;
+  z-index: 0;
   height: clamp(110px, 11vw, 160px);
   overflow: hidden;
   background: linear-gradient(
     to bottom,
     var(--transition-from) 0%,
-    color-mix(in srgb, var(--transition-from) 45%, var(--transition-to)) 55%,
+    color-mix(in srgb, var(--transition-from) 45%, var(--transition-to)) 52%,
     var(--transition-to) 100%
   );
-  transform: translateY(-50%);
   pointer-events: none;
+}
+
+.editorial-intro-copy,
+.brand-rail-label,
+.brand-rail-list,
+.collection-heading,
+.collection-gallery-shell,
+.product-grid,
+.catalog-disclaimer,
+.manifesto-copy,
+.confidence-heading,
+.trust-grid,
+.about-image,
+.about-copy,
+.final-cta-inner {
+  position: relative;
+  z-index: 2;
 }
 
 .section-transition-soft {
@@ -592,7 +609,8 @@ img {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
 }
 
 .editorial-intro h2 {

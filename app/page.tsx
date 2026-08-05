@@ -266,11 +266,10 @@ function ProductGalleryShowcase() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isNearViewport, setIsNearViewport] = useState(false);
   const reduceMotion = useReducedMotion();
-  const reducedEffects = useReducedEffects();
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element || reduceMotion || reducedEffects) return;
+    if (!element || reduceMotion) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsNearViewport(entry.isIntersecting),
@@ -279,7 +278,7 @@ function ProductGalleryShowcase() {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [reduceMotion, reducedEffects]);
+  }, [reduceMotion]);
 
   return (
     <AnimatedSection className="collection-gallery-shell">
@@ -292,7 +291,7 @@ function ProductGalleryShowcase() {
       </div>
 
       <div className="gallery-stage" ref={containerRef}>
-        {reduceMotion || reducedEffects ? (
+        {reduceMotion ? (
           <div
             className="gallery-static"
             role="region"
