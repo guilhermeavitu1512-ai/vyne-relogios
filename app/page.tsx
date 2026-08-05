@@ -268,8 +268,6 @@ export default function Home() {
                 allow="autoplay; fullscreen; xr-spatial-tracking"
                 allowFullScreen
               />
-              <div className="viewer-top-mask" aria-hidden="true" />
-              <div className="viewer-mask" aria-hidden="true" />
             </m.div>
 
             <div className="hero-scroll-cue" aria-hidden="true">
