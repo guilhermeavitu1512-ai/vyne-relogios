@@ -266,7 +266,7 @@ export default function Home() {
                     <iframe
                       className="hero-sketchfab"
                       title="Relógio Seiko em visualização 3D interativa"
-                      src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_fullscreen=0&ui_watermark=0&ui_watermark_link=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
+                      src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_controls=0&ui_general_controls=0&ui_start=0&ui_loading=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_annotations=0&ui_animations=0&ui_fullscreen=0&ui_watermark=0&ui_watermark_link=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
                       loading="eager"
                       allow="autoplay; fullscreen; xr-spatial-tracking"
                       allowFullScreen
@@ -375,14 +375,6 @@ export default function Home() {
           </Section>
 
           <Section id="confianca" className="trust-section">
-            <div className="trust-media">
-              <ResponsiveWatchImage
-                src="https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=2200&q=92"
-                alt="Detalhe editorial de um relógio de aço"
-                sizes="(max-width: 900px) 100vw, 50vw"
-              />
-              <span aria-hidden="true" />
-            </div>
             <div className="trust-content">
               <AnimatedSection className="section-heading">
                 <span className="section-index">03 · Autenticidade</span>

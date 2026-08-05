@@ -325,6 +325,8 @@ canvas {
   inset: 0;
   max-width: 100%;
   overflow: clip;
+  contain: layout paint;
+  isolation: isolate;
 }
 
 .hero-sketchfab {
@@ -336,8 +338,8 @@ canvas {
   border: 0;
   background: transparent;
   filter: contrast(1.04) saturate(0.88) brightness(1.09);
-  transform: scale(1.2);
-  transform-origin: 50% 48%;
+  transform: scale(1.24);
+  transform-origin: 50% 46%;
 }
 
 .model-caption {
@@ -736,44 +738,20 @@ canvas {
 }
 
 .trust-section {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: 780px;
-  background: var(--black);
-}
-
-.trust-media {
-  position: relative;
-  min-height: 780px;
-  overflow: hidden;
-}
-
-.trust-media img {
-  object-fit: cover;
-  filter: brightness(0.7) saturate(0.78);
-  transition: transform 700ms ease;
-}
-
-.trust-section:hover .trust-media img {
-  transform: scale(1.02);
-}
-
-.trust-media > span {
-  position: absolute;
-  inset: 0;
+  padding: clamp(96px, 10vw, 150px) var(--page-gutter);
   background:
-    linear-gradient(90deg, transparent 55%, var(--black) 100%),
-    linear-gradient(0deg, rgba(5, 7, 6, 0.54), transparent 45%);
+    radial-gradient(circle at 84% 22%, rgba(76, 155, 112, 0.055), transparent 27%),
+    var(--black);
 }
 
 .trust-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(76px, 8vw, 130px) var(--page-gutter);
-  background:
-    radial-gradient(circle at 100% 20%, rgba(76, 155, 112, 0.055), transparent 28%),
-    var(--black);
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(360px, 1fr);
+  gap: clamp(52px, 8vw, 128px);
+  align-items: start;
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 .trust-content .section-heading h2 {
@@ -786,7 +764,7 @@ canvas {
 }
 
 .trust-list {
-  margin-top: 50px;
+  margin-top: 0;
   border-top: 1px solid var(--line);
 }
 
@@ -1459,16 +1437,9 @@ canvas {
     scroll-snap-align: start;
   }
 
-  .trust-section {
+  .trust-content {
     grid-template-columns: 1fr;
-  }
-
-  .trust-media {
-    min-height: 58dvh;
-  }
-
-  .trust-media > span {
-    background: linear-gradient(0deg, var(--black) 0%, transparent 45%);
+    gap: 48px;
   }
 
   .about-section {
@@ -1560,7 +1531,7 @@ canvas {
 
   .hero-sketchfab {
     mix-blend-mode: screen;
-    transform: scale(1.2);
+    transform: scale(1.24);
   }
 
   .essence-section,
@@ -1657,17 +1628,8 @@ canvas {
     text-align: center;
   }
 
-  .trust-media {
-    min-height: 430px;
-  }
-
-  .trust-content {
-    padding-top: 76px;
-    padding-bottom: 76px;
-  }
-
   .trust-list {
-    margin-top: 42px;
+    margin-top: 0;
   }
 
   .trust-list article {
