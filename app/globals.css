@@ -1526,7 +1526,7 @@ canvas {
   .hero-copy h1 {
     max-width: 100%;
     margin: 18px 0 20px;
-    font-size: clamp(2.35rem, 11.2vw, 3.25rem);
+    font-size: clamp(2.2rem, 11vw, 3.25rem);
     letter-spacing: -0.03em;
     line-height: 0.94;
   }
@@ -1578,6 +1578,10 @@ canvas {
     font-size: clamp(2.35rem, 10vw, 3rem);
     letter-spacing: -0.03em;
     line-height: 0.98;
+  }
+
+  .about-copy h2 {
+    font-size: clamp(1.7rem, 8.6vw, 2.6rem);
   }
 
   .essence-copy p,
