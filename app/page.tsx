@@ -224,51 +224,57 @@ export default function Home() {
 
             <div className="hero-atmosphere" aria-hidden="true" />
 
-            <m.div
-              className="hero-copy"
-              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reduceMotion ? 0 : 0.85, ease: editorialEase }}
-            >
-              <span className="eyebrow">Curadoria independente · Relógios originais</span>
-              <h1 id="hero-title">
-                Sofisticação real.
-                <em>Preço inteligente.</em>
-              </h1>
-              <p>
-                Seiko, Casio, Citizen, Orient e Timex selecionados para quem procura
-                autenticidade, elegância e uma compra mais consciente.
-              </p>
-              <div className="hero-actions">
-                <a className="button button-primary" href="/catalogo">
-                  Explorar coleção <span aria-hidden="true">↗</span>
-                </a>
-                <a className="text-link" href="#confianca">
-                  Como garantimos confiança <span aria-hidden="true">↓</span>
-                </a>
-              </div>
-            </m.div>
+            <div className="hero-container">
+              <div className="hero-grid">
+                <m.div
+                  className="hero-copy"
+                  initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.85, ease: editorialEase }}
+                >
+                  <span className="eyebrow">Curadoria independente · Relógios originais</span>
+                  <h1 id="hero-title">
+                    Sofisticação real.
+                    <em>Preço inteligente.</em>
+                  </h1>
+                  <p>
+                    Seiko, Casio, Citizen, Orient e Timex selecionados para quem procura
+                    autenticidade, elegância e uma compra mais consciente.
+                  </p>
+                  <div className="hero-actions">
+                    <a className="button button-primary" href="/catalogo">
+                      Explorar coleção <span aria-hidden="true">↗</span>
+                    </a>
+                    <a className="text-link" href="#confianca">
+                      Como garantimos confiança <span aria-hidden="true">↓</span>
+                    </a>
+                  </div>
+                </m.div>
 
-            <m.div
-              className="hero-model"
-              initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: reduceMotion ? 0 : 0.9, delay: 0.12, ease: editorialEase }}
-            >
-              <div className="model-caption">
-                <span>Visualização 3D</span>
-                <i />
-                <small>Arraste para explorar</small>
+                <m.div
+                  className="hero-model"
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.9, delay: 0.12, ease: editorialEase }}
+                >
+                  <div className="model-caption">
+                    <span>Visualização 3D</span>
+                    <i />
+                    <small>Arraste para explorar</small>
+                  </div>
+                  <div className="hero-model-viewport">
+                    <iframe
+                      className="hero-sketchfab"
+                      title="Relógio Seiko em visualização 3D interativa"
+                      src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_fullscreen=0&ui_watermark=0&ui_watermark_link=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
+                      loading="eager"
+                      allow="autoplay; fullscreen; xr-spatial-tracking"
+                      allowFullScreen
+                    />
+                  </div>
+                </m.div>
               </div>
-              <iframe
-                className="hero-sketchfab"
-                title="Relógio Seiko em visualização 3D interativa"
-                src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_fullscreen=0&ui_watermark=0&ui_watermark_link=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
-                loading="eager"
-                allow="autoplay; fullscreen; xr-spatial-tracking"
-                allowFullScreen
-              />
-            </m.div>
+            </div>
 
             <div className="hero-scroll-cue" aria-hidden="true">
               <span>Deslize para descobrir</span>

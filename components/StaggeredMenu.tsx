@@ -337,41 +337,43 @@ export default function StaggeredMenu({
       </div>
 
       <header className="staggered-menu-header">
-        <Link className="sm-logo" href="/#inicio" aria-label="VYNE — início">
-          VYNE
-        </Link>
+        <div className="staggered-menu-header-inner">
+          <Link className="sm-logo" href="/#inicio" aria-label="VYNE — início">
+            VYNE
+          </Link>
 
-        {headerLinks.length > 0 && (
-          <nav className="sm-header-nav" aria-label="Atalhos principais">
-            {headerLinks.map((item) => (
-              <Link href={item.link} key={`${item.label}-${item.link}`}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        )}
+          {headerLinks.length > 0 && (
+            <nav className="sm-header-nav" aria-label="Atalhos principais">
+              {headerLinks.map((item) => (
+                <Link href={item.link} key={`${item.label}-${item.link}`}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
-        <button
-          ref={toggleRef}
-          className="sm-toggle"
-          style={{ color: open ? openMenuButtonColor : menuButtonColor }}
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
-          aria-expanded={open}
-          aria-controls="staggered-menu-panel"
-          onClick={toggleMenu}
-          type="button"
-        >
-          <span className="sm-toggle-text-wrap" aria-hidden="true">
-            <span ref={textRef} className="sm-toggle-text-inner">
-              <span>Menu</span>
-              <span>Fechar</span>
+          <button
+            ref={toggleRef}
+            className="sm-toggle"
+            style={{ color: open ? openMenuButtonColor : menuButtonColor }}
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={open}
+            aria-controls="staggered-menu-panel"
+            onClick={toggleMenu}
+            type="button"
+          >
+            <span className="sm-toggle-text-wrap" aria-hidden="true">
+              <span ref={textRef} className="sm-toggle-text-inner">
+                <span>Menu</span>
+                <span>Fechar</span>
+              </span>
             </span>
-          </span>
-          <span ref={iconRef} className="sm-icon" aria-hidden="true">
-            <span className="sm-icon-line" />
-            <span className="sm-icon-line sm-icon-line-v" />
-          </span>
-        </button>
+            <span ref={iconRef} className="sm-icon" aria-hidden="true">
+              <span className="sm-icon-line" />
+              <span className="sm-icon-line sm-icon-line-v" />
+            </span>
+          </button>
+        </div>
       </header>
 
       <aside
