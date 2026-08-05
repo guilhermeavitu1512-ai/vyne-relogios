@@ -10,9 +10,9 @@ import "@fontsource/manrope/600.css";
 import "@fontsource/manrope/700.css";
 import "./globals.css";
 
-const title = "VYNE — Relógios originais. Escolhas com intenção.";
+const title = "VYNE — Relógios originais. Preço inteligente.";
 const description =
-  "Curadoria de relógios originais de marcas reconhecidas, com autenticidade, elegância e preço inteligente.";
+  "Curadoria independente de relógios originais Seiko, Casio, Citizen, Orient e Timex, com autenticidade, elegância e preço inteligente.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
@@ -36,9 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: socialImage,
-          width: 1728,
-          height: 907,
-          alt: "VYNE — Relógios originais. Escolhas com intenção.",
+          width: 1536,
+          height: 1024,
+          alt: "VYNE — Relógios originais. Preço inteligente.",
         },
       ],
     },
@@ -58,7 +58,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#conteudo">
+          Ir para o conteúdo
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

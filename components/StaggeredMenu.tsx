@@ -9,6 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 import { gsap } from "gsap";
+import Link from "next/link";
 
 import "./StaggeredMenu.css";
 
@@ -38,6 +39,7 @@ type StaggeredMenuProps = {
   onMenuClose?: () => void;
   isFixed?: boolean;
   scrolled?: boolean;
+  headerLinks?: Array<{ label: string; link: string }>;
 };
 
 export default function StaggeredMenu({
@@ -55,6 +57,7 @@ export default function StaggeredMenu({
   onMenuClose,
   isFixed = true,
   scrolled = false,
+  headerLinks = [],
 }: StaggeredMenuProps) {
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
@@ -334,9 +337,19 @@ export default function StaggeredMenu({
       </div>
 
       <header className="staggered-menu-header">
-        <a className="sm-logo" href="#inicio" aria-label="VYNE — início">
+        <Link className="sm-logo" href="/#inicio" aria-label="VYNE — início">
           VYNE
-        </a>
+        </Link>
+
+        {headerLinks.length > 0 && (
+          <nav className="sm-header-nav" aria-label="Atalhos principais">
+            {headerLinks.map((item) => (
+              <Link href={item.link} key={`${item.label}-${item.link}`}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <button
           ref={toggleRef}
@@ -379,7 +392,7 @@ export default function StaggeredMenu({
           >
             {items.map((item, index) => (
               <li className="sm-panel-item-wrap" key={`${item.label}-${index}`}>
-                <a
+                <Link
                   className="sm-panel-item"
                   href={item.link}
                   aria-label={item.ariaLabel}
@@ -387,7 +400,7 @@ export default function StaggeredMenu({
                 >
                   <span className="sm-panel-item-label">{item.label}</span>
                   <i aria-hidden="true">↗</i>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

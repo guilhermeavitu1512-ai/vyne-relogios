@@ -1,0 +1,226 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
+import SiteFooter from "@/components/SiteFooter";
+import StaggeredMenu from "@/components/StaggeredMenu";
+import { brandNames, products } from "@/lib/products";
+
+const menuItems = [
+  { label: "Início", ariaLabel: "Voltar ao início", link: "/#inicio" },
+  { label: "Coleção", ariaLabel: "Ver a coleção", link: "/catalogo" },
+  {
+    label: "Autenticidade",
+    ariaLabel: "Conhecer os compromissos da VYNE",
+    link: "/#confianca",
+  },
+  { label: "A VYNE", ariaLabel: "Conhecer a VYNE", link: "/#sobre" },
+];
+
+const categories = ["Todos", "Automático", "Digital", "Quartzo"] as const;
+
+export default function CatalogPage() {
+  const [search, setSearch] = useState("");
+  const [brand, setBrand] = useState("Todas");
+  const [category, setCategory] = useState<(typeof categories)[number]>("Todos");
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedSearch = params.get("busca");
+    const requestedBrand = params.get("marca");
+    const saved = localStorage.getItem("vyne-favorites");
+    const syncState = window.requestAnimationFrame(() => {
+      if (requestedSearch) setSearch(requestedSearch);
+      if (requestedBrand && brandNames.includes(requestedBrand)) setBrand(requestedBrand);
+      if (saved) {
+        try {
+          setFavorites(JSON.parse(saved));
+        } catch {
+          localStorage.removeItem("vyne-favorites");
+        }
+      }
+    });
+    return () => window.cancelAnimationFrame(syncState);
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase("pt-BR");
+    return products.filter((product) => {
+      const matchesSearch =
+        !term ||
+        `${product.brand} ${product.model} ${product.descriptor}`
+          .toLocaleLowerCase("pt-BR")
+          .includes(term);
+      const matchesBrand = brand === "Todas" || product.brand === brand;
+      const matchesCategory = category === "Todos" || product.category === category;
+      return matchesSearch && matchesBrand && matchesCategory;
+    });
+  }, [brand, category, search]);
+
+  const toggleFavorite = (key: string) => {
+    setFavorites((current) => {
+      const next = current.includes(key)
+        ? current.filter((item) => item !== key)
+        : [...current, key];
+      localStorage.setItem("vyne-favorites", JSON.stringify(next));
+      return next;
+    });
+  };
+
+  return (
+    <div className="site-shell catalog-shell">
+      <StaggeredMenu
+        items={menuItems}
+        headerLinks={[
+          { label: "Início", link: "/#inicio" },
+          { label: "Autenticidade", link: "/#confianca" },
+        ]}
+        accentColor="#4c9b70"
+        menuButtonColor="#f1efe8"
+        openMenuButtonColor="#f1efe8"
+        closeOnClickAway
+        isFixed
+        scrolled
+      />
+
+      <main id="conteudo" className="catalog-main">
+        <header className="catalog-hero">
+          <span className="section-index">Coleção VYNE</span>
+          <h1>Relógios escolhidos com intenção.</h1>
+          <p>
+            Explore modelos de marcas reconhecidas e encontre a combinação certa de
+            mecanismo, presença e preço.
+          </p>
+        </header>
+
+        <section className="catalog-tools" id="filtros" aria-label="Filtros do catálogo">
+          <label className="catalog-search">
+            <span>Buscar por marca ou modelo</span>
+            <div>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Ex.: Seiko automático"
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch("")}>
+                  Limpar
+                </button>
+              )}
+            </div>
+          </label>
+
+          <div className="filter-group">
+            <span>Marca</span>
+            <div role="group" aria-label="Filtrar por marca">
+              {["Todas", ...brandNames].map((item) => (
+                <button
+                  type="button"
+                  aria-pressed={brand === item}
+                  onClick={() => setBrand(item)}
+                  key={item}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <span>Mecanismo</span>
+            <div role="group" aria-label="Filtrar por mecanismo">
+              {categories.map((item) => (
+                <button
+                  type="button"
+                  aria-pressed={category === item}
+                  onClick={() => setCategory(item)}
+                  key={item}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="catalog-results" aria-live="polite">
+          <div className="catalog-results-bar">
+            <span>
+              {filteredProducts.length} {filteredProducts.length === 1 ? "resultado" : "resultados"}
+            </span>
+            <span id="favoritos">
+              {favorites.length} {favorites.length === 1 ? "favorito" : "favoritos"}
+            </span>
+          </div>
+
+          {filteredProducts.length > 0 ? (
+            <div className="catalog-grid">
+              {filteredProducts.map((product) => {
+                const key = `${product.brand}-${product.model}`;
+                const isFavorite = favorites.includes(key);
+                return (
+                  <article className="catalog-card" key={key}>
+                    <div className="catalog-card-image">
+                      <ResponsiveWatchImage
+                        src={product.image}
+                        alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
+                        sizes="(max-width: 700px) 100vw, 50vw"
+                      />
+                      <span className="catalog-card-tag">{product.tag}</span>
+                      <button
+                        className="favorite-button"
+                        type="button"
+                        aria-label={`${isFavorite ? "Remover" : "Adicionar"} ${product.brand} ${product.model} ${isFavorite ? "dos" : "aos"} favoritos`}
+                        aria-pressed={isFavorite}
+                        onClick={() => toggleFavorite(key)}
+                      >
+                        <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
+                      </button>
+                    </div>
+                    <div className="catalog-card-copy">
+                      <span>{product.brand}</span>
+                      <h2>{product.model}</h2>
+                      <p>{product.descriptor}</p>
+                      <ul>
+                        {product.specs.map((spec) => <li key={spec}>{spec}</li>)}
+                      </ul>
+                      <div>
+                        <small>A partir de</small>
+                        <strong>{product.price}</strong>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="catalog-empty">
+              <h2>Nenhum relógio encontrado.</h2>
+              <p>Experimente limpar a busca ou selecionar outra combinação de filtros.</p>
+              <button
+                className="button button-secondary"
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setBrand("Todas");
+                  setCategory("Todos");
+                }}
+              >
+                Limpar filtros
+              </button>
+            </div>
+          )}
+
+          <p className="catalog-disclaimer">
+            * Produtos, valores e disponibilidade são ilustrativos. A versão comercial
+            deve refletir catálogo, estoque, garantia e condições reais da VYNE.
+          </p>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
+  );
+}
