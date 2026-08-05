@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
   const origin = host
     ? `${protocol}://${host}`
-    : "https://vyne-relogios.guilhermeavitu1512.chatgpt.site";
+    : "https://vyne-relogios.vercel.app";
   const socialImage = `${origin}/og.png`;
 
   return {

@@ -12,8 +12,18 @@ import {
   useSpring,
 } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import AnimatedSection from "@/components/AnimatedSection";
 import GradualBlur from "@/components/GradualBlur";
+import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
+import SectionTransition, {
+  type SectionTone,
+} from "@/components/SectionTransition";
 import StaggeredMenu from "@/components/StaggeredMenu";
+import {
+  editorialEase,
+  motionDurations,
+  staggerDelay,
+} from "@/lib/motion";
 
 const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
@@ -27,7 +37,7 @@ const FloatingLines = dynamic(() => import("@/components/FloatingLines"), {
   ssr: false,
 });
 
-const heroLineGradient = ["#071f17", "#2f8f64", "#54ad81", "#d8d7d0"];
+const heroLineGradient = ["#07110d", "#173629", "#3f7f5a", "#9da89f"];
 const heroEnabledWaves: Array<"middle" | "bottom"> = ["middle", "bottom"];
 const heroLineCount = [7, 6];
 const heroLineDistance = [4.5, 5.5];
@@ -138,44 +148,13 @@ const trustPoints = [
   },
 ];
 
-const editorialEase = [0.16, 1, 0.3, 1] as const;
-type SectionTone = "black" | "forest";
-
-function Reveal({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <m.div
-      className={className}
-      initial={
-        reduceMotion
-          ? false
-          : { opacity: 0, y: 30, filter: "blur(6px)" }
-      }
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.9, delay, ease: editorialEase }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
 function CinematicSection({
   children,
   className,
   id,
   ariaLabel,
   from = "black",
-  to = "forest",
+  to = "darkGreen",
 }: {
   children: ReactNode;
   className: string;
@@ -184,28 +163,30 @@ function CinematicSection({
   from?: SectionTone;
   to?: SectionTone;
 }) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <m.section
-      className={`cinematic-section section-transition-${from}-to-${to} ${className}`}
+      className={`cinematic-section ${className}`}
       id={id}
       aria-label={ariaLabel}
     >
-      <m.span
-        className="cinematic-section-boundary"
-        aria-hidden="true"
-        initial={reduceMotion ? false : { scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true, amount: 0.05, margin: "0px 0px -8% 0px" }}
-        transition={{
-          duration: reduceMotion ? 0 : 0.95,
-          ease: editorialEase,
-        }}
-      />
+      <SectionTransition from={from} to={to} intensity="subtle" />
       {children}
     </m.section>
   );
+}
+
+function useReducedEffects() {
+  const [reducedEffects, setReducedEffects] = useState(true);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 768px)");
+    const update = () => setReducedEffects(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return reducedEffects;
 }
 
 function ImageReveal({
@@ -213,39 +194,33 @@ function ImageReveal({
   alt,
   className = "",
   priority = false,
+  sizes = "(max-width: 900px) 100vw, 55vw",
 }: {
   src: string;
   alt: string;
   className?: string;
   priority?: boolean;
+  sizes?: string;
 }) {
   const reduceMotion = useReducedMotion();
 
   return (
     <m.div
       className={`image-reveal ${className}`}
-      initial={reduceMotion ? false : { opacity: 0, scale: 1.035 }}
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 1.2, ease: editorialEase }}
+      viewport={{ once: true, amount: 0.16 }}
+      transition={{
+        duration: reduceMotion ? 0 : motionDurations.image,
+        ease: editorialEase,
+      }}
     >
-      <img
+      <ResponsiveWatchImage
         src={src}
         alt={alt}
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
-        decoding="async"
+        sizes={sizes}
+        priority={priority}
       />
-      {!reduceMotion && (
-        <m.span
-          className="image-reveal-curtain"
-          aria-hidden="true"
-          initial={{ scaleY: 1 }}
-          whileInView={{ scaleY: 0 }}
-          viewport={{ once: true, amount: 0.12 }}
-          transition={{ duration: 1.05, delay: 0.08, ease: editorialEase }}
-        />
-      )}
     </m.div>
   );
 }
@@ -254,10 +229,11 @@ function AuroraBackdrop() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isNearViewport, setIsNearViewport] = useState(false);
   const reduceMotion = useReducedMotion();
+  const reducedEffects = useReducedEffects();
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element || reduceMotion) return;
+    if (!element || reduceMotion || reducedEffects) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsNearViewport(entry.isIntersecting),
@@ -266,7 +242,7 @@ function AuroraBackdrop() {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [reduceMotion]);
+  }, [reduceMotion, reducedEffects]);
 
   return (
     <div
@@ -275,11 +251,11 @@ function AuroraBackdrop() {
       style={{ width: "1080px", height: "1080px", position: "absolute" }}
       aria-hidden="true"
     >
-      {isNearViewport && !reduceMotion && (
+      {isNearViewport && !reduceMotion && !reducedEffects && (
         <Aurora
-          colorStops={["#ffffff", "#508000", "#bab1ff"]}
-          amplitude={1.1}
-          blend={0.5}
+          colorStops={["#07110d", "#3f7f5a", "#d8d7d0"]}
+          amplitude={0.68}
+          blend={0.72}
         />
       )}
     </div>
@@ -290,10 +266,11 @@ function ProductGalleryShowcase() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isNearViewport, setIsNearViewport] = useState(false);
   const reduceMotion = useReducedMotion();
+  const reducedEffects = useReducedEffects();
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element || reduceMotion) return;
+    if (!element || reduceMotion || reducedEffects) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsNearViewport(entry.isIntersecting),
@@ -302,10 +279,10 @@ function ProductGalleryShowcase() {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [reduceMotion]);
+  }, [reduceMotion, reducedEffects]);
 
   return (
-    <Reveal className="collection-gallery-shell">
+    <AnimatedSection className="collection-gallery-shell">
       <div className="gallery-caption">
         <div>
           <span className="gallery-caption-kicker">Relógios disponíveis</span>
@@ -315,7 +292,7 @@ function ProductGalleryShowcase() {
       </div>
 
       <div className="gallery-stage" ref={containerRef}>
-        {reduceMotion ? (
+        {reduceMotion || reducedEffects ? (
           <div
             className="gallery-static"
             role="region"
@@ -323,11 +300,10 @@ function ProductGalleryShowcase() {
           >
             {products.map((product) => (
               <article key={`static-${product.brand}-${product.model}`}>
-                <img
+                <ResponsiveWatchImage
                   src={product.image}
                   alt={`${product.brand} ${product.model}`}
-                  loading="lazy"
-                  decoding="async"
+                  sizes="(max-width: 640px) 82vw, 38vw"
                 />
                 <span>{product.brand}</span>
                 <strong>{product.model}</strong>
@@ -347,7 +323,7 @@ function ProductGalleryShowcase() {
           <div className="gallery-placeholder" aria-hidden="true" />
         )}
       </div>
-    </Reveal>
+    </AnimatedSection>
   );
 }
 
@@ -355,6 +331,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const reduceMotion = useReducedMotion();
+  const reducedEffects = useReducedEffects();
   const { scrollY, scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 120,
@@ -393,8 +370,8 @@ export default function Home() {
         <StaggeredMenu
           items={menuItems}
           position="right"
-          colors={["#0a3525", "#2f8f64", "#8fb5a1"]}
-          accentColor="#54ad81"
+          colors={["#0b2117", "#173629", "#294738"]}
+          accentColor="#3f9b6b"
           menuButtonColor="#f1efe8"
           openMenuButtonColor="#f1efe8"
           displayItemNumbering
@@ -412,17 +389,17 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, ease: editorialEase }}
             >
-              <img
+              <ResponsiveWatchImage
                 src="/og.png"
                 alt="VYNE — Relógios originais. Escolhas com intenção."
-                fetchPriority="high"
-                decoding="async"
+                sizes="100vw"
+                priority
               />
             </m.div>
 
             <div className="signature-hero-model-shade" aria-hidden="true" />
 
-            {!reduceMotion && (
+            {!reduceMotion && !reducedEffects && (
               <div className="signature-hero-floating-lines">
                 <FloatingLines
                   linesGradient={heroLineGradient}
@@ -431,7 +408,7 @@ export default function Home() {
                   lineDistance={heroLineDistance}
                   middleWavePosition={heroMiddleWavePosition}
                   bottomWavePosition={heroBottomWavePosition}
-                  animationSpeed={0.55}
+                  animationSpeed={0.42}
                   interactive
                   bendRadius={4.6}
                   bendStrength={-0.65}
@@ -449,10 +426,14 @@ export default function Home() {
                 initial={
                   reduceMotion
                     ? false
-                    : { opacity: 0, y: 24, filter: "blur(12px)" }
+                    : { opacity: 0, y: 20, scale: 0.98 }
                 }
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 1.25, delay: 0.28, ease: editorialEase }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  duration: reduceMotion ? 0 : motionDurations.image,
+                  delay: reduceMotion ? 0 : 0.16,
+                  ease: editorialEase,
+                }}
               >
                 <div className="signature-hero-model-label">
                   <span>Visualização 3D</span>
@@ -483,12 +464,12 @@ export default function Home() {
             className="editorial-intro"
             id="essencia"
             from="black"
-            to="forest"
+            to="darkGreen"
           >
-            <Reveal className="editorial-intro-copy">
+            <AnimatedSection className="editorial-intro-copy">
               <span className="section-index">01 / Essência</span>
               <h2>
-                Luxo acessível não é parecer mais.
+                <span>Luxo acessível não é parecer mais.</span>
                 <em>É escolher melhor.</em>
               </h2>
               <p>
@@ -496,13 +477,13 @@ export default function Home() {
                 conquistaram confiança, com uma experiência serena, clara e
                 visualmente precisa.
               </p>
-            </Reveal>
+            </AnimatedSection>
           </CinematicSection>
 
           <CinematicSection
             className="brand-rail"
             ariaLabel="Marcas disponíveis"
-            from="forest"
+            from="darkGreen"
             to="black"
           >
             <span className="brand-rail-label">Marcas selecionadas</span>
@@ -514,8 +495,8 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{
-                    duration: 0.6,
-                    delay: reduceMotion ? 0 : index * 0.08,
+                    duration: reduceMotion ? 0 : motionDurations.content,
+                    delay: reduceMotion ? 0 : staggerDelay(index),
                     ease: editorialEase,
                   }}
                 >
@@ -531,7 +512,7 @@ export default function Home() {
             from="black"
             to="black"
           >
-            <Reveal className="collection-heading">
+            <AnimatedSection className="collection-heading">
               <div>
                 <span className="section-index">02 / Coleção</span>
                 <span className="eyebrow">Uma curadoria para cada ritmo</span>
@@ -544,7 +525,7 @@ export default function Home() {
                 Modelos organizados por presença, mecanismo e ocasião — para
                 você comparar menos ruído e mais significado.
               </p>
-            </Reveal>
+            </AnimatedSection>
 
             <ProductGalleryShowcase />
 
@@ -553,12 +534,12 @@ export default function Home() {
                 <m.article
                   className={`product-card ${index === 0 ? "product-featured" : ""}`}
                   key={`${product.brand}-${product.model}`}
-                  initial={reduceMotion ? false : { opacity: 0, y: 44 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.14 }}
                   transition={{
-                    duration: 0.9,
-                    delay: reduceMotion ? 0 : (index % 2) * 0.1,
+                    duration: reduceMotion ? 0 : motionDurations.content,
+                    delay: reduceMotion ? 0 : (index % 2) * 0.07,
                     ease: editorialEase,
                   }}
                 >
@@ -572,11 +553,15 @@ export default function Home() {
                       className="product-image"
                       layoutId={`watch-image-${product.brand}-${product.model}`}
                     >
-                      <img
+                      <ResponsiveWatchImage
                         src={product.image}
                         alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        decoding="async"
+                        sizes={
+                          index === 0
+                            ? "(max-width: 900px) 100vw, 88vw"
+                            : "(max-width: 900px) 100vw, 44vw"
+                        }
+                        priority={index === 0}
                       />
                       <span className="product-shade" aria-hidden="true" />
                       <span className="product-tag">{product.tag}</span>
@@ -611,24 +596,26 @@ export default function Home() {
           <CinematicSection
             className="manifesto-section"
             from="black"
-            to="forest"
+            to="darkGreen"
           >
             <m.div
               className="manifesto-media"
-              initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 1.25, ease: editorialEase }}
+              transition={{
+                duration: reduceMotion ? 0 : motionDurations.image,
+                ease: editorialEase,
+              }}
             >
-              <img
+              <ResponsiveWatchImage
                 src="https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=2200&q=92"
                 alt="Detalhe editorial de um relógio de aço"
-                loading="lazy"
-                decoding="async"
+                sizes="100vw"
               />
               <div className="manifesto-shade" aria-hidden="true" />
             </m.div>
-            <Reveal className="manifesto-copy">
+            <AnimatedSection className="manifesto-copy">
               <span className="section-index section-index-light">03 / Perspectiva</span>
               <span className="eyebrow">O detalhe muda tudo</span>
               <h2>
@@ -644,16 +631,16 @@ export default function Home() {
                 Conheça nossa visão
                 <span aria-hidden="true">→</span>
               </a>
-            </Reveal>
+            </AnimatedSection>
           </CinematicSection>
 
           <CinematicSection
             className="confidence-section"
             id="confianca"
-            from="forest"
+            from="darkGreen"
             to="black"
           >
-            <Reveal className="confidence-heading">
+            <AnimatedSection className="confidence-heading">
               <span className="section-index">04 / Autenticidade</span>
               <h2>
                 Confiança não é um selo visual.
@@ -663,7 +650,7 @@ export default function Home() {
                 Antes do acabamento, vem a clareza. Cada ponto da experiência
                 deve reduzir dúvidas e sustentar a decisão.
               </p>
-            </Reveal>
+            </AnimatedSection>
 
             <div className="trust-grid">
               {trustPoints.map((point, index) => (
@@ -674,8 +661,8 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{
-                    duration: 0.75,
-                    delay: reduceMotion ? 0 : index * 0.09,
+                    duration: reduceMotion ? 0 : motionDurations.content,
+                    delay: reduceMotion ? 0 : staggerDelay(index),
                     ease: editorialEase,
                   }}
                 >
@@ -692,14 +679,14 @@ export default function Home() {
             className="about-section"
             id="sobre"
             from="black"
-            to="forest"
+            to="darkGreen"
           >
             <ImageReveal
               className="about-image"
               src="https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1800&q=90"
               alt="Relógio em composição editorial escura"
             />
-            <Reveal className="about-copy">
+            <AnimatedSection className="about-copy">
               <span className="section-index section-index-light">05 / A VYNE</span>
               <span className="eyebrow">Relojoaria digital independente</span>
               <h2>Reconhecimento de marca. Liberdade de escolha.</h2>
@@ -722,17 +709,17 @@ export default function Home() {
                   <span>foco em originalidade</span>
                 </div>
               </div>
-            </Reveal>
+            </AnimatedSection>
           </CinematicSection>
 
           <CinematicSection
             className="final-cta"
-            from="forest"
+            from="darkGreen"
             to="black"
           >
             <AuroraBackdrop />
             <div className="final-cta-glow" aria-hidden="true" />
-            <Reveal className="final-cta-inner">
+            <AnimatedSection className="final-cta-inner">
               <span className="eyebrow">A escolha certa começa com confiança</span>
               <h2>
                 Sofisticação real.
@@ -746,7 +733,7 @@ export default function Home() {
                 Explorar a coleção
                 <span aria-hidden="true">↗</span>
               </a>
-            </Reveal>
+            </AnimatedSection>
           </CinematicSection>
         </main>
 
@@ -788,24 +775,24 @@ export default function Home() {
           </div>
         </footer>
 
-        <GradualBlur
-          className="page-gradual-blur"
-          preset="intense"
-          target="page"
-          position="bottom"
-          height="8.5rem"
-          mobileHeight="6rem"
-          tabletHeight="7rem"
-          desktopHeight="8.5rem"
-          strength={5.4}
-          divCount={10}
-          curve="ease-in-out"
-          exponential
-          opacity={0.94}
-          responsive
-          gpuOptimized
-          zIndex={-25}
-        />
+        {!reducedEffects && !reduceMotion && (
+          <GradualBlur
+            className="page-gradual-blur"
+            preset="subtle"
+            target="page"
+            position="bottom"
+            height="5.5rem"
+            tabletHeight="4.5rem"
+            desktopHeight="5.5rem"
+            strength={2.1}
+            divCount={4}
+            curve="ease-in-out"
+            opacity={0.52}
+            responsive
+            gpuOptimized
+            zIndex={-25}
+          />
+        )}
 
         <AnimatePresence>
           {selectedProduct && (
@@ -841,9 +828,10 @@ export default function Home() {
                   className="modal-image"
                   layoutId={`watch-image-${selectedProduct.brand}-${selectedProduct.model}`}
                 >
-                  <img
+                  <ResponsiveWatchImage
                     src={selectedProduct.image}
                     alt={`Imagem ilustrativa do ${selectedProduct.brand} ${selectedProduct.model}`}
+                    sizes="(max-width: 900px) calc(100vw - 24px), 55vw"
                   />
                   <span>Imagem ilustrativa</span>
                 </m.div>

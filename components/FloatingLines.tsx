@@ -65,8 +65,8 @@ uniform vec3 lineGradient[8];
 uniform int lineGradientCount;
 
 const vec3 BLACK = vec3(0.0);
-const vec3 PINK = vec3(233.0, 71.0, 245.0) / 255.0;
-const vec3 BLUE = vec3(47.0, 75.0, 162.0) / 255.0;
+const vec3 EMERALD = vec3(63.0, 127.0, 90.0) / 255.0;
+const vec3 FOREST = vec3(7.0, 17.0, 13.0) / 255.0;
 
 mat2 rotate(float radians) {
   return mat2(
@@ -82,9 +82,9 @@ vec3 backgroundColor(vec2 uv) {
   float y = sin(uv.x - 0.2) * 0.3 - 0.1;
   float movement = uv.y - y;
 
-  color += mix(BLUE, BLACK, smoothstep(0.0, 1.0, abs(movement)));
-  color += mix(PINK, BLACK, smoothstep(0.0, 1.0, abs(movement - 0.8)));
-  return color * 0.5;
+  color += mix(FOREST, BLACK, smoothstep(0.0, 1.0, abs(movement)));
+  color += mix(EMERALD, BLACK, smoothstep(0.0, 1.0, abs(movement - 0.8)));
+  return color * 0.28;
 }
 
 vec3 getLineColor(float progress, vec3 baseColor) {

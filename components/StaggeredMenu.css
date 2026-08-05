@@ -10,7 +10,7 @@
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100svh;
+  height: 100dvh;
 }
 
 .staggered-menu-header {
@@ -23,22 +23,22 @@
   justify-content: space-between;
   width: 100%;
   min-height: 88px;
-  padding: 0 4vw;
+  padding: env(safe-area-inset-top) var(--page-gutter) 0;
   border-bottom: 1px solid transparent;
   background: transparent;
   transition:
-    background-color 420ms ease,
-    border-color 420ms ease,
-    box-shadow 420ms ease;
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
   pointer-events: none;
 }
 
 .staggered-menu-wrapper.is-scrolled .staggered-menu-header {
   border-color: rgba(241, 239, 232, 0.1);
-  background: rgba(5, 8, 6, 0.89);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(5, 7, 6, 0.82);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .staggered-menu-wrapper[data-open="true"] .staggered-menu-header {
@@ -71,7 +71,8 @@
   align-items: center;
   gap: 14px;
   min-width: 104px;
-  padding: 15px 0;
+  min-height: 44px;
+  padding: 13px 0;
   overflow: visible;
   border: 0;
   background: transparent;
@@ -192,12 +193,12 @@
   flex-direction: column;
   width: clamp(420px, 49vw, 740px);
   height: 100%;
-  padding: 132px clamp(34px, 4.2vw, 72px) 38px;
+  padding: calc(118px + env(safe-area-inset-top)) clamp(34px, 4.2vw, 72px) calc(32px + env(safe-area-inset-bottom));
   overflow-y: auto;
   border-left: 1px solid rgba(241, 239, 232, 0.1);
   background:
-    radial-gradient(circle at 92% 8%, rgba(47, 143, 100, 0.17), transparent 27%),
-    linear-gradient(150deg, #07130e 0%, #050806 45%, #030504 100%);
+    radial-gradient(circle at 92% 8%, rgba(47, 143, 100, 0.08), transparent 27%),
+    linear-gradient(150deg, #0b1a12 0%, #050706 46%, #030504 100%);
   color: var(--ivory);
   opacity: 0;
   pointer-events: none;
@@ -254,7 +255,7 @@
   grid-template-columns: 1fr 32px;
   gap: 20px;
   align-items: center;
-  min-height: clamp(78px, 10vh, 112px);
+  min-height: clamp(72px, 9vh, 102px);
   padding: 12px 0 12px 44px;
   color: var(--ivory);
   cursor: pointer;
@@ -263,7 +264,7 @@
 .sm-panel-item-label {
   display: inline-block;
   font-family: var(--font-display);
-  font-size: clamp(45px, 5.2vw, 76px);
+  font-size: clamp(42px, 4.7vw, 68px);
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 0.88;
@@ -288,6 +289,12 @@
 .sm-panel-item:focus-visible .sm-panel-item-label {
   color: var(--sm-accent);
   transform: translateX(8px);
+}
+
+.sm-toggle:active,
+.sm-panel-item:active,
+.sm-socials-link:active {
+  transform: scale(0.98);
 }
 
 .sm-panel-item:hover i,
@@ -376,7 +383,8 @@ body.staggered-menu-open {
 
 @media (max-width: 900px) {
   .staggered-menu-header {
-    padding-inline: 24px;
+    min-height: calc(76px + env(safe-area-inset-top));
+    padding-inline: var(--page-gutter);
   }
 
   .sm-prelayers,
@@ -391,14 +399,14 @@ body.staggered-menu-open {
   }
 
   .sm-panel-item-label {
-    font-size: clamp(52px, 10vw, 74px);
+    font-size: clamp(42px, 8vw, 62px);
   }
 }
 
 @media (max-width: 640px) {
   .staggered-menu-header {
-    min-height: 76px;
-    padding-inline: 18px;
+    min-height: calc(66px + env(safe-area-inset-top));
+    padding-inline: var(--page-gutter);
   }
 
   .sm-logo {
@@ -410,11 +418,11 @@ body.staggered-menu-open {
   }
 
   .staggered-menu-panel {
-    padding: 106px 18px 28px;
+    padding: calc(88px + env(safe-area-inset-top)) var(--page-gutter) calc(24px + env(safe-area-inset-bottom));
   }
 
   .sm-panel-inner {
-    min-height: 500px;
+    min-height: min(500px, calc(100dvh - 120px));
   }
 
   .sm-panel-kicker {
@@ -422,12 +430,12 @@ body.staggered-menu-open {
   }
 
   .sm-panel-item {
-    min-height: 86px;
+    min-height: clamp(68px, 12.5dvh, 82px);
     padding-left: 34px;
   }
 
   .sm-panel-item-label {
-    font-size: clamp(45px, 14vw, 62px);
+    font-size: clamp(38px, 12vw, 50px);
   }
 
   .sm-panel-list[data-numbering] .sm-panel-item::before {

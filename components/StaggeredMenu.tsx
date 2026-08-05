@@ -42,14 +42,14 @@ type StaggeredMenuProps = {
 
 export default function StaggeredMenu({
   position = "right",
-  colors = ["#0a3525", "#2f8f64", "#8fb5a1"],
+  colors = ["#0b2117", "#173629", "#294738"],
   items,
   socialItems = [],
   displaySocials = false,
   displayItemNumbering = true,
   menuButtonColor = "#f1efe8",
   openMenuButtonColor = "#f1efe8",
-  accentColor = "#54ad81",
+  accentColor = "#4b9c70",
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose,
@@ -104,7 +104,7 @@ export default function StaggeredMenu({
         ? Array.from(layersRef.current.querySelectorAll<HTMLElement>(".sm-prelayer"))
         : [];
       const offscreen = position === "left" ? -100 : 100;
-      const duration = reducedMotion() ? 0 : 0.34;
+      const duration = reducedMotion() ? 0 : 0.28;
 
       gsap.to(iconRef.current, {
         rotate: 0,
@@ -186,7 +186,7 @@ export default function StaggeredMenu({
         layer,
         {
           xPercent: 0,
-          duration: noMotion ? 0 : 0.52,
+          duration: noMotion ? 0 : 0.42,
           ease: "power4.out",
         },
         noMotion ? 0 : index * 0.07,
@@ -198,7 +198,7 @@ export default function StaggeredMenu({
       panel,
       {
         xPercent: 0,
-        duration: noMotion ? 0 : 0.68,
+        duration: noMotion ? 0 : 0.5,
         ease: "power4.out",
       },
       panelStart,
@@ -208,7 +208,7 @@ export default function StaggeredMenu({
       {
         yPercent: 0,
         rotate: 0,
-        duration: noMotion ? 0 : 0.92,
+        duration: noMotion ? 0 : 0.58,
         ease: "power4.out",
         stagger: noMotion ? 0 : 0.085,
       },
@@ -218,7 +218,7 @@ export default function StaggeredMenu({
       numberedItems,
       {
         "--sm-num-opacity": 1,
-        duration: noMotion ? 0 : 0.55,
+        duration: noMotion ? 0 : 0.42,
         stagger: noMotion ? 0 : 0.07,
       },
       panelStart + (noMotion ? 0 : 0.2),
@@ -245,12 +245,12 @@ export default function StaggeredMenu({
     timelineRef.current = timeline;
     gsap.to(iconRef.current, {
       rotate: 225,
-      duration: noMotion ? 0 : 0.8,
+      duration: noMotion ? 0 : 0.5,
       ease: "power4.out",
     });
     gsap.to(textRef.current, {
       yPercent: -50,
-      duration: noMotion ? 0 : 0.65,
+      duration: noMotion ? 0 : 0.46,
       ease: "power4.out",
     });
   }, [onMenuOpen, position, reducedMotion]);
