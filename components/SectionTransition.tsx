@@ -11,7 +11,7 @@ export type SectionTransitionIntensity = "subtle" | "soft";
 const toneColors: Record<SectionTone, string> = {
   black: "#050706",
   blackGreen: "#07110d",
-  darkGreen: "#0b2117",
+  darkGreen: "#08150f",
 };
 
 type SectionTransitionProps = {

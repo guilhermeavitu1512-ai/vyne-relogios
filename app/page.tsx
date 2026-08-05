@@ -165,7 +165,7 @@ function CinematicSection({
 }) {
   return (
     <m.section
-      className={`cinematic-section ${className}`}
+      className={`cinematic-section scroll-mt-24 ${className}`}
       id={id}
       aria-label={ariaLabel}
     >
@@ -453,18 +453,21 @@ export default function Home() {
               </m.div>
             </div>
 
-            <div className="signature-mobile-copy" aria-hidden="true">
-              <strong>VYNE</strong>
+            <div className="signature-mobile-copy">
               <i />
               <span>Relógios originais. Escolhas com intenção.</span>
+              <a className="signature-mobile-cta button button-primary" href="#colecao">
+                Explorar coleção
+                <span aria-hidden="true">↗</span>
+              </a>
             </div>
           </section>
 
           <CinematicSection
             className="editorial-intro"
             id="essencia"
-            from="black"
-            to="darkGreen"
+            from="darkGreen"
+            to="blackGreen"
           >
             <AnimatedSection className="editorial-intro-copy">
               <span className="section-index">01 / Essência</span>
@@ -483,7 +486,7 @@ export default function Home() {
           <CinematicSection
             className="brand-rail"
             ariaLabel="Marcas disponíveis"
-            from="darkGreen"
+            from="black"
             to="black"
           >
             <span className="brand-rail-label">Marcas selecionadas</span>
