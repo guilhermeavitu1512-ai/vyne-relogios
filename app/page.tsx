@@ -263,11 +263,12 @@ export default function Home() {
               <iframe
                 className="hero-sketchfab"
                 title="Relógio Seiko em visualização 3D interativa"
-                src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
+                src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_fullscreen=0&ui_watermark=0&ui_watermark_link=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${compactEffects ? 1024 : 2048}&ui_theme=dark`}
                 loading="eager"
                 allow="autoplay; fullscreen; xr-spatial-tracking"
                 allowFullScreen
               />
+              <div className="viewer-top-mask" aria-hidden="true" />
               <div className="viewer-mask" aria-hidden="true" />
             </m.div>
 
