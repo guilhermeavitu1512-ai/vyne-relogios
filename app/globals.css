@@ -516,20 +516,7 @@ img {
 }
 
 .section-transition {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 0;
-  height: clamp(110px, 11vw, 160px);
-  overflow: hidden;
-  background: linear-gradient(
-    to bottom,
-    var(--transition-from) 0%,
-    color-mix(in srgb, var(--transition-from) 45%, var(--transition-to)) 52%,
-    var(--transition-to) 100%
-  );
-  pointer-events: none;
+  display: none;
 }
 
 .editorial-intro-copy,
@@ -1057,6 +1044,27 @@ img {
   isolation: isolate;
 }
 
+.manifesto-section::before,
+.manifesto-section::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: clamp(150px, 18vw, 240px);
+  content: "";
+  pointer-events: none;
+}
+
+.manifesto-section::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ink) 0%, rgba(5, 7, 6, 0.76) 34%, transparent 100%);
+}
+
+.manifesto-section::after {
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(5, 7, 6, 0.72) 68%, var(--ink) 100%);
+}
+
 .manifesto-media {
   position: absolute;
   inset: 0;
@@ -1248,6 +1256,18 @@ img {
   z-index: 1;
   height: clamp(150px, 18vw, 230px);
   background: linear-gradient(to bottom, transparent 0%, rgba(5, 7, 6, 0.72) 68%, var(--ink) 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.about-section::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: clamp(140px, 16vw, 210px);
+  background: linear-gradient(to bottom, var(--ink) 0%, rgba(5, 7, 6, 0.72) 36%, transparent 100%);
   content: "";
   pointer-events: none;
 }
