@@ -465,7 +465,7 @@ export default function Home() {
           <CinematicSection
             className="editorial-intro"
             id="essencia"
-            from="darkGreen"
+            from="blackGreen"
             to="blackGreen"
           >
             <AnimatedSection className="editorial-intro-copy">

@@ -13,7 +13,7 @@
   --ivory: #f1efe8;
   --paper-muted: #d8d7d0;
   --mist: #9ea8a1;
-  --line: rgba(241, 239, 232, 0.15);
+  --line: rgba(241, 239, 232, 0.11);
   --line-dark: rgba(5, 8, 6, 0.14);
   --font-display: "Bodoni Moda", Didot, "Times New Roman", serif;
   --font-sans: "Manrope", Arial, Helvetica, sans-serif;
@@ -360,12 +360,13 @@ img {
   bottom: 0;
   left: 0;
   z-index: 5;
-  height: clamp(96px, 21vh, 230px);
+  height: clamp(220px, 34vh, 380px);
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(5, 12, 8, 0.2) 42%,
-    var(--forest-deep) 100%
+    rgba(5, 10, 7, 0.16) 38%,
+    rgba(6, 14, 10, 0.7) 76%,
+    var(--ink-soft) 100%
   );
   content: "";
   pointer-events: none;
@@ -575,9 +576,17 @@ img {
   place-items: center;
   min-height: 80svh;
   padding: 126px var(--page-gutter);
-  background:
-    radial-gradient(circle at 15% 18%, rgba(75, 126, 94, 0.025), transparent 19%),
-    linear-gradient(180deg, #07110d 0%, #08150f 48%, var(--ink) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--ink-soft) 0%,
+    #070f0b 24%,
+    #060a08 62%,
+    var(--ink) 100%
+  );
+}
+
+.editorial-intro > .section-transition {
+  display: none;
 }
 
 .editorial-intro::after {
@@ -644,8 +653,8 @@ img {
   align-items: center;
   min-height: 150px;
   padding: 0 6vw;
-  border-bottom: 1px solid var(--line);
-  background: var(--ink);
+  border-bottom: 1px solid rgba(241, 239, 232, 0.07);
+  background: linear-gradient(180deg, var(--ink), #060907);
 }
 
 .brand-rail-label {
@@ -672,7 +681,7 @@ img {
 
 .collection-section {
   padding: 138px var(--page-gutter) 154px;
-  background: var(--ink);
+  background: linear-gradient(180deg, #060907 0%, var(--ink) 14%, var(--ink) 100%);
 }
 
 .collection-heading {
@@ -711,10 +720,10 @@ img {
   height: clamp(500px, 49vw, 690px);
   margin: 0 -6vw 112px;
   overflow: hidden;
-  border-top: 1px solid rgba(241, 239, 232, 0.1);
-  border-bottom: 1px solid rgba(241, 239, 232, 0.1);
+  border-top: 1px solid rgba(241, 239, 232, 0.06);
+  border-bottom: 1px solid rgba(241, 239, 232, 0.06);
   background:
-    radial-gradient(circle at 50% 115%, rgba(47, 143, 100, 0.09), transparent 47%),
+    radial-gradient(circle at 50% 115%, rgba(47, 143, 100, 0.045), transparent 43%),
     linear-gradient(180deg, #030504 0%, #080b09 54%, #040605 100%);
   isolation: isolate;
 }
@@ -940,7 +949,7 @@ img {
   top: 24px;
   left: 24px;
   padding: 9px 13px;
-  border: 1px solid rgba(241, 239, 232, 0.24);
+  border: 1px solid rgba(241, 239, 232, 0.18);
   border-radius: 999px;
   background: rgba(5, 8, 6, 0.28);
   color: rgba(241, 239, 232, 0.86);
@@ -1113,7 +1122,7 @@ img {
 .confidence-section {
   padding: 144px var(--page-gutter) 154px;
   background:
-    radial-gradient(circle at 88% 5%, rgba(47, 143, 100, 0.045), transparent 24%),
+    radial-gradient(circle at 88% 5%, rgba(47, 143, 100, 0.022), transparent 20%),
     var(--ink);
 }
 
@@ -1160,14 +1169,14 @@ img {
 .trust-card::before {
   position: absolute;
   inset: 0;
-  background: linear-gradient(145deg, rgba(47, 143, 100, 0.16), transparent 64%);
+  background: linear-gradient(145deg, rgba(47, 143, 100, 0.08), transparent 58%);
   content: "";
   opacity: 0;
   transition: opacity 380ms ease;
 }
 
 .trust-card:hover {
-  background: rgba(47, 143, 100, 0.05);
+  background: rgba(47, 143, 100, 0.03);
   transform: translateY(-5px);
 }
 
@@ -1228,7 +1237,7 @@ img {
   display: grid;
   grid-template-columns: 1.08fr 0.92fr;
   min-height: 820px;
-  background: var(--forest-deep);
+  background: linear-gradient(145deg, #07100c 0%, #07130d 42%, #050706 100%);
 }
 
 .image-reveal {
@@ -1356,7 +1365,7 @@ img {
   width: min(55vw, 720px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgba(47, 143, 100, 0.065);
+  background: rgba(47, 143, 100, 0.04);
   filter: blur(72px);
   transform: translate(-50%, -50%);
 }
@@ -1427,7 +1436,7 @@ img {
   gap: 58px;
   padding: 68px var(--page-gutter) 26px;
   border-top: 1px solid var(--line);
-  background: #030504;
+  background: #040605;
 }
 
 .footer-brand p {
@@ -2619,12 +2628,13 @@ img {
   }
 
   .signature-hero::after {
-    height: 168px;
+    height: 220px;
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      rgba(5, 12, 8, 0.26) 32%,
-      var(--forest-deep) 100%
+      rgba(5, 10, 7, 0.14) 30%,
+      rgba(6, 14, 10, 0.7) 72%,
+      var(--ink-soft) 100%
     );
   }
 
