@@ -246,6 +246,12 @@ img {
   transform: translate(3px, -3px);
 }
 
+.button:active,
+.product-card-button:active,
+.modal-close:active {
+  transform: scale(0.98);
+}
+
 .button-primary {
   background: var(--emerald);
   color: #fff;

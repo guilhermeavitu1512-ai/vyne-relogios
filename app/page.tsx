@@ -444,7 +444,7 @@ export default function Home() {
                 <iframe
                   className="signature-hero-sketchfab"
                   title="Relógio Seiko Coutura 3D interativo"
-                  src="https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=2048&ui_theme=dark"
+                  src={`https://sketchfab.com/models/0796e23ab5c0448c9bdf3fe5c3b3e362/embed?autostart=1&camera=0&scrollwheel=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_vr=0&ui_ar=0&dnt=1&transparent=1&max_texture_size=${reducedEffects ? 1024 : 2048}&ui_theme=dark`}
                   loading="eager"
                   allow="autoplay; fullscreen; xr-spatial-tracking"
                   allowFullScreen
@@ -561,7 +561,6 @@ export default function Home() {
                             ? "(max-width: 900px) 100vw, 88vw"
                             : "(max-width: 900px) 100vw, 44vw"
                         }
-                        priority={index === 0}
                       />
                       <span className="product-shade" aria-hidden="true" />
                       <span className="product-tag">{product.tag}</span>
