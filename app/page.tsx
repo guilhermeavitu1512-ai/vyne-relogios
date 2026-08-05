@@ -715,7 +715,7 @@ export default function Home() {
 
           <CinematicSection
             className="final-cta"
-            from="darkGreen"
+            from="black"
             to="black"
           >
             <AuroraBackdrop />

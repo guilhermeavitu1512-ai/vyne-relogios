@@ -1240,6 +1240,18 @@ img {
   background: linear-gradient(145deg, #07100c 0%, #07130d 42%, #050706 100%);
 }
 
+.about-section::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: clamp(150px, 18vw, 230px);
+  background: linear-gradient(to bottom, transparent 0%, rgba(5, 7, 6, 0.72) 68%, var(--ink) 100%);
+  content: "";
+  pointer-events: none;
+}
+
 .image-reveal {
   position: relative;
   overflow: hidden;
@@ -1333,6 +1345,10 @@ img {
   overflow: hidden;
   background: var(--ink);
   isolation: isolate;
+}
+
+.final-cta > .section-transition {
+  display: none;
 }
 
 .final-cta::before,
