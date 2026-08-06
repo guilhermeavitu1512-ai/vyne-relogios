@@ -6,10 +6,8 @@ import {
   useEffect,
   useRef,
   useState,
-  type FocusEvent,
   type KeyboardEvent,
   type PointerEvent,
-  type WheelEvent,
 } from "react";
 import type { Product } from "@/lib/products";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
@@ -39,9 +37,6 @@ export default function RecommendedMarquee({
   const secondGroupRef = useRef<HTMLDivElement>(null);
   const groupWidthRef = useRef(0);
   const frameRef = useRef<number | null>(null);
-  const resumeAtRef = useRef(0);
-  const hoveredRef = useRef(false);
-  const focusWithinRef = useRef(false);
   const suppressClickRef = useRef(false);
   const pointerRef = useRef({
     active: false,
@@ -106,10 +101,6 @@ export default function RecommendedMarquee({
     }
   }, []);
 
-  const pauseAutoplay = useCallback((delay = 2600) => {
-    resumeAtRef.current = performance.now() + delay;
-  }, []);
-
   useEffect(() => {
     const viewport = viewportRef.current;
     const firstGroup = firstGroupRef.current;
@@ -142,13 +133,7 @@ export default function RecommendedMarquee({
       const elapsed = Math.min(time - previousTime, 34);
       previousTime = time;
 
-      if (
-        viewport &&
-        !pointerRef.current.active &&
-        !hoveredRef.current &&
-        !focusWithinRef.current &&
-        time >= resumeAtRef.current
-      ) {
+      if (viewport && !pointerRef.current.dragging) {
         viewport.scrollLeft += elapsed * 0.022;
         normalizePosition();
         updateCenteredCard();
@@ -166,7 +151,6 @@ export default function RecommendedMarquee({
   const moveByViewport = (direction: -1 | 1) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    pauseAutoplay();
     viewport.scrollBy({
       left: direction * Math.max(260, viewport.clientWidth * 0.72),
       behavior: shouldReduceMotion ? "auto" : "smooth",
@@ -187,7 +171,6 @@ export default function RecommendedMarquee({
       dragging: false,
     };
     viewport.setPointerCapture(event.pointerId);
-    pauseAutoplay();
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -215,12 +198,10 @@ export default function RecommendedMarquee({
 
     suppressClickRef.current = pointer.dragging;
     pointer.active = false;
-    if (event.pointerType !== "mouse") hoveredRef.current = false;
     if (viewport.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
     }
     delete viewport.dataset.dragging;
-    pauseAutoplay(3200);
     normalizePosition();
     updateCenteredCard();
   };
@@ -229,20 +210,6 @@ export default function RecommendedMarquee({
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
     moveByViewport(event.key === "ArrowRight" ? 1 : -1);
-  };
-
-  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
-    if (Math.abs(event.deltaX) > 0 || event.shiftKey) pauseAutoplay(3000);
-  };
-
-  const handleFocus = () => {
-    focusWithinRef.current = true;
-  };
-
-  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (event.currentTarget.contains(event.relatedTarget)) return;
-    focusWithinRef.current = false;
-    pauseAutoplay(1800);
   };
 
   return (
@@ -266,20 +233,8 @@ export default function RecommendedMarquee({
         onPointerMove={handlePointerMove}
         onPointerUp={endPointerInteraction}
         onPointerCancel={endPointerInteraction}
-        onPointerEnter={(event) => {
-          if (event.pointerType === "mouse") hoveredRef.current = true;
-        }}
-        onPointerLeave={(event) => {
-          if (event.pointerType === "mouse") {
-            hoveredRef.current = false;
-            pauseAutoplay(1800);
-          }
-        }}
         onKeyDown={handleKeyDown}
-        onWheel={handleWheel}
         onScroll={updateCenteredCard}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
       >
         <div className="recommended-marquee-track">
           {[0, 1, 2].map((groupIndex) => (

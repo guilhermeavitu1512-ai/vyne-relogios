@@ -69,6 +69,8 @@ function Section({
 function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fallbackRef = useRef<number | null>(null);
+  const startRequestedRef = useRef(false);
+  const startedRef = useRef(false);
   const [contentVisible, setContentVisible] = useState(reduceMotion);
 
   const revealContent = useCallback(() => {
@@ -79,6 +81,29 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
     setContentVisible(true);
   }, []);
 
+  const startPlayback = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || startedRef.current) return;
+
+    if (reduceMotion) {
+      revealContent();
+      return;
+    }
+
+    startRequestedRef.current = true;
+    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+
+    startRequestedRef.current = false;
+    startedRef.current = true;
+    video.pause();
+    video.currentTime = 0;
+    fallbackRef.current = window.setTimeout(revealContent, 12000);
+
+    window.requestAnimationFrame(() => {
+      video.play().catch(revealContent);
+    });
+  }, [reduceMotion, revealContent]);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -88,10 +113,6 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
       const frame = window.requestAnimationFrame(revealContent);
       return () => window.cancelAnimationFrame(frame);
     }
-
-    fallbackRef.current = window.setTimeout(revealContent, 12000);
-    const playback = video.play();
-    playback?.catch(revealContent);
 
     return () => {
       if (fallbackRef.current !== null) window.clearTimeout(fallbackRef.current);
@@ -106,6 +127,7 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
           initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: reduceMotion ? 0 : 0.55, ease: editorialEase }}
+          onAnimationComplete={startPlayback}
         >
           <video
             ref={videoRef}
@@ -113,8 +135,10 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
             src="/media/vyne-v-intro.mp4"
             muted
             playsInline
-            autoPlay={!reduceMotion}
             preload="auto"
+            onCanPlay={() => {
+              if (startRequestedRef.current) startPlayback();
+            }}
             onEnded={revealContent}
             onError={revealContent}
             aria-label="Animação da letra V da VYNE"
@@ -138,7 +162,7 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
             BUSCA PERSONALIDADE, QUALIDADE E ESCOLHAS MAIS INTELIGENTES.
           </p>
           <a className="button button-primary hero-intro-action" href="#recomendados">
-            EXPLORAR RELÓGIOS <span aria-hidden="true">↓</span>
+            EXPLORAR RELÓGIOS
           </a>
         </m.div>
       </div>
