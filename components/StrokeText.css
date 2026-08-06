@@ -33,19 +33,12 @@
 }
 
 .hero-stroke-title .stroke-text + .stroke-text {
-  margin-top: -5px;
+  margin-top: clamp(-10px, -0.6vw, -4px);
 }
 
-.hero-stroke-row--real {
-  width: 44%;
-}
-
-.hero-stroke-row--price {
-  width: 48%;
-}
-
-.hero-stroke-row--smart {
-  width: 96%;
+.hero-stroke-row {
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 640px) {
@@ -56,17 +49,5 @@
 
   .hero-stroke-title .stroke-text + .stroke-text {
     margin-top: -4px;
-  }
-
-  .hero-stroke-row--real {
-    width: 48%;
-  }
-
-  .hero-stroke-row--price {
-    width: 52%;
-  }
-
-  .hero-stroke-row--smart {
-    width: 100%;
   }
 }

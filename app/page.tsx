@@ -240,39 +240,21 @@ export default function Home() {
                     aria-label="Sofisticação real. Preço inteligente."
                   >
                     <StrokeText
-                      text="SOFISTICAÇÃO"
-                      className="hero-stroke-row hero-stroke-row--sophistication"
+                      text="SOFISTICAÇÃO REAL."
+                      className="hero-stroke-row hero-stroke-row--primary"
                       strokeColor="#6fbd8e"
                       fillColor="#f1efe8"
                       startDelay={0.05}
-                      height="clamp(50px, 13.8vw, 76px)"
+                      height="clamp(46px, 7.2vw, 98px)"
                       ariaHidden
                     />
                     <StrokeText
-                      text="REAL."
-                      className="hero-stroke-row hero-stroke-row--real"
-                      strokeColor="#6fbd8e"
-                      fillColor="#f1efe8"
-                      startDelay={0.12}
-                      height="clamp(50px, 13.8vw, 76px)"
-                      ariaHidden
-                    />
-                    <StrokeText
-                      text="PREÇO"
-                      className="hero-stroke-row hero-stroke-row--price"
+                      text="PREÇO INTELIGENTE."
+                      className="hero-stroke-row hero-stroke-row--accent"
                       strokeColor="#f1efe8"
                       fillColor="#6fbd8e"
-                      startDelay={0.19}
-                      height="clamp(50px, 13.8vw, 76px)"
-                      ariaHidden
-                    />
-                    <StrokeText
-                      text="INTELIGENTE."
-                      className="hero-stroke-row hero-stroke-row--smart"
-                      strokeColor="#f1efe8"
-                      fillColor="#6fbd8e"
-                      startDelay={0.26}
-                      height="clamp(50px, 13.8vw, 76px)"
+                      startDelay={0.18}
+                      height="clamp(46px, 7.2vw, 98px)"
                       ariaHidden
                     />
                   </h1>
