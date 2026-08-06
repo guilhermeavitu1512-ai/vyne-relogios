@@ -121,12 +121,12 @@ function createTitleTexture(gl: GL, text: string, color: string) {
   if (!context) throw new Error("Não foi possível criar o título da galeria.");
 
   const fontSize = 28 * scale;
-  context.font = `600 ${fontSize}px Manrope, Arial, sans-serif`;
+  context.font = `400 ${fontSize}px "Gasoek One", sans-serif`;
   const textWidth = Math.ceil(context.measureText(text).width);
   canvas.width = textWidth + 40 * scale;
   canvas.height = 66 * scale;
 
-  context.font = `600 ${fontSize}px Manrope, Arial, sans-serif`;
+  context.font = `400 ${fontSize}px "Gasoek One", sans-serif`;
   context.fillStyle = color;
   context.textAlign = "center";
   context.textBaseline = "middle";

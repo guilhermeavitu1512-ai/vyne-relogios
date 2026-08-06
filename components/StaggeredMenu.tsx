@@ -44,14 +44,14 @@ type StaggeredMenuProps = {
 
 export default function StaggeredMenu({
   position = "right",
-  colors = ["#0b2117", "#173629", "#294738"],
+  colors = ["#a3fb06", "#263a04", "#101700"],
   items,
   socialItems = [],
   displaySocials = false,
   displayItemNumbering = true,
-  menuButtonColor = "#f1efe8",
-  openMenuButtonColor = "#f1efe8",
-  accentColor = "#4b9c70",
+  menuButtonColor = "#ffffff",
+  openMenuButtonColor = "#ffffff",
+  accentColor = "#a3fb06",
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose,
@@ -60,6 +60,7 @@ export default function StaggeredMenu({
   headerLinks = [],
 }: StaggeredMenuProps) {
   const [open, setOpen] = useState(false);
+  const [activeTarget, setActiveTarget] = useState("");
   const openRef = useRef(false);
   const panelRef = useRef<HTMLElement>(null);
   const layersRef = useRef<HTMLDivElement>(null);
@@ -305,6 +306,20 @@ export default function StaggeredMenu({
     [],
   );
 
+  useEffect(() => {
+    const updateActiveTarget = () => {
+      setActiveTarget(`${window.location.pathname}${window.location.hash}`);
+    };
+    const frame = window.requestAnimationFrame(updateActiveTarget);
+    window.addEventListener("hashchange", updateActiveTarget);
+    window.addEventListener("popstate", updateActiveTarget);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", updateActiveTarget);
+      window.removeEventListener("popstate", updateActiveTarget);
+    };
+  }, []);
+
   return (
     <div
       className={`staggered-menu-wrapper ${isFixed ? "fixed-wrapper" : ""} ${
@@ -345,7 +360,11 @@ export default function StaggeredMenu({
           {headerLinks.length > 0 && (
             <nav className="sm-header-nav" aria-label="Atalhos principais">
               {headerLinks.map((item) => (
-                <Link href={item.link} key={`${item.label}-${item.link}`}>
+                <Link
+                  href={item.link}
+                  aria-current={activeTarget === item.link ? "location" : undefined}
+                  key={`${item.label}-${item.link}`}
+                >
                   {item.label}
                 </Link>
               ))}
@@ -398,6 +417,7 @@ export default function StaggeredMenu({
                   className="sm-panel-item"
                   href={item.link}
                   aria-label={item.ariaLabel}
+                  aria-current={activeTarget === item.link ? "location" : undefined}
                   onClick={() => closeMenu(false)}
                 >
                   <span className="sm-panel-item-label">{item.label}</span>

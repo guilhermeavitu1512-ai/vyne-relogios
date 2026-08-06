@@ -34,6 +34,11 @@ test("renders the finished VYNE home page", async () => {
   assert.match(html, /VYNE/);
   assert.match(html, /Sofistica(?:ç|&#xE7;|&ccedil;)ão real/i);
   assert.match(html, /Explorar cole(?:ç|&#xE7;|&ccedil;)ão/i);
+  assert.match(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
+  assert.match(html, /Quem somos/i);
+  assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
+  assert.match(html, /Arraste horizontalmente ou use as setas do teclado/i);
+  assert.doesNotMatch(html, /id=["']confianca["']/i);
   assert.match(html, /Ir para o conte(?:ú|&#xFA;|&uacute;)do/i);
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/i);

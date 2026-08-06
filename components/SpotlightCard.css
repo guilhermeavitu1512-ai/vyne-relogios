@@ -5,7 +5,7 @@
   isolation: isolate;
   --mouse-x: 50%;
   --mouse-y: 50%;
-  --spotlight-color: rgba(111, 189, 142, 0.22);
+  --spotlight-color: rgba(163, 251, 6, 0.16);
 }
 
 .card-spotlight::before {

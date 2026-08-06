@@ -21,8 +21,8 @@
   border: 1px solid rgba(241, 239, 232, 0.15);
   border-radius: 3px;
   background:
-    radial-gradient(circle at 76% 10%, rgba(76, 155, 112, 0.11), transparent 33%),
-    #060a08;
+    radial-gradient(circle at 76% 10%, rgba(163, 251, 6, 0.08), transparent 30%),
+    #080808;
   box-shadow: 0 32px 90px rgba(0, 0, 0, 0.58);
   animation: product-dialog-in 460ms var(--ease-editorial) both;
 }
@@ -58,8 +58,7 @@
 .product-dialog-close:hover,
 .product-dialog-close:focus-visible {
   border-color: var(--green-bright);
-  background: rgba(76, 155, 112, 0.5);
-  transform: rotate(4deg);
+  background: rgba(163, 251, 6, 0.18);
 }
 
 .product-dialog-image {
@@ -79,7 +78,7 @@
 }
 
 .product-dialog-image img {
-  object-fit: cover;
+  object-fit: contain;
   filter: brightness(1.1) contrast(1.03);
 }
 
@@ -194,8 +193,8 @@
 .product-dialog-notice {
   margin-top: 18px;
   padding: 18px;
-  border: 1px solid rgba(111, 189, 142, 0.24);
-  background: rgba(76, 155, 112, 0.08);
+  border: 1px solid rgba(163, 251, 6, 0.28);
+  background: rgba(163, 251, 6, 0.07);
   animation: product-notice-in 320ms var(--ease-editorial) both;
 }
 

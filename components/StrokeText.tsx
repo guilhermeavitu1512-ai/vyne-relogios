@@ -51,8 +51,8 @@ type TextBox = {
 
 export default function StrokeText({
   text,
-  strokeColor = "#6fbd8e",
-  fillColor = "#f1efe8",
+  strokeColor = "#a3fb06",
+  fillColor = "#ffffff",
   strokeWidth = 1.2,
   drawDuration = 1.35,
   fillDelay = 0.08,
@@ -61,7 +61,7 @@ export default function StrokeText({
   trigger = "mount",
   fillMode = "wipe",
   fontSize = 118,
-  fontWeight = 500,
+  fontWeight = 400,
   letterSpacing = -4,
   reverse = false,
   startDelay = 0,

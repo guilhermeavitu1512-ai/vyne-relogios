@@ -1,0 +1,240 @@
+.recommended-marquee-shell {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: clip;
+}
+
+.recommended-marquee-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  max-width: var(--content-width);
+  margin: 0 auto 18px;
+  padding-inline: var(--page-gutter);
+}
+
+.recommended-marquee-controls button {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: #080808;
+  color: #fff;
+  font-size: 18px;
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.recommended-marquee-controls button:hover,
+.recommended-marquee-controls button:focus-visible {
+  border-color: #a3fb06;
+  background: #a3fb06;
+  color: #000;
+}
+
+.recommended-marquee-viewport {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 var(--page-gutter) 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.recommended-marquee-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.recommended-marquee-viewport[data-dragging="true"] {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.recommended-marquee-track,
+.recommended-marquee-group {
+  display: flex;
+  width: max-content;
+}
+
+.recommended-marquee-track {
+  gap: 18px;
+}
+
+.recommended-marquee-group {
+  gap: 18px;
+}
+
+.recommended-card {
+  flex: 0 0 clamp(250px, 23vw, 340px);
+  width: clamp(250px, 23vw, 340px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  background: #080808;
+  scroll-snap-align: start;
+  transition:
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    transform 260ms ease;
+}
+
+.recommended-card:hover,
+.recommended-card:focus-within {
+  border-color: rgba(163, 251, 6, 0.52);
+  box-shadow:
+    0 0 22px rgba(163, 251, 6, 0.12),
+    0 20px 50px rgba(0, 0, 0, 0.28);
+  transform: translateY(-2px);
+}
+
+.recommended-card > button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.recommended-card-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #050505;
+}
+
+.recommended-card-image::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.52), transparent 42%);
+  content: "";
+  pointer-events: none;
+}
+
+.recommended-card-image img {
+  object-fit: contain;
+  padding: 10px;
+  filter: brightness(1.1) contrast(1.04);
+  transition: transform 520ms ease;
+}
+
+.recommended-card:hover .recommended-card-image img,
+.recommended-card:focus-within .recommended-card-image img {
+  transform: scale(1.025);
+}
+
+.recommended-card-image > span {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 14px;
+  max-width: calc(100% - 28px);
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #a3fb06;
+  color: #000;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.recommended-card-copy {
+  min-height: 150px;
+  padding: 20px;
+}
+
+.recommended-card-copy > span {
+  color: #a3fb06;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.recommended-card-copy h3 {
+  margin: 9px 0 20px;
+  overflow-wrap: break-word;
+  font-size: clamp(22px, 2.2vw, 31px);
+  font-weight: 400;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.recommended-card-copy > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.recommended-card-copy strong {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.recommended-card-copy i {
+  color: #d8d8d8;
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 1023px) {
+  .recommended-card {
+    flex-basis: clamp(270px, 42vw, 340px);
+    width: clamp(270px, 42vw, 340px);
+  }
+}
+
+@media (max-width: 639px) {
+  .recommended-marquee-controls {
+    margin-bottom: 12px;
+  }
+
+  .recommended-marquee-controls button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .recommended-marquee-viewport {
+    padding-inline: 16px;
+  }
+
+  .recommended-card {
+    flex-basis: min(82vw, 330px);
+    width: min(82vw, 330px);
+  }
+
+  .recommended-card-copy {
+    min-height: 142px;
+    padding: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recommended-card,
+  .recommended-card-image img,
+  .recommended-marquee-controls button {
+    transition: none;
+  }
+}
+
+.user-reduced-motion .recommended-card,
+.user-reduced-motion .recommended-card-image img,
+.user-reduced-motion .recommended-marquee-controls button {
+  transition: none;
+}

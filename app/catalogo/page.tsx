@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import FreeShippingBanner from "@/components/FreeShippingBanner";
 import ProductQuickView from "@/components/ProductQuickView";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
@@ -10,12 +11,8 @@ import { brandNames, products, type Product } from "@/lib/products";
 
 const menuItems = [
   { label: "Início", ariaLabel: "Voltar ao início", link: "/#inicio" },
-  { label: "Coleção", ariaLabel: "Ver a coleção", link: "/catalogo" },
-  {
-    label: "Autenticidade",
-    ariaLabel: "Conhecer os compromissos da VYNE",
-    link: "/#confianca",
-  },
+  { label: "Recomendados", ariaLabel: "Ver relógios recomendados", link: "/#recomendados" },
+  { label: "Coleção", ariaLabel: "Ver a coleção", link: "/#colecao" },
   { label: "A VYNE", ariaLabel: "Conhecer a VYNE", link: "/#sobre" },
 ];
 
@@ -73,15 +70,16 @@ export default function CatalogPage() {
 
   return (
     <div className="site-shell catalog-shell">
+      <FreeShippingBanner />
       <StaggeredMenu
         items={menuItems}
         headerLinks={[
           { label: "Início", link: "/#inicio" },
-          { label: "Autenticidade", link: "/#confianca" },
+          { label: "A VYNE", link: "/#sobre" },
         ]}
-        accentColor="#4c9b70"
-        menuButtonColor="#f1efe8"
-        openMenuButtonColor="#f1efe8"
+        accentColor="#a3fb06"
+        menuButtonColor="#ffffff"
+        openMenuButtonColor="#ffffff"
         closeOnClickAway
         isFixed
         scrolled

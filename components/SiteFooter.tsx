@@ -16,7 +16,7 @@ export default function SiteFooter() {
           <div>
             <span>Explorar</span>
             <Link href="/catalogo">Catálogo</Link>
-            <Link href="/#confianca">Autenticidade</Link>
+            <Link href="/#recomendados">Recomendados</Link>
             <Link href="/#sobre">A VYNE</Link>
           </div>
           <div>
