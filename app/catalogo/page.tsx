@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ProductQuickView from "@/components/ProductQuickView";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
 import SpotlightCard from "@/components/SpotlightCard";
 import StaggeredMenu from "@/components/StaggeredMenu";
-import { brandNames, products } from "@/lib/products";
+import { brandNames, products, type Product } from "@/lib/products";
 
 const menuItems = [
   { label: "Início", ariaLabel: "Voltar ao início", link: "/#inicio" },
@@ -25,6 +26,7 @@ export default function CatalogPage() {
   const [brand, setBrand] = useState("Todas");
   const [category, setCategory] = useState<(typeof categories)[number]>("Todos");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -162,37 +164,49 @@ export default function CatalogPage() {
                 const key = `${product.brand}-${product.model}`;
                 const isFavorite = favorites.includes(key);
                 return (
-                    <SpotlightCard as="article" className="catalog-card" key={key}>
-                    <div className="catalog-card-image">
-                      <ResponsiveWatchImage
-                        src={product.image}
-                        alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
-                        sizes="(max-width: 700px) 100vw, 50vw"
-                      />
-                      <span className="catalog-card-tag">{product.tag}</span>
-                      <button
-                        className="favorite-button"
-                        type="button"
-                        aria-label={`${isFavorite ? "Remover" : "Adicionar"} ${product.brand} ${product.model} ${isFavorite ? "dos" : "aos"} favoritos`}
-                        aria-pressed={isFavorite}
-                        onClick={() => toggleFavorite(key)}
-                      >
-                        <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
-                      </button>
-                    </div>
-                    <div className="catalog-card-copy">
-                      <span>{product.brand}</span>
-                      <h2>{product.model}</h2>
-                      <p>{product.descriptor}</p>
-                      <ul>
-                        {product.specs.map((spec) => <li key={spec}>{spec}</li>)}
-                      </ul>
-                      <div>
-                        <small>A partir de</small>
-                        <strong>{product.price}</strong>
+                  <SpotlightCard as="article" className="catalog-card" key={key}>
+                    <button
+                      className="catalog-card-trigger"
+                      type="button"
+                      aria-label={`Ver detalhes e comprar ${product.brand} ${product.model}`}
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      <div className="catalog-card-image">
+                        <ResponsiveWatchImage
+                          src={product.image}
+                          alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
+                          sizes="(max-width: 700px) 100vw, 50vw"
+                        />
+                        <span className="catalog-card-tag">{product.tag}</span>
                       </div>
-                    </div>
-                    </SpotlightCard>
+                      <div className="catalog-card-copy">
+                        <span>{product.brand}</span>
+                        <h2>{product.model}</h2>
+                        <p>{product.descriptor}</p>
+                        <ul>
+                          {product.specs.map((spec) => <li key={spec}>{spec}</li>)}
+                        </ul>
+                        <div>
+                          <span className="catalog-card-price">
+                            <small>A partir de</small>
+                            <strong>{product.price}</strong>
+                          </span>
+                          <span className="catalog-card-action">
+                            Ver detalhes <span aria-hidden="true">→</span>
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                    <button
+                      className="favorite-button"
+                      type="button"
+                      aria-label={`${isFavorite ? "Remover" : "Adicionar"} ${product.brand} ${product.model} ${isFavorite ? "dos" : "aos"} favoritos`}
+                      aria-pressed={isFavorite}
+                      onClick={() => toggleFavorite(key)}
+                    >
+                      <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
+                    </button>
+                  </SpotlightCard>
                 );
               })}
             </div>
@@ -222,6 +236,10 @@ export default function CatalogPage() {
       </main>
 
       <SiteFooter />
+      <ProductQuickView
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   );
 }

@@ -49,4 +49,5 @@ test("renders the searchable catalog route", async () => {
   assert.match(html, /SEIKO/);
   assert.match(html, /CASIO/);
   assert.match(html, /Adicionar.+favoritos/i);
+  assert.match(html, /Ver detalhes e comprar SEIKO 5 Sports/i);
 });

@@ -12,12 +12,13 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
+import ProductQuickView from "@/components/ProductQuickView";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
 import SpotlightCard from "@/components/SpotlightCard";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import StrokeText from "@/components/StrokeText";
-import { brandNames, products } from "@/lib/products";
+import { brandNames, products, type Product } from "@/lib/products";
 import { editorialEase, motionDurations, staggerDelay } from "@/lib/motion";
 
 const CircularGallery = dynamic(() => import("@/components/CircularGallery"), {
@@ -106,7 +107,11 @@ function useCompactEffects() {
   return compact;
 }
 
-function ProductGalleryShowcase() {
+function ProductGalleryShowcase({
+  onSelectProduct,
+}: {
+  onSelectProduct: (product: Product) => void;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -140,17 +145,23 @@ function ProductGalleryShowcase() {
                   className="gallery-static-card"
                   key={`${product.brand}-${product.model}`}
                 >
-                  <div>
-                  <ResponsiveWatchImage
-                    src={product.image}
-                    alt={`${product.brand} ${product.model}`}
-                    sizes="78vw"
-                  />
-                </div>
-                  <span>{product.brand}</span>
-                  <strong>{product.model}</strong>
+                  <button
+                    type="button"
+                    aria-label={`Ver detalhes e comprar ${product.brand} ${product.model}`}
+                    onClick={() => onSelectProduct(product)}
+                  >
+                    <div>
+                      <ResponsiveWatchImage
+                        src={product.image}
+                        alt={`${product.brand} ${product.model}`}
+                        sizes="78vw"
+                      />
+                    </div>
+                    <span>{product.brand}</span>
+                    <strong>{product.model}</strong>
+                  </button>
                 </SpotlightCard>
-            ))}
+              ))}
           </div>
         ) : ready ? (
           <CircularGallery
@@ -171,6 +182,7 @@ function ProductGalleryShowcase() {
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const reduceMotion = useReducedMotion();
   const compactEffects = useCompactEffects();
   const { scrollY, scrollYProgress } = useScroll();
@@ -356,7 +368,7 @@ export default function Home() {
               </div>
             </AnimatedSection>
 
-            <ProductGalleryShowcase />
+            <ProductGalleryShowcase onSelectProduct={setSelectedProduct} />
 
             <div className="featured-products" aria-label="Produtos em destaque">
               {products.slice(0, 3).map((product, index) => (
@@ -373,7 +385,12 @@ export default function Home() {
                   }}
                   >
                     <SpotlightCard className="featured-card-spotlight">
-                      <a href={`/catalogo?busca=${encodeURIComponent(`${product.brand} ${product.model}`)}`}>
+                      <button
+                        className="featured-card-trigger"
+                        type="button"
+                        aria-label={`Ver detalhes e comprar ${product.brand} ${product.model}`}
+                        onClick={() => setSelectedProduct(product)}
+                      >
                         <div className="featured-image">
                           <ResponsiveWatchImage
                             src={product.image}
@@ -388,7 +405,7 @@ export default function Home() {
                           <p>{product.descriptor}</p>
                           <strong>{product.price}</strong>
                         </div>
-                      </a>
+                      </button>
                     </SpotlightCard>
                   </m.article>
               ))}
@@ -467,6 +484,10 @@ export default function Home() {
         </main>
 
         <SiteFooter />
+        <ProductQuickView
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
       </div>
     </LazyMotion>
   );
