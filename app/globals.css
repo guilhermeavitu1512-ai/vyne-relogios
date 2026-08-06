@@ -638,8 +638,9 @@ canvas {
   min-width: 0;
 }
 
-.featured-card > a {
+.featured-card-spotlight > a {
   display: block;
+  height: 100%;
 }
 
 .featured-image {

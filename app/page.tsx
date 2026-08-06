@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
+import SpotlightCard from "@/components/SpotlightCard";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import StrokeText from "@/components/StrokeText";
 import { brandNames, products } from "@/lib/products";
@@ -133,18 +134,22 @@ function ProductGalleryShowcase() {
       <div className="gallery-stage" ref={containerRef}>
         {reduceMotion ? (
           <div className="gallery-static" role="region" aria-label="Relógios disponíveis">
-            {products.map((product) => (
-              <article key={`${product.brand}-${product.model}`}>
-                <div>
+              {products.map((product) => (
+                <SpotlightCard
+                  as="article"
+                  className="gallery-static-card"
+                  key={`${product.brand}-${product.model}`}
+                >
+                  <div>
                   <ResponsiveWatchImage
                     src={product.image}
                     alt={`${product.brand} ${product.model}`}
                     sizes="78vw"
                   />
                 </div>
-                <span>{product.brand}</span>
-                <strong>{product.model}</strong>
-              </article>
+                  <span>{product.brand}</span>
+                  <strong>{product.model}</strong>
+                </SpotlightCard>
             ))}
           </div>
         ) : ready ? (
@@ -366,24 +371,26 @@ export default function Home() {
                     delay: reduceMotion ? 0 : index * 0.07,
                     ease: editorialEase,
                   }}
-                >
-                  <a href={`/catalogo?busca=${encodeURIComponent(`${product.brand} ${product.model}`)}`}>
-                    <div className="featured-image">
-                      <ResponsiveWatchImage
-                        src={product.image}
-                        alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
-                        sizes="(max-width: 700px) 82vw, 31vw"
-                      />
-                      <span>{product.tag}</span>
-                    </div>
-                    <div className="featured-info">
-                      <span>{product.brand}</span>
-                      <h3>{product.model}</h3>
-                      <p>{product.descriptor}</p>
-                      <strong>{product.price}</strong>
-                    </div>
-                  </a>
-                </m.article>
+                  >
+                    <SpotlightCard className="featured-card-spotlight">
+                      <a href={`/catalogo?busca=${encodeURIComponent(`${product.brand} ${product.model}`)}`}>
+                        <div className="featured-image">
+                          <ResponsiveWatchImage
+                            src={product.image}
+                            alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
+                            sizes="(max-width: 700px) 82vw, 31vw"
+                          />
+                          <span>{product.tag}</span>
+                        </div>
+                        <div className="featured-info">
+                          <span>{product.brand}</span>
+                          <h3>{product.model}</h3>
+                          <p>{product.descriptor}</p>
+                          <strong>{product.price}</strong>
+                        </div>
+                      </a>
+                    </SpotlightCard>
+                  </m.article>
               ))}
             </div>
 

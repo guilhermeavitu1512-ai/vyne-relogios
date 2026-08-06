@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
+import SpotlightCard from "@/components/SpotlightCard";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import { brandNames, products } from "@/lib/products";
 
@@ -161,7 +162,7 @@ export default function CatalogPage() {
                 const key = `${product.brand}-${product.model}`;
                 const isFavorite = favorites.includes(key);
                 return (
-                  <article className="catalog-card" key={key}>
+                    <SpotlightCard as="article" className="catalog-card" key={key}>
                     <div className="catalog-card-image">
                       <ResponsiveWatchImage
                         src={product.image}
@@ -191,7 +192,7 @@ export default function CatalogPage() {
                         <strong>{product.price}</strong>
                       </div>
                     </div>
-                  </article>
+                    </SpotlightCard>
                 );
               })}
             </div>

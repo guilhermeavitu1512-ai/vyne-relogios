@@ -1,0 +1,46 @@
+.card-spotlight {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(111, 189, 142, 0.22);
+}
+
+.card-spotlight::before {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background: radial-gradient(
+    circle 280px at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 76%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 450ms var(--ease-editorial);
+}
+
+.card-spotlight:hover::before,
+.card-spotlight:focus-within::before {
+  opacity: 0.72;
+}
+
+.featured-card-spotlight {
+  height: 100%;
+}
+
+@media (hover: none) {
+  .card-spotlight::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-spotlight::before {
+    transition: none;
+  }
+}
