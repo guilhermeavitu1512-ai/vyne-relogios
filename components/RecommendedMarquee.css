@@ -48,7 +48,7 @@
   touch-action: pan-y;
   overscroll-behavior-inline: contain;
   scrollbar-width: none;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: none;
 }
 
 .recommended-marquee-viewport::-webkit-scrollbar {
@@ -57,7 +57,6 @@
 
 .recommended-marquee-viewport[data-dragging="true"] {
   cursor: grabbing;
-  scroll-snap-type: none;
   user-select: none;
 }
 
