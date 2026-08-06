@@ -15,6 +15,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
 import StaggeredMenu from "@/components/StaggeredMenu";
+import StrokeText from "@/components/StrokeText";
 import { brandNames, products } from "@/lib/products";
 import { editorialEase, motionDurations, staggerDelay } from "@/lib/motion";
 
@@ -233,9 +234,47 @@ export default function Home() {
                   transition={{ duration: reduceMotion ? 0 : 0.85, ease: editorialEase }}
                 >
                   <span className="eyebrow">Curadoria independente · Relógios originais</span>
-                  <h1 id="hero-title">
-                    Sofisticação real.
-                    <em>Preço inteligente.</em>
+                  <h1
+                    id="hero-title"
+                    className="hero-stroke-title"
+                    aria-label="Sofisticação real. Preço inteligente."
+                  >
+                    <StrokeText
+                      text="SOFISTICAÇÃO"
+                      className="hero-stroke-row hero-stroke-row--sophistication"
+                      strokeColor="#6fbd8e"
+                      fillColor="#f1efe8"
+                      startDelay={0.05}
+                      height="clamp(50px, 13.8vw, 76px)"
+                      ariaHidden
+                    />
+                    <StrokeText
+                      text="REAL."
+                      className="hero-stroke-row hero-stroke-row--real"
+                      strokeColor="#6fbd8e"
+                      fillColor="#f1efe8"
+                      startDelay={0.12}
+                      height="clamp(50px, 13.8vw, 76px)"
+                      ariaHidden
+                    />
+                    <StrokeText
+                      text="PREÇO"
+                      className="hero-stroke-row hero-stroke-row--price"
+                      strokeColor="#f1efe8"
+                      fillColor="#6fbd8e"
+                      startDelay={0.19}
+                      height="clamp(50px, 13.8vw, 76px)"
+                      ariaHidden
+                    />
+                    <StrokeText
+                      text="INTELIGENTE."
+                      className="hero-stroke-row hero-stroke-row--smart"
+                      strokeColor="#f1efe8"
+                      fillColor="#6fbd8e"
+                      startDelay={0.26}
+                      height="clamp(50px, 13.8vw, 76px)"
+                      ariaHidden
+                    />
                   </h1>
                   <p>
                     Seiko, Casio, Citizen, Orient e Timex selecionados para quem procura
