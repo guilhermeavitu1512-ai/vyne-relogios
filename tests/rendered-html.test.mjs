@@ -32,12 +32,18 @@ test("renders the finished VYNE home page", async () => {
 
   const html = await response.text();
   assert.match(html, /VYNE/);
-  assert.match(html, /Sofistica(?:ç|&#xE7;|&ccedil;)ão real/i);
+  assert.match(html, /Quem somos n(?:ó|&#xF3;|&oacute;)s/i);
+  assert.match(html, /Curadoria independente.+Rel(?:ó|&#xF3;|&oacute;)gios originais/i);
+  assert.match(html, /media\/vyne-v-intro\.mp4/i);
+  assert.match(html, /Explorar rel(?:ó|&#xF3;|&oacute;)gios/i);
   assert.match(html, /Explorar cole(?:ç|&#xE7;|&ccedil;)ão/i);
   assert.match(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
-  assert.match(html, /Quem somos/i);
   assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
   assert.match(html, /Arraste horizontalmente ou use as setas do teclado/i);
+  assert.doesNotMatch(html, /<iframe\b/i);
+  assert.doesNotMatch(html, /5 marcas reconhecidas/i);
+  assert.doesNotMatch(html, /r(?:é|&#xE9;|&eacute;)plicas no cat(?:á|&#xE1;|&aacute;)logo/i);
+  assert.doesNotMatch(html, /100%.+originalidade/i);
   assert.doesNotMatch(html, /id=["']confianca["']/i);
   assert.match(html, /Ir para o conte(?:ú|&#xFA;|&uacute;)do/i);
   assert.doesNotMatch(html, developmentPreviewMeta);

@@ -18,6 +18,7 @@ import "./RecommendedMarquee.css";
 type RecommendedMarqueeProps = {
   products: Product[];
   onSelectProduct: (product: Product) => void;
+  variant?: "recommended" | "gallery";
 };
 
 const recommendationLabels = [
@@ -31,6 +32,7 @@ const recommendationLabels = [
 export default function RecommendedMarquee({
   products,
   onSelectProduct,
+  variant = "recommended",
 }: RecommendedMarqueeProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const firstGroupRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,31 @@ export default function RecommendedMarquee({
   const reducedMotion = useReducedMotion();
   const [userReducedMotion, setUserReducedMotion] = useState(false);
   const shouldReduceMotion = Boolean(reducedMotion) || userReducedMotion;
+
+  const updateCenteredCard = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const viewportCenter = viewportRect.left + viewportRect.width / 2;
+    let closestCard: HTMLElement | null = null;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    viewport.querySelectorAll<HTMLElement>(".recommended-card").forEach((card) => {
+      const cardRect = card.getBoundingClientRect();
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      const distance = Math.abs(cardCenter - viewportCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestCard = card;
+      }
+    });
+
+    viewport.querySelectorAll<HTMLElement>(".recommended-card[data-centered]").forEach((card) => {
+      if (card !== closestCard) delete card.dataset.centered;
+    });
+    if (closestCard) (closestCard as HTMLElement).dataset.centered = "true";
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -96,6 +123,7 @@ export default function RecommendedMarquee({
       groupWidthRef.current = groupWidth;
       if (wasUninitialized) viewport.scrollLeft = groupWidth;
       normalizePosition();
+      window.requestAnimationFrame(updateCenteredCard);
     };
 
     measure();
@@ -103,7 +131,7 @@ export default function RecommendedMarquee({
     observer.observe(viewport);
     observer.observe(firstGroup);
     return () => observer.disconnect();
-  }, [normalizePosition, products]);
+  }, [normalizePosition, products, updateCenteredCard]);
 
   useEffect(() => {
     if (shouldReduceMotion) return;
@@ -123,6 +151,7 @@ export default function RecommendedMarquee({
       ) {
         viewport.scrollLeft += elapsed * 0.022;
         normalizePosition();
+        updateCenteredCard();
       }
 
       frameRef.current = window.requestAnimationFrame(animate);
@@ -132,7 +161,7 @@ export default function RecommendedMarquee({
     return () => {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
     };
-  }, [normalizePosition, shouldReduceMotion]);
+  }, [normalizePosition, shouldReduceMotion, updateCenteredCard]);
 
   const moveByViewport = (direction: -1 | 1) => {
     const viewport = viewportRef.current;
@@ -176,6 +205,7 @@ export default function RecommendedMarquee({
     if (!pointer.dragging) return;
     viewport.scrollLeft = pointer.startScrollLeft - deltaX;
     normalizePosition();
+    updateCenteredCard();
   };
 
   const endPointerInteraction = (event: PointerEvent<HTMLDivElement>) => {
@@ -192,6 +222,7 @@ export default function RecommendedMarquee({
     delete viewport.dataset.dragging;
     pauseAutoplay(3200);
     normalizePosition();
+    updateCenteredCard();
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -215,8 +246,8 @@ export default function RecommendedMarquee({
   };
 
   return (
-    <div className="recommended-marquee-shell">
-      <div className="recommended-marquee-controls" aria-label="Controles dos recomendados">
+    <div className={`recommended-marquee-shell recommended-marquee-shell--${variant}`}>
+      <div className="recommended-marquee-controls" aria-label="Controles do carrossel">
         <button type="button" onClick={() => moveByViewport(-1)} aria-label="Relógios anteriores">
           <span aria-hidden="true">←</span>
         </button>
@@ -246,6 +277,7 @@ export default function RecommendedMarquee({
         }}
         onKeyDown={handleKeyDown}
         onWheel={handleWheel}
+        onScroll={updateCenteredCard}
         onFocus={handleFocus}
         onBlur={handleBlur}
       >
@@ -259,7 +291,7 @@ export default function RecommendedMarquee({
             >
               {products.map((product, productIndex) => (
                 <article
-                  className="recommended-card"
+                  className={`recommended-card recommended-card--${variant}`}
                   key={`${groupIndex}-${product.brand}-${product.model}`}
                 >
                   <button
@@ -281,13 +313,15 @@ export default function RecommendedMarquee({
                         alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
                         sizes="(max-width: 639px) 82vw, (max-width: 1023px) 42vw, 24vw"
                       />
-                      <span>{recommendationLabels[productIndex % recommendationLabels.length]}</span>
+                      {variant === "recommended" && (
+                        <span>{recommendationLabels[productIndex % recommendationLabels.length]}</span>
+                      )}
                     </div>
                     <div className="recommended-card-copy">
                       <span>{product.brand}</span>
                       <h3>{product.model}</h3>
                       <div>
-                        <strong>{product.price}</strong>
+                        <strong>{variant === "recommended" ? product.price : "VER RELÓGIO"}</strong>
                         <i>VISUALIZAR →</i>
                       </div>
                     </div>
