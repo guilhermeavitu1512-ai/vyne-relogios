@@ -34,12 +34,14 @@ test("renders the finished VYNE home page", async () => {
   assert.match(html, /VYNE/);
   assert.match(html, /Quem somos n(?:ó|&#xF3;|&oacute;)s/i);
   assert.match(html, /Curadoria independente.+Rel(?:ó|&#xF3;|&oacute;)gios originais/i);
-  assert.match(html, /media\/vyne-v-intro\.mp4/i);
-  assert.match(html, /Explorar rel(?:ó|&#xF3;|&oacute;)gios/i);
+  assert.match(html, /media\/vyne-wordmark-transparent\.webm/i);
+  assert.match(html, /Ver cat(?:á|&#xE1;|&aacute;)logo/i);
   assert.match(html, /Explorar cole(?:ç|&#xE7;|&ccedil;)ão/i);
   assert.match(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
   assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
-  assert.match(html, /Arraste horizontalmente ou use as setas do teclado/i);
+  assert.match(html, /BUILT ON TRUST/i);
+  assert.match(html, /alt=["']Logo VYNE["']/i);
+  assert.doesNotMatch(html, /Arraste para descobrir|Arraste horizontalmente|Use o gesto horizontal/i);
   assert.doesNotMatch(html, /<iframe\b/i);
   assert.doesNotMatch(html, /5 marcas reconhecidas/i);
   assert.doesNotMatch(html, /r(?:é|&#xE9;|&eacute;)plicas no cat(?:á|&#xE1;|&aacute;)logo/i);
@@ -55,7 +57,7 @@ test("renders the searchable catalog route", async () => {
   assert.equal(response.status, 200);
 
   const html = await response.text();
-  assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios escolhidos com inten(?:ç|&#xE7;|&ccedil;)ão/i);
+  assert.match(html, /BUILT ON TRUST/i);
   assert.match(html, /Buscar por marca ou modelo/i);
   assert.match(html, /SEIKO/);
   assert.match(html, /CASIO/);

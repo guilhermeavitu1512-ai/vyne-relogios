@@ -37,6 +37,7 @@ export default function RecommendedMarquee({
   const secondGroupRef = useRef<HTMLDivElement>(null);
   const groupWidthRef = useRef(0);
   const frameRef = useRef<number | null>(null);
+  const navigationOffsetRef = useRef(0);
   const suppressClickRef = useRef(false);
   const pointerRef = useRef({
     active: false,
@@ -96,8 +97,10 @@ export default function RecommendedMarquee({
 
     if (viewport.scrollLeft >= groupWidth * 2) {
       viewport.scrollLeft -= groupWidth;
+      if (pointerRef.current.active) pointerRef.current.startScrollLeft -= groupWidth;
     } else if (viewport.scrollLeft <= 1) {
       viewport.scrollLeft += groupWidth;
+      if (pointerRef.current.active) pointerRef.current.startScrollLeft += groupWidth;
     }
   }, []);
 
@@ -133,8 +136,17 @@ export default function RecommendedMarquee({
       const elapsed = Math.min(time - previousTime, 34);
       previousTime = time;
 
-      if (viewport && !pointerRef.current.dragging) {
-        viewport.scrollLeft += elapsed * 0.022;
+      if (viewport) {
+        const autoplayAdvance = elapsed * 0.032;
+        const navigationAdvance = navigationOffsetRef.current * Math.min(elapsed / 92, 0.2);
+        navigationOffsetRef.current -= navigationAdvance;
+        if (Math.abs(navigationOffsetRef.current) < 0.2) navigationOffsetRef.current = 0;
+
+        const totalAdvance = autoplayAdvance + navigationAdvance;
+        viewport.scrollLeft += totalAdvance;
+        if (pointerRef.current.active) {
+          pointerRef.current.startScrollLeft += totalAdvance;
+        }
         normalizePosition();
         updateCenteredCard();
       }
@@ -151,10 +163,19 @@ export default function RecommendedMarquee({
   const moveByViewport = (direction: -1 | 1) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    viewport.scrollBy({
-      left: direction * Math.max(260, viewport.clientWidth * 0.72),
-      behavior: shouldReduceMotion ? "auto" : "smooth",
-    });
+    const card = viewport.querySelector<HTMLElement>(".recommended-card");
+    const track = viewport.querySelector<HTMLElement>(".recommended-marquee-track");
+    const gap = track ? Number.parseFloat(window.getComputedStyle(track).columnGap) || 18 : 18;
+    const distance = (card?.offsetWidth ?? Math.max(260, viewport.clientWidth * 0.72)) + gap;
+
+    if (shouldReduceMotion) {
+      viewport.scrollLeft += direction * distance;
+      normalizePosition();
+      updateCenteredCard();
+      return;
+    }
+
+    navigationOffsetRef.current += direction * distance;
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -227,7 +248,8 @@ export default function RecommendedMarquee({
         ref={viewportRef}
         className="recommended-marquee-viewport"
         role="region"
-        aria-label="Relógios recomendados. Arraste horizontalmente ou use as setas do teclado."
+        aria-label="Carrossel contínuo de relógios recomendados."
+        aria-live="off"
         tabIndex={0}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}

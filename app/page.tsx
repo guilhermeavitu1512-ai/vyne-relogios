@@ -148,8 +148,8 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
             VYNE Curadoria de Relógios Premium. Uma seleção de relógios das principais
             marcas do mundo, com autenticidade, procedência e atendimento especializado.
           </p>
-          <a className="button button-primary hero-intro-action" href="#recomendados">
-            EXPLORAR RELÓGIOS
+          <a className="button button-primary hero-intro-action" href="/catalogo">
+            VER CATÁLOGO <span aria-hidden="true">→</span>
           </a>
         </m.div>
       </div>
@@ -164,13 +164,6 @@ function ProductGalleryShowcase({
 }) {
   return (
     <div className="gallery-module">
-      <div className="gallery-caption">
-        <div>
-          <span>EXPLORAÇÃO INTERATIVA</span>
-          <strong>ARRASTE PARA DESCOBRIR</strong>
-        </div>
-        <p>USE O GESTO HORIZONTAL OU AS SETAS DO TECLADO.</p>
-      </div>
       <RecommendedMarquee
         products={products}
         onSelectProduct={onSelectProduct}
@@ -234,6 +227,9 @@ export default function Home() {
                 OS MODELOS QUE MELHOR REPRESENTAM NOSSA CURADORIA DE ESTILO, QUALIDADE E
                 VALOR.
               </p>
+              <a className="button button-secondary recommended-catalog-cta" href="/catalogo">
+                VER CATÁLOGO COMPLETO <span aria-hidden="true">→</span>
+              </a>
             </AnimatedSection>
             <RecommendedMarquee products={products} onSelectProduct={setSelectedProduct} />
           </Section>

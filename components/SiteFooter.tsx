@@ -1,4 +1,5 @@
 import AccessibilityControls from "@/components/AccessibilityControls";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function SiteFooter() {
@@ -9,7 +10,7 @@ export default function SiteFooter() {
           <Link className="footer-logo" href="/#inicio" aria-label="VYNE — início">
             VYNE
           </Link>
-          <p>Relógios originais. Escolhas com intenção.</p>
+          <p>BUILT ON TRUST</p>
         </div>
 
         <nav className="footer-links" aria-label="Navegação do rodapé">
@@ -30,20 +31,32 @@ export default function SiteFooter() {
 
       <AccessibilityControls />
 
-      <div className="footer-bottom">
-        <span>© 2026 VYNE. Experiência digital independente.</span>
-        <span>Imagens editoriais: Unsplash · Produtos ilustrativos.</span>
-        <span>
-          Modelo 3D “Seiko Watch” por{" "}
-          <a
-            href="https://sketchfab.com/3d-models/seiko-watch-0796e23ab5c0448c9bdf3fe5c3b3e362"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            carloshisserich, via Sketchfab
-          </a>{" "}
-          · Licença CC BY 4.0
-        </span>
+      <div className="footer-signature-row">
+        <Link className="footer-picture-logo" href="/#inicio" aria-label="VYNE — voltar ao início">
+          <Image
+            src="/media/vyne-footer-logo.jpeg"
+            alt="Logo VYNE"
+            width={1365}
+            height={768}
+            sizes="(max-width: 640px) 170px, 210px"
+          />
+        </Link>
+
+        <div className="footer-bottom">
+          <span>© 2026 VYNE. Experiência digital independente.</span>
+          <span>Imagens editoriais: Unsplash · Produtos ilustrativos.</span>
+          <span>
+            Modelo 3D “Seiko Watch” por{" "}
+            <a
+              href="https://sketchfab.com/3d-models/seiko-watch-0796e23ab5c0448c9bdf3fe5c3b3e362"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              carloshisserich, via Sketchfab
+            </a>{" "}
+            · Licença CC BY 4.0
+          </span>
+        </div>
       </div>
     </footer>
   );

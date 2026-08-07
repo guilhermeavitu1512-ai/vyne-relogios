@@ -88,7 +88,7 @@ export default function CatalogPage() {
       <main id="conteudo" className="catalog-main">
         <header className="catalog-hero">
           <span className="section-index">Coleção VYNE</span>
-          <h1>Relógios escolhidos com intenção.</h1>
+          <h1>BUILT ON TRUST.</h1>
           <p>
             Explore modelos de marcas reconhecidas e encontre a combinação certa de
             mecanismo, presença e preço.

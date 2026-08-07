@@ -461,7 +461,7 @@ export default function CircularGallery({
       ref={containerRef}
       tabIndex={0}
       role="region"
-      aria-label="Galeria circular de relógios disponíveis. Arraste horizontalmente ou use as setas esquerda e direita."
+      aria-label="Galeria circular de relógios disponíveis."
     />
   );
 }
