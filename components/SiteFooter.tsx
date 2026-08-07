@@ -1,4 +1,3 @@
-import AccessibilityControls from "@/components/AccessibilityControls";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,8 +33,6 @@ export default function SiteFooter() {
           </div>
         </nav>
       </div>
-
-      <AccessibilityControls />
 
       <div className="footer-signature-row">
         <Link className="footer-picture-logo" href="/#inicio" aria-label="VYNE — voltar ao início">
