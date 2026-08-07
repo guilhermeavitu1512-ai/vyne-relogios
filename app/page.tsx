@@ -144,8 +144,8 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
           <span className="eyebrow">CURADORIA INDEPENDENTE · RELÓGIOS ORIGINAIS</span>
           <h1 id="hero-title">QUEM SOMOS NÓS?</h1>
           <p>
-            A VYNE É UMA CURADORIA INDEPENDENTE DE RELÓGIOS ORIGINAIS, CRIADA PARA QUEM
-            BUSCA PERSONALIDADE, QUALIDADE E ESCOLHAS MAIS INTELIGENTES.
+            VYNE Curadoria de Relógios Premium. Uma seleção de relógios das principais
+            marcas do mundo, com autenticidade, procedência e atendimento especializado.
           </p>
           <a className="button button-primary hero-intro-action" href="#recomendados">
             EXPLORAR RELÓGIOS
