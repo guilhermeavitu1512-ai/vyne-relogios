@@ -17,14 +17,12 @@ export default function VyneNeonLogo({ onComplete }: { onComplete: () => void })
   const letterStyle: React.CSSProperties = {
     color: "#a3fb06",
     fontFamily: "var(--font-display)",
-    fontSize: "clamp(5rem, 18vw, 18rem)",
+    fontSize: "clamp(2.5rem, 8vw, 7rem)",
     lineHeight: 1,
     letterSpacing: "-0.02em",
     userSelect: "none",
     whiteSpace: "nowrap",
     display: "block",
-    textShadow:
-      "0 0 7px #a3fb06, 0 0 20px rgba(163,251,6,0.7), 0 0 50px rgba(163,251,6,0.5), 0 0 100px rgba(163,251,6,0.3)",
   };
 
   return (
