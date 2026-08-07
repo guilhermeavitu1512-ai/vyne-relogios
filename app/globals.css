@@ -951,9 +951,9 @@ canvas {
 
 .footer-logo img {
   position: absolute;
-  top: -83px;
-  left: -64px;
-  width: 238px;
+  top: -72px;
+  left: -54px;
+  width: 220px;
   max-width: none;
   height: auto;
   mix-blend-mode: screen;
@@ -2437,9 +2437,9 @@ body.intro-locked {
   }
 
   .footer-logo img {
-    top: -71px;
-    left: -54px;
-    width: 203px;
+    top: -61px;
+    left: -46px;
+    width: 188px;
   }
 
   .hero {
