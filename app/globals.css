@@ -951,9 +951,9 @@ canvas {
 
 .footer-logo img {
   position: absolute;
-  top: -55px;
-  left: -29px;
-  width: 176px;
+  top: -57px;
+  left: -31px;
+  width: 225px;
   max-width: none;
   height: auto;
   mix-blend-mode: screen;
@@ -1047,15 +1047,22 @@ canvas {
 }
 
 .footer-picture-logo {
+  position: relative;
   display: block;
   width: min(210px, 100%);
+  height: 64px;
   overflow: hidden;
 }
 
 .footer-picture-logo img {
-  width: 100%;
+  position: absolute;
+  top: -87px;
+  left: -56px;
+  width: 340px;
+  max-width: none;
   height: auto;
   mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .footer-bottom a {
@@ -1791,6 +1798,13 @@ canvas {
 
   .footer-picture-logo {
     width: 170px;
+    height: 54px;
+  }
+
+  .footer-picture-logo img {
+    top: -69px;
+    left: -45px;
+    width: 275px;
   }
 
   .accessibility-controls {
@@ -2437,9 +2451,9 @@ body.intro-locked {
   }
 
   .footer-logo img {
-    top: -47px;
-    left: -25px;
-    width: 151px;
+    top: -48px;
+    left: -26px;
+    width: 192px;
   }
 
   .hero {

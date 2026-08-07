@@ -37,7 +37,14 @@ export default function RecommendedMarquee({
   const secondGroupRef = useRef<HTMLDivElement>(null);
   const groupWidthRef = useRef(0);
   const frameRef = useRef<number | null>(null);
-  const navigationOffsetRef = useRef(0);
+  const arrowTimerRef = useRef<number | null>(null);
+  const navigationRef = useRef({
+    active: false,
+    startTime: 0,
+    duration: 640,
+    distance: 0,
+    previousProgress: 0,
+  });
   const suppressClickRef = useRef(false);
   const pointerRef = useRef({
     active: false,
@@ -49,6 +56,7 @@ export default function RecommendedMarquee({
   });
   const reducedMotion = useReducedMotion();
   const [userReducedMotion, setUserReducedMotion] = useState(false);
+  const [activeDirection, setActiveDirection] = useState<-1 | 1 | null>(null);
   const shouldReduceMotion = Boolean(reducedMotion) || userReducedMotion;
 
   const updateCenteredCard = useCallback(() => {
@@ -95,10 +103,10 @@ export default function RecommendedMarquee({
     const groupWidth = groupWidthRef.current;
     if (!viewport || groupWidth <= 0) return;
 
-    if (viewport.scrollLeft >= groupWidth * 2) {
+    if (viewport.scrollLeft >= groupWidth * 1.5) {
       viewport.scrollLeft -= groupWidth;
       if (pointerRef.current.active) pointerRef.current.startScrollLeft -= groupWidth;
-    } else if (viewport.scrollLeft <= 1) {
+    } else if (viewport.scrollLeft <= groupWidth * 0.5) {
       viewport.scrollLeft += groupWidth;
       if (pointerRef.current.active) pointerRef.current.startScrollLeft += groupWidth;
     }
@@ -113,9 +121,18 @@ export default function RecommendedMarquee({
     const measure = () => {
       const groupWidth = secondGroup.offsetLeft - firstGroup.offsetLeft;
       if (groupWidth <= 0) return;
-      const wasUninitialized = groupWidthRef.current === 0;
+      const previousGroupWidth = groupWidthRef.current;
       groupWidthRef.current = groupWidth;
-      if (wasUninitialized) viewport.scrollLeft = groupWidth;
+      if (previousGroupWidth === 0) {
+        viewport.scrollLeft = groupWidth;
+      } else if (Math.abs(previousGroupWidth - groupWidth) > 0.5) {
+        const relativePosition = viewport.scrollLeft / previousGroupWidth;
+        viewport.scrollLeft = relativePosition * groupWidth;
+        if (pointerRef.current.active) {
+          pointerRef.current.startScrollLeft =
+            (pointerRef.current.startScrollLeft / previousGroupWidth) * groupWidth;
+        }
+      }
       normalizePosition();
       window.requestAnimationFrame(updateCenteredCard);
     };
@@ -137,10 +154,21 @@ export default function RecommendedMarquee({
       previousTime = time;
 
       if (viewport) {
-        const autoplayAdvance = elapsed * 0.032;
-        const navigationAdvance = navigationOffsetRef.current * Math.min(elapsed / 92, 0.2);
-        navigationOffsetRef.current -= navigationAdvance;
-        if (Math.abs(navigationOffsetRef.current) < 0.2) navigationOffsetRef.current = 0;
+        const autoplayAdvance = elapsed * 0.048;
+        const navigation = navigationRef.current;
+        let navigationAdvance = 0;
+
+        if (navigation.active) {
+          const linearProgress = Math.min(
+            1,
+            Math.max(0, (time - navigation.startTime) / navigation.duration),
+          );
+          const easedProgress = 1 - Math.pow(1 - linearProgress, 3);
+          navigationAdvance =
+            (easedProgress - navigation.previousProgress) * navigation.distance;
+          navigation.previousProgress = easedProgress;
+          if (linearProgress >= 1) navigation.active = false;
+        }
 
         const totalAdvance = autoplayAdvance + navigationAdvance;
         viewport.scrollLeft += totalAdvance;
@@ -160,6 +188,13 @@ export default function RecommendedMarquee({
     };
   }, [normalizePosition, shouldReduceMotion, updateCenteredCard]);
 
+  useEffect(
+    () => () => {
+      if (arrowTimerRef.current !== null) window.clearTimeout(arrowTimerRef.current);
+    },
+    [],
+  );
+
   const moveByViewport = (direction: -1 | 1) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -175,13 +210,27 @@ export default function RecommendedMarquee({
       return;
     }
 
-    navigationOffsetRef.current += direction * distance;
+    navigationRef.current = {
+      active: true,
+      startTime: performance.now(),
+      duration: 640,
+      distance: direction * distance,
+      previousProgress: 0,
+    };
+    setActiveDirection(direction);
+    if (arrowTimerRef.current !== null) window.clearTimeout(arrowTimerRef.current);
+    arrowTimerRef.current = window.setTimeout(() => {
+      setActiveDirection(null);
+      arrowTimerRef.current = null;
+    }, 640);
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const viewport = viewportRef.current;
     if (!viewport) return;
+
+    navigationRef.current.active = false;
 
     pointerRef.current = {
       active: true,
@@ -236,10 +285,22 @@ export default function RecommendedMarquee({
   return (
     <div className={`recommended-marquee-shell recommended-marquee-shell--${variant}`}>
       <div className="recommended-marquee-controls" aria-label="Controles do carrossel">
-        <button type="button" onClick={() => moveByViewport(-1)} aria-label="Relógios anteriores">
+        <button
+          type="button"
+          data-active={activeDirection === -1 ? "true" : undefined}
+          data-direction="previous"
+          onClick={() => moveByViewport(-1)}
+          aria-label="Relógios anteriores"
+        >
           <span aria-hidden="true">←</span>
         </button>
-        <button type="button" onClick={() => moveByViewport(1)} aria-label="Próximos relógios">
+        <button
+          type="button"
+          data-active={activeDirection === 1 ? "true" : undefined}
+          data-direction="next"
+          onClick={() => moveByViewport(1)}
+          aria-label="Próximos relógios"
+        >
           <span aria-hidden="true">→</span>
         </button>
       </div>
@@ -289,6 +350,7 @@ export default function RecommendedMarquee({
                         src={product.image}
                         alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
                         sizes="(max-width: 639px) 82vw, (max-width: 1023px) 42vw, 24vw"
+                        fit="contain"
                       />
                       {variant === "recommended" && (
                         <span>{recommendationLabels[productIndex % recommendationLabels.length]}</span>

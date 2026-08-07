@@ -6,6 +6,7 @@ type ResponsiveWatchImageProps = {
   sizes: string;
   priority?: boolean;
   className?: string;
+  fit?: "cover" | "contain";
 };
 
 export default function ResponsiveWatchImage({
@@ -14,6 +15,7 @@ export default function ResponsiveWatchImage({
   sizes,
   priority = false,
   className,
+  fit = "cover",
 }: ResponsiveWatchImageProps) {
   return (
     <Image
@@ -24,6 +26,7 @@ export default function ResponsiveWatchImage({
       priority={priority}
       quality={priority ? 92 : 86}
       className={className}
+      style={{ objectFit: fit, objectPosition: "center" }}
     />
   );
 }

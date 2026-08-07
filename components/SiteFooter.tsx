@@ -9,10 +9,10 @@ export default function SiteFooter() {
         <div className="footer-brand">
           <Link className="footer-logo" href="/#inicio" aria-label="VYNE — início">
             <Image
-              src="/media/vyne-footer-logo.jpeg"
+              src="/media/vyne-logo-final.jpg"
               alt="VYNE"
               width={1365}
-              height={768}
+              height={960}
               sizes="(max-width: 640px) 128px, 150px"
             />
           </Link>
@@ -40,10 +40,10 @@ export default function SiteFooter() {
       <div className="footer-signature-row">
         <Link className="footer-picture-logo" href="/#inicio" aria-label="VYNE — voltar ao início">
           <Image
-            src="/media/vyne-footer-logo.jpeg"
+            src="/media/vyne-logo-final.jpg"
             alt="Logo VYNE"
             width={1365}
-            height={768}
+            height={960}
             sizes="(max-width: 640px) 170px, 210px"
           />
         </Link>

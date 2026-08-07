@@ -26,9 +26,42 @@
   color: #fff;
   font-size: 18px;
   transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
     border-color 220ms ease,
     background-color 220ms ease,
     color 220ms ease;
+}
+
+.recommended-marquee-controls button span {
+  display: block;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.recommended-marquee-controls button[data-active="true"] {
+  border-color: #a3fb06;
+  background: #a3fb06;
+  color: #000;
+  transform: scale(0.94);
+}
+
+.recommended-marquee-controls button[data-direction="previous"][data-active="true"] span {
+  animation: recommended-arrow-previous 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.recommended-marquee-controls button[data-direction="next"][data-active="true"] span {
+  animation: recommended-arrow-next 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes recommended-arrow-previous {
+  0% { transform: translateX(0); }
+  45% { transform: translateX(-7px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes recommended-arrow-next {
+  0% { transform: translateX(0); }
+  45% { transform: translateX(7px); }
+  100% { transform: translateX(0); }
 }
 
 .recommended-marquee-controls button:hover,
@@ -139,6 +172,7 @@
 
 .recommended-card-image img {
   object-fit: contain;
+  object-position: center;
   padding: 10px;
   filter: brightness(1.1) contrast(1.04);
   transition: transform 520ms ease;
@@ -221,8 +255,9 @@
 }
 
 .recommended-marquee-shell--gallery .recommended-card-image img {
-  padding: 0;
-  object-fit: cover;
+  padding: clamp(10px, 1.8vw, 18px);
+  object-fit: contain;
+  object-position: center;
 }
 
 .recommended-marquee-shell--gallery .recommended-card-copy {
@@ -273,8 +308,8 @@
   }
 
   .recommended-card {
-    flex-basis: min(82vw, 330px);
-    width: min(82vw, 330px);
+    flex-basis: min(78vw, 320px);
+    width: min(78vw, 320px);
   }
 
   .recommended-card[data-centered="true"] {
@@ -282,8 +317,8 @@
   }
 
   .recommended-marquee-shell--gallery .recommended-card {
-    flex-basis: min(84vw, 350px);
-    width: min(84vw, 350px);
+    flex-basis: min(80vw, 330px);
+    width: min(80vw, 330px);
   }
 
   .recommended-card-copy {

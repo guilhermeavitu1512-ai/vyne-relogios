@@ -356,10 +356,10 @@ export default function StaggeredMenu({
         <div className="staggered-menu-header-inner">
           <Link className="sm-logo" href="/#inicio" aria-label="VYNE — início">
             <Image
-              src="/media/vyne-footer-logo.jpeg"
+              src="/media/vyne-logo-final.jpg"
               alt="VYNE"
               width={1365}
-              height={768}
+              height={960}
               priority
               sizes="(max-width: 640px) 104px, 120px"
             />

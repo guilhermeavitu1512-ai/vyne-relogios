@@ -40,6 +40,7 @@ test("renders the finished VYNE home page", async () => {
   assert.match(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
   assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
   assert.match(html, /BUILT ON TRUST/i);
+  assert.match(html, /vyne-logo-final\.jpg/i);
   assert.match(html, /alt=["']Logo VYNE["']/i);
   assert.match(html, /alt=["']VYNE["']/i);
   assert.match(html, /data-intro-complete=["']false["']/i);
