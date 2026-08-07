@@ -124,9 +124,9 @@
 
 .sm-logo img {
   position: absolute;
-  top: -49px;
-  left: -33px;
-  width: 158px;
+  top: -42px;
+  left: -23px;
+  width: 142px;
   max-width: none;
   height: auto;
   mix-blend-mode: screen;
@@ -493,9 +493,9 @@ body.staggered-menu-open {
   }
 
   .sm-logo img {
-    top: -41px;
-    left: -26px;
-    width: 132px;
+    top: -35px;
+    left: -18px;
+    width: 119px;
   }
 
   .sm-toggle {
