@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import "@fontsource/gasoek-one/400.css";
+import "@fontsource/barlow-condensed/600.css";
 import "./globals.css";
 
 const title = "VYNE — Relógios originais. Preço inteligente.";

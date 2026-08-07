@@ -9,8 +9,8 @@
   --muted: #d8d8d8;
   --soft: #9a9a9a;
   --line: rgba(255, 255, 255, 0.14);
-  --font-display: "Gasoek One", sans-serif;
-  --font-sans: "Gasoek One", sans-serif;
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-sans: "Barlow Condensed", sans-serif;
   --promo-bar-height: 32px;
   --page-gutter: clamp(20px, 4.5vw, 72px);
   --content-width: 1400px;
