@@ -2491,25 +2491,16 @@ h6 {
 
 .hero-video-lockup {
   position: relative;
-  display: grid;
-  width: clamp(112px, 10vw, 154px);
-  max-width: 62vw;
-  aspect-ratio: 9 / 16;
-  place-items: center;
+  display: flex;
+  width: 100%;
+  max-width: 100vw;
+  align-items: center;
+  justify-content: center;
   overflow: visible;
   background: transparent;
+  padding: 3rem 0;
 }
 
-.hero-logo-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: transparent;
-  filter: contrast(1.08) saturate(1.04) brightness(1.08);
-  mix-blend-mode: screen;
-}
 
 .hero-intro-copy {
   display: flex;
@@ -2658,4 +2649,9 @@ h6 {
   .hero-logo-video {
     animation: none;
   }
+}
+.neon-text {
+  color: #a3fb06;
+  font-family: var(--font-display);
+  text-shadow: 0 0 7px #a3fb06, 0 0 20px rgba(163,251,6,0.7), 0 0 50px rgba(163,251,6,0.5), 0 0 100px rgba(163,251,6,0.3);
 }

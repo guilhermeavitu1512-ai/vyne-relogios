@@ -18,6 +18,7 @@ import SiteFooter from "@/components/SiteFooter";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import { products, type Product } from "@/lib/products";
 import { editorialEase, motionDurations, staggerDelay } from "@/lib/motion";
+import VyneNeonLogo from "@/components/VyneNeonLogo";
 
 const menuItems = [
   { label: "Início", ariaLabel: "Ir para o início", link: "/#inicio" },
@@ -67,81 +68,27 @@ function Section({
 }
 
 function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const fallbackRef = useRef<number | null>(null);
-  const startRequestedRef = useRef(false);
-  const startedRef = useRef(false);
   const [contentVisible, setContentVisible] = useState(reduceMotion);
 
   const revealContent = useCallback(() => {
-    if (fallbackRef.current !== null) {
-      window.clearTimeout(fallbackRef.current);
-      fallbackRef.current = null;
-    }
     setContentVisible(true);
   }, []);
-
-  const startPlayback = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || startedRef.current) return;
-
-    if (reduceMotion) {
-      revealContent();
-      return;
-    }
-
-    startRequestedRef.current = true;
-    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-
-    startRequestedRef.current = false;
-    startedRef.current = true;
-    video.pause();
-    video.currentTime = 0;
-    fallbackRef.current = window.setTimeout(revealContent, 12000);
-
-    window.requestAnimationFrame(() => {
-      video.play().catch(revealContent);
-    });
-  }, [reduceMotion, revealContent]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (reduceMotion) {
-      video.pause();
-      const frame = window.requestAnimationFrame(revealContent);
-      return () => window.cancelAnimationFrame(frame);
-    }
-
-    return () => {
-      if (fallbackRef.current !== null) window.clearTimeout(fallbackRef.current);
-    };
-  }, [reduceMotion, revealContent]);
 
   return (
     <div className="hero-container hero-intro-container">
       <div className="hero-intro-stack">
         <m.div
-          className="hero-video-lockup"
+          className="hero-video-lockup pointer-events-none"
           initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: reduceMotion ? 0 : 0.55, ease: editorialEase }}
-          onAnimationComplete={startPlayback}
         >
-          <video
-            ref={videoRef}
-            className="hero-logo-video"
-            src="/media/vyne-v-intro.mp4"
-            muted
-            playsInline
-            preload="auto"
-            onCanPlay={() => {
-              if (startRequestedRef.current) startPlayback();
-            }}
-            onEnded={revealContent}
-            onError={revealContent}
-            aria-label="Animação da letra V da VYNE"
+          <VyneNeonLogo 
+            onComplete={() => {
+              if (!reduceMotion) {
+                revealContent();
+              }
+            }} 
           />
         </m.div>
 
