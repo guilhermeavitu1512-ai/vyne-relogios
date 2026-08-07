@@ -18,7 +18,8 @@ import SiteFooter from "@/components/SiteFooter";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import { products, type Product } from "@/lib/products";
 import { editorialEase, motionDurations, staggerDelay } from "@/lib/motion";
-import ProductCard from "@/components/ProductCard";
+
+
 
 const menuItems = [
   { label: "Início", ariaLabel: "Ir para o início", link: "/#inicio" },
