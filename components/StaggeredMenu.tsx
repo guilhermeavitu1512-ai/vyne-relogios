@@ -9,6 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 import { gsap } from "gsap";
+import Image from "next/image";
 import Link from "next/link";
 
 import "./StaggeredMenu.css";
@@ -354,7 +355,14 @@ export default function StaggeredMenu({
       <header className="staggered-menu-header">
         <div className="staggered-menu-header-inner">
           <Link className="sm-logo" href="/#inicio" aria-label="VYNE — início">
-            VYNE
+            <Image
+              src="/media/vyne-footer-logo.jpeg"
+              alt="VYNE"
+              width={1365}
+              height={768}
+              priority
+              sizes="(max-width: 640px) 104px, 120px"
+            />
           </Link>
 
           {headerLinks.length > 0 && (

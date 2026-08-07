@@ -115,12 +115,22 @@
 .sm-logo {
   position: relative;
   z-index: 22;
-  color: var(--ivory);
-  font-size: 23px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  line-height: 1;
+  display: block;
+  width: 120px;
+  height: 38px;
+  overflow: hidden;
   user-select: none;
+}
+
+.sm-logo img {
+  position: absolute;
+  top: -67px;
+  left: -51px;
+  width: 190px;
+  max-width: none;
+  height: auto;
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .sm-toggle {
@@ -478,7 +488,14 @@ body.staggered-menu-open {
   }
 
   .sm-logo {
-    font-size: 19px;
+    width: 104px;
+    height: 33px;
+  }
+
+  .sm-logo img {
+    top: -58px;
+    left: -44px;
+    width: 165px;
   }
 
   .sm-toggle {
