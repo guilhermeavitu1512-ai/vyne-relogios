@@ -121,14 +121,14 @@ function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
           <video
             ref={videoRef}
             className="hero-logo-video"
-            src="/media/vyne-v-intro.mp4"
+            src="/media/vyne-wordmark-transparent.webm"
             muted
             playsInline
             preload="auto"
             onCanPlay={() => { if (startRequestedRef.current) startPlayback(); }}
             onEnded={revealContent}
             onError={revealContent}
-            aria-label="Animação da letra V da VYNE"
+            aria-label="Animação do nome VYNE"
           />
         </m.div>
 
@@ -223,7 +223,6 @@ export default function Home() {
             id="inicio"
             aria-labelledby="hero-title"
           >
-            <div className="hero-intro-glow" aria-hidden="true" />
             <HeroIntro reduceMotion={reduceMotion} />
           </section>
 
