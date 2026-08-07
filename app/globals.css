@@ -2472,13 +2472,13 @@ h6 {
 .hero-video-lockup {
   position: relative;
   display: flex;
-  width: clamp(200px, 22vw, 320px);
-  max-width: 70vw;
+  width: clamp(300px, 34vw, 480px);
+  max-width: 88vw;
   align-items: center;
   justify-content: center;
   overflow: visible;
   background: transparent;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .hero-logo-video {
@@ -2495,7 +2495,7 @@ h6 {
   min-width: 0;
   flex-direction: column;
   align-items: center;
-  margin-top: clamp(12px, 2vw, 22px);
+  margin-top: -6px;
 }
 
 .hero-intro-copy .eyebrow {
@@ -2576,12 +2576,12 @@ h6 {
   }
 
   .hero-video-lockup {
-    width: clamp(102px, 29vw, 128px);
-    max-width: 54vw;
+    width: clamp(220px, 66vw, 300px);
+    max-width: 82vw;
   }
 
   .hero-intro-copy {
-    margin-top: 8px;
+    margin-top: -6px;
   }
 
   .hero-intro-copy .eyebrow {
@@ -2624,7 +2624,7 @@ h6 {
   }
 
   .hero-video-lockup {
-    width: 100px;
+    width: min(72vw, 240px);
   }
 
   .hero-intro-copy h1 {
