@@ -42,6 +42,8 @@ test("renders the finished VYNE home page", async () => {
   assert.match(html, /BUILT ON TRUST/i);
   assert.match(html, /alt=["']Logo VYNE["']/i);
   assert.match(html, /alt=["']VYNE["']/i);
+  assert.match(html, /data-intro-complete=["']false["']/i);
+  assert.doesNotMatch(html, />\s*VYNE\s*</i);
   assert.doesNotMatch(html, /Arraste para descobrir|Arraste horizontalmente|Use o gesto horizontal/i);
   assert.doesNotMatch(html, /<iframe\b/i);
   assert.doesNotMatch(html, /5 marcas reconhecidas/i);

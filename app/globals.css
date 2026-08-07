@@ -11,7 +11,7 @@
   --line: rgba(255, 255, 255, 0.14);
   --font-display: "Barlow Condensed", sans-serif;
   --font-sans: "Barlow Condensed", sans-serif;
-  --promo-bar-height: 32px;
+  --promo-bar-height: 40px;
   --page-gutter: clamp(20px, 4.5vw, 72px);
   --content-width: 1400px;
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
@@ -942,9 +942,22 @@ canvas {
 }
 
 .footer-logo {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.26em;
+  position: relative;
+  display: block;
+  width: 150px;
+  height: 46px;
+  overflow: hidden;
+}
+
+.footer-logo img {
+  position: absolute;
+  top: -83px;
+  left: -64px;
+  width: 238px;
+  max-width: none;
+  height: auto;
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .footer-links {
@@ -1909,13 +1922,59 @@ h6 {
   left: 0;
   display: grid;
   min-height: var(--promo-bar-height);
-  padding: 7px 16px 6px;
+  padding: 0 var(--page-gutter);
   place-items: center;
   background: #a3fb06;
   color: #000;
-  font-size: clamp(8px, 1.7vw, 11px);
+  font-size: clamp(10px, 1vw, 14px);
   line-height: 1;
   text-align: center;
+}
+
+.shipping-banner-inner {
+  display: flex;
+  width: 100%;
+  max-width: var(--content-width);
+  min-height: var(--promo-bar-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(18px, 5vw, 96px);
+  margin-inline: auto;
+}
+
+.shipping-banner-inner span {
+  letter-spacing: 0.08em !important;
+  white-space: nowrap;
+}
+
+html.intro-locked,
+body.intro-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.site-shell[data-intro-complete="false"] {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.site-shell[data-intro-complete="false"] main > .story-section,
+.site-shell[data-intro-complete="false"] .site-footer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.site-shell[data-intro-complete="false"] .shipping-banner,
+.site-shell[data-intro-complete="false"] .staggered-menu-wrapper,
+.site-shell[data-intro-complete="false"] .scroll-progress {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shipping-banner,
+.staggered-menu-wrapper,
+.scroll-progress {
+  transition: opacity 420ms var(--ease-editorial);
 }
 
 .scroll-progress {
@@ -2356,12 +2415,31 @@ h6 {
 @media (max-width: 640px) {
   :root {
     --page-gutter: 20px;
-    --promo-bar-height: 30px;
+    --promo-bar-height: 36px;
   }
 
   .shipping-banner {
-    padding-inline: 10px;
-    font-size: 8px;
+    padding-inline: 12px;
+    font-size: 9px;
+  }
+
+  .shipping-banner-inner {
+    gap: 10px;
+  }
+
+  .shipping-banner-inner span:nth-child(2) {
+    display: none;
+  }
+
+  .footer-logo {
+    width: 128px;
+    height: 40px;
+  }
+
+  .footer-logo img {
+    top: -71px;
+    left: -54px;
+    width: 203px;
   }
 
   .hero {

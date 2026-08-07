@@ -68,20 +68,30 @@ function Section({
   );
 }
 
-function HeroIntro({ reduceMotion }: { reduceMotion: boolean }) {
+function HeroIntro({
+  reduceMotion,
+  onComplete,
+}: {
+  reduceMotion: boolean;
+  onComplete: () => void;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fallbackRef = useRef<number | null>(null);
   const startRequestedRef = useRef(false);
   const startedRef = useRef(false);
+  const completedRef = useRef(false);
   const [contentVisible, setContentVisible] = useState(reduceMotion);
 
   const revealContent = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
     if (fallbackRef.current !== null) {
       window.clearTimeout(fallbackRef.current);
       fallbackRef.current = null;
     }
     setContentVisible(true);
-  }, []);
+    onComplete();
+  }, [onComplete]);
 
   const startPlayback = useCallback(() => {
     const video = videoRef.current;
@@ -176,6 +186,7 @@ function ProductGalleryShowcase({
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [introComplete, setIntroComplete] = useState(false);
   const reduceMotion = Boolean(useReducedMotion());
   const { scrollY, scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, {
@@ -189,9 +200,31 @@ export default function Home() {
     setScrolled((current) => (current === next ? current : next));
   });
 
+  const completeIntro = useCallback(() => setIntroComplete(true), []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (introComplete) {
+      root.classList.remove("intro-locked");
+      body.classList.remove("intro-locked");
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    root.classList.add("intro-locked");
+    body.classList.add("intro-locked");
+
+    return () => {
+      root.classList.remove("intro-locked");
+      body.classList.remove("intro-locked");
+    };
+  }, [introComplete]);
+
   return (
     <LazyMotion features={domAnimation}>
-      <div className="site-shell">
+      <div className="site-shell" data-intro-complete={introComplete ? "true" : "false"}>
         <m.div className="scroll-progress" style={{ scaleX: smoothProgress }} aria-hidden="true" />
         <FreeShippingBanner />
 
@@ -216,7 +249,7 @@ export default function Home() {
             id="inicio"
             aria-labelledby="hero-title"
           >
-            <HeroIntro reduceMotion={reduceMotion} />
+            <HeroIntro reduceMotion={reduceMotion} onComplete={completeIntro} />
           </section>
 
           <Section id="recomendados" className="recommended-section">

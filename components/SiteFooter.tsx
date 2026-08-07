@@ -8,7 +8,13 @@ export default function SiteFooter() {
       <div className="footer-main">
         <div className="footer-brand">
           <Link className="footer-logo" href="/#inicio" aria-label="VYNE — início">
-            VYNE
+            <Image
+              src="/media/vyne-footer-logo.jpeg"
+              alt="VYNE"
+              width={1365}
+              height={768}
+              sizes="(max-width: 640px) 128px, 150px"
+            />
           </Link>
           <p>BUILT ON TRUST</p>
         </div>
