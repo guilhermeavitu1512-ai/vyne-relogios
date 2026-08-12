@@ -104,8 +104,7 @@ function HeroIntro({
     startedRef.current = true;
     video.pause();
     video.currentTime = 0;
-    video.playbackRate = 1.25;
-    fallbackRef.current = window.setTimeout(revealContent, 9000);
+    video.playbackRate = 1.75;
     window.requestAnimationFrame(() => { video.play().catch(revealContent); });
   }, [reduceMotion, revealContent]);
 
@@ -117,6 +116,7 @@ function HeroIntro({
       const frame = window.requestAnimationFrame(revealContent);
       return () => window.cancelAnimationFrame(frame);
     }
+    fallbackRef.current = window.setTimeout(revealContent, 300);
     return () => { if (fallbackRef.current !== null) window.clearTimeout(fallbackRef.current); };
   }, [reduceMotion, revealContent]);
 
@@ -127,7 +127,7 @@ function HeroIntro({
           className="hero-video-lockup pointer-events-none"
           initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: reduceMotion ? 0 : 0.4, ease: editorialEase }}
+          transition={{ duration: reduceMotion ? 0 : 0.3, ease: editorialEase }}
           onAnimationComplete={startPlayback}
         >
           <video
@@ -152,7 +152,7 @@ function HeroIntro({
               ? { opacity: 1, y: 0, visibility: "visible" }
               : { opacity: 0, y: 18, visibility: "hidden" }
           }
-          transition={{ duration: reduceMotion ? 0 : 0.42, ease: editorialEase }}
+          transition={{ duration: reduceMotion ? 0 : 0.3, ease: editorialEase }}
         >
           <span className="eyebrow">CURADORIA INDEPENDENTE · RELÓGIOS ORIGINAIS</span>
           <h1 id="hero-title">QUEM SOMOS NÓS?</h1>
@@ -191,7 +191,7 @@ export default function Home() {
   const { products } = useProducts();
   const recommendedProducts = useMemo(() => {
     const recommended = products.filter((product) => product.recommended);
-    return recommended.length > 0 ? recommended : products;
+    return (recommended.length > 0 ? recommended : products).slice(0, 5);
   }, [products]);
   const [scrolled, setScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

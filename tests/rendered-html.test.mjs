@@ -40,6 +40,10 @@ test("renders the finished VYNE home page", async () => {
   assert.doesNotMatch(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
   assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
   assert.match(html, /recommended-products-grid/i);
+  assert.equal((html.match(/class=["']recommended-product["']/gi) ?? []).length, 5);
+  assert.match(html, /data-last=["']true["']/i);
+  assert.equal((html.match(/class=["']recommended-product["']/gi) ?? []).length, 5);
+  assert.match(html, /data-last=["']true["']/i);
   assert.match(html, /BUILT ON TRUST/i);
   assert.match(html, /vyne-logo-final\.jpg/i);
   assert.match(html, /alt=["']Logo VYNE["']/i);

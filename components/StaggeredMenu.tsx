@@ -109,7 +109,7 @@ export default function StaggeredMenu({
         ? Array.from(layersRef.current.querySelectorAll<HTMLElement>(".sm-prelayer"))
         : [];
       const offscreen = position === "left" ? -100 : 100;
-      const duration = reducedMotion() ? 0 : 0.28;
+      const duration = reducedMotion() ? 0 : 0.2;
 
       gsap.to(iconRef.current, {
         rotate: 0,
@@ -191,19 +191,19 @@ export default function StaggeredMenu({
         layer,
         {
           xPercent: 0,
-          duration: noMotion ? 0 : 0.42,
+          duration: noMotion ? 0 : 0.32,
           ease: "power4.out",
         },
-        noMotion ? 0 : index * 0.07,
+        noMotion ? 0 : index * 0.05,
       );
     });
 
-    const panelStart = noMotion ? 0 : Math.max(layers.length - 1, 0) * 0.07 + 0.08;
+    const panelStart = noMotion ? 0 : Math.max(layers.length - 1, 0) * 0.05 + 0.05;
     timeline.to(
       panel,
       {
         xPercent: 0,
-        duration: noMotion ? 0 : 0.5,
+        duration: noMotion ? 0 : 0.36,
         ease: "power4.out",
       },
       panelStart,
@@ -213,49 +213,49 @@ export default function StaggeredMenu({
       {
         yPercent: 0,
         rotate: 0,
-        duration: noMotion ? 0 : 0.58,
+        duration: noMotion ? 0 : 0.36,
         ease: "power4.out",
-        stagger: noMotion ? 0 : 0.085,
+        stagger: noMotion ? 0 : 0.055,
       },
-      panelStart + (noMotion ? 0 : 0.11),
+      panelStart + (noMotion ? 0 : 0.06),
     );
     timeline.to(
       numberedItems,
       {
         "--sm-num-opacity": 1,
-        duration: noMotion ? 0 : 0.42,
-        stagger: noMotion ? 0 : 0.07,
+        duration: noMotion ? 0 : 0.3,
+        stagger: noMotion ? 0 : 0.05,
       },
-      panelStart + (noMotion ? 0 : 0.2),
+      panelStart + (noMotion ? 0 : 0.1),
     );
 
     if (socialTitle || socialLinks.length) {
       timeline.to(
         socialTitle,
-        { opacity: 1, duration: noMotion ? 0 : 0.4 },
-        panelStart + (noMotion ? 0 : 0.35),
+        { opacity: 1, duration: noMotion ? 0 : 0.28 },
+        panelStart + (noMotion ? 0 : 0.14),
       );
       timeline.to(
         socialLinks,
         {
           y: 0,
           opacity: 1,
-          duration: noMotion ? 0 : 0.5,
-          stagger: noMotion ? 0 : 0.07,
+          duration: noMotion ? 0 : 0.32,
+          stagger: noMotion ? 0 : 0.05,
         },
-        panelStart + (noMotion ? 0 : 0.38),
+        panelStart + (noMotion ? 0 : 0.16),
       );
     }
 
     timelineRef.current = timeline;
     gsap.to(iconRef.current, {
       rotate: 225,
-      duration: noMotion ? 0 : 0.5,
+      duration: noMotion ? 0 : 0.34,
       ease: "power4.out",
     });
     gsap.to(textRef.current, {
       yPercent: -50,
-      duration: noMotion ? 0 : 0.46,
+      duration: noMotion ? 0 : 0.32,
       ease: "power4.out",
     });
   }, [onMenuOpen, position, reducedMotion]);

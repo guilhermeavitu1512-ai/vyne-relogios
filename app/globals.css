@@ -91,7 +91,7 @@ canvas {
   font-size: 13px;
   font-weight: 700;
   transform: translateY(-150%);
-  transition: transform 300ms var(--ease-editorial);
+  transition: transform 180ms var(--ease-editorial);
 }
 
 .skip-link:focus {
@@ -144,15 +144,15 @@ canvas {
   line-height: 1;
   text-transform: uppercase;
   transition:
-    color 220ms ease,
-    background-color 220ms ease,
-    border-color 220ms ease,
-    transform 220ms var(--ease-editorial);
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms var(--ease-editorial);
 }
 
 .button span,
 .text-link span {
-  transition: transform 220ms var(--ease-editorial);
+  transition: transform 180ms var(--ease-editorial);
 }
 
 .button:hover span,
@@ -209,7 +209,7 @@ canvas {
   content: "";
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 300ms var(--ease-editorial);
+  transition: transform 180ms var(--ease-editorial);
 }
 
 .text-link {
@@ -985,7 +985,7 @@ canvas {
   min-height: 30px;
   color: var(--muted);
   font-size: 13px;
-  transition: color 300ms ease;
+  transition: color 180ms ease;
 }
 
 .footer-links a:hover,
@@ -1014,9 +1014,9 @@ canvas {
   color: var(--muted);
   font-size: 11px;
   transition:
-    border-color 300ms ease,
-    color 300ms ease,
-    background 300ms ease;
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
 }
 
 .accessibility-controls button[aria-pressed="true"] {
@@ -1181,7 +1181,7 @@ canvas {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: 300ms ease;
+  transition: 180ms ease;
 }
 
 .filter-group button[aria-pressed="true"] {
@@ -1289,9 +1289,9 @@ canvas {
   font-size: 19px;
   backdrop-filter: blur(8px);
   transition:
-    background 300ms ease,
-    border-color 300ms ease,
-    transform 300ms var(--ease-editorial);
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms var(--ease-editorial);
 }
 
 .favorite-button:hover,
@@ -1381,7 +1381,7 @@ canvas {
 .catalog-card-action > span {
   color: var(--green-bright);
   font-size: 16px;
-  transition: transform 300ms var(--ease-editorial);
+  transition: transform 180ms var(--ease-editorial);
 }
 
 .catalog-card:hover .catalog-card-action > span,
@@ -1978,7 +1978,7 @@ body.intro-locked {
 
 .staggered-menu-wrapper,
 .scroll-progress {
-  transition: opacity 320ms var(--ease-editorial);
+  transition: opacity 180ms var(--ease-editorial);
 }
 
 .scroll-progress {
