@@ -104,7 +104,7 @@ function HeroIntro({
     startedRef.current = true;
     video.pause();
     video.currentTime = 0;
-    video.playbackRate = 1.75;
+    video.playbackRate = 1.45;
     window.requestAnimationFrame(() => { video.play().catch(revealContent); });
   }, [reduceMotion, revealContent]);
 
@@ -116,7 +116,7 @@ function HeroIntro({
       const frame = window.requestAnimationFrame(revealContent);
       return () => window.cancelAnimationFrame(frame);
     }
-    fallbackRef.current = window.setTimeout(revealContent, 300);
+    fallbackRef.current = window.setTimeout(revealContent, 1000);
     return () => { if (fallbackRef.current !== null) window.clearTimeout(fallbackRef.current); };
   }, [reduceMotion, revealContent]);
 
