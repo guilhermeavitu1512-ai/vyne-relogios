@@ -25,6 +25,7 @@ export default function ResponsiveWatchImage({
       sizes={sizes}
       priority={priority}
       quality={priority ? 92 : 86}
+      unoptimized={src.startsWith("/api/product-images/")}
       className={className}
       style={{ objectFit: fit, objectPosition: "center" }}
     />

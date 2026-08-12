@@ -9,14 +9,15 @@ import {
   useScroll,
   useSpring,
 } from "framer-motion";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import FreeShippingBanner from "@/components/FreeShippingBanner";
 import ProductQuickView from "@/components/ProductQuickView";
 import RecommendedMarquee from "@/components/RecommendedMarquee";
 import SiteFooter from "@/components/SiteFooter";
 import StaggeredMenu from "@/components/StaggeredMenu";
-import { products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { editorialEase, motionDurations, staggerDelay } from "@/lib/motion";
 
 
@@ -168,8 +169,10 @@ function HeroIntro({
 }
 
 function ProductGalleryShowcase({
+  products,
   onSelectProduct,
 }: {
+  products: Product[];
   onSelectProduct: (product: Product) => void;
 }) {
   return (
@@ -184,6 +187,11 @@ function ProductGalleryShowcase({
 }
 
 export default function Home() {
+  const { products } = useProducts();
+  const recommendedProducts = useMemo(() => {
+    const recommended = products.filter((product) => product.recommended);
+    return recommended.length > 0 ? recommended : products;
+  }, [products]);
   const [scrolled, setScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [introComplete, setIntroComplete] = useState(false);
@@ -264,7 +272,7 @@ export default function Home() {
                 VER CATÁLOGO COMPLETO <span aria-hidden="true">→</span>
               </a>
             </AnimatedSection>
-            <RecommendedMarquee products={products} onSelectProduct={setSelectedProduct} />
+            <RecommendedMarquee products={recommendedProducts} onSelectProduct={setSelectedProduct} />
           </Section>
 
           <Section id="colecao" className="collection-section">
@@ -276,7 +284,7 @@ export default function Home() {
               </p>
             </AnimatedSection>
 
-            <ProductGalleryShowcase onSelectProduct={setSelectedProduct} />
+            <ProductGalleryShowcase products={products} onSelectProduct={setSelectedProduct} />
 
             <div className="collection-action">
               <a className="button button-primary collection-primary-cta" href="/catalogo">

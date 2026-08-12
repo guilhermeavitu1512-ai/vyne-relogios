@@ -355,6 +355,7 @@ export default function RecommendedMarquee({
                       {variant === "recommended" && (
                         <span>{recommendationLabels[productIndex % recommendationLabels.length]}</span>
                       )}
+                      {product.stock === 0 && <span className="recommended-card-stock">ESGOTADO</span>}
                     </div>
                     <div className="recommended-card-copy">
                       <span>{product.brand}</span>

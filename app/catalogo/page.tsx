@@ -7,7 +7,8 @@ import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
 import SpotlightCard from "@/components/SpotlightCard";
 import StaggeredMenu from "@/components/StaggeredMenu";
-import { brandNames, products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 
 const menuItems = [
   { label: "Início", ariaLabel: "Voltar ao início", link: "/#inicio" },
@@ -16,12 +17,11 @@ const menuItems = [
   { label: "A VYNE", ariaLabel: "Conhecer a VYNE", link: "/#sobre" },
 ];
 
-const categories = ["Todos", "Automático", "Digital", "Quartzo"] as const;
-
 export default function CatalogPage() {
+  const { products } = useProducts();
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("Todas");
-  const [category, setCategory] = useState<(typeof categories)[number]>("Todos");
+  const [category, setCategory] = useState("Todos");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -32,7 +32,7 @@ export default function CatalogPage() {
     const saved = localStorage.getItem("vyne-favorites");
     const syncState = window.requestAnimationFrame(() => {
       if (requestedSearch) setSearch(requestedSearch);
-      if (requestedBrand && brandNames.includes(requestedBrand)) setBrand(requestedBrand);
+      if (requestedBrand) setBrand(requestedBrand);
       if (saved) {
         try {
           setFavorites(JSON.parse(saved));
@@ -43,6 +43,15 @@ export default function CatalogPage() {
     });
     return () => window.cancelAnimationFrame(syncState);
   }, []);
+
+  const brandNames = useMemo(
+    () => [...new Set(products.map((product) => product.brand))].sort(),
+    [products],
+  );
+  const categories = useMemo(
+    () => ["Todos", ...new Set(products.map((product) => product.category))],
+    [products],
+  );
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("pt-BR");
@@ -56,7 +65,7 @@ export default function CatalogPage() {
       const matchesCategory = category === "Todos" || product.category === category;
       return matchesSearch && matchesBrand && matchesCategory;
     });
-  }, [brand, category, search]);
+  }, [brand, category, products, search]);
 
   const toggleFavorite = (key: string) => {
     setFavorites((current) => {
@@ -176,6 +185,7 @@ export default function CatalogPage() {
                           sizes="(max-width: 700px) 100vw, 50vw"
                         />
                         <span className="catalog-card-tag">{product.tag}</span>
+                        {product.stock === 0 && <span className="catalog-card-stock">ESGOTADO</span>}
                       </div>
                       <div className="catalog-card-copy">
                         <span>{product.brand}</span>
@@ -190,7 +200,7 @@ export default function CatalogPage() {
                             <strong>{product.price}</strong>
                           </span>
                           <span className="catalog-card-action">
-                            Ver detalhes <span aria-hidden="true">→</span>
+                            {product.stock === 0 ? "Ver produto" : "Ver detalhes"} <span aria-hidden="true">→</span>
                           </span>
                         </div>
                       </div>

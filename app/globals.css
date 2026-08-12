@@ -1945,6 +1945,29 @@ h6 {
   text-align: center;
 }
 
+.catalog-card-stock,
+.recommended-card-stock {
+  position: absolute;
+  z-index: 4;
+  right: 16px;
+  bottom: 16px;
+  min-height: 28px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.product-dialog-cta:disabled {
+  cursor: not-allowed;
+  background: #282828;
+  color: #aaa;
+  opacity: 1;
+}
+
 .shipping-banner-inner {
   display: flex;
   width: 100%;

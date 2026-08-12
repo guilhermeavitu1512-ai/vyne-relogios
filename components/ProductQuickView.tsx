@@ -150,15 +150,16 @@ export default function ProductQuickView({ product, onClose }: ProductQuickViewP
             <button
               className="button button-primary product-dialog-cta"
               type="button"
+              disabled={product.stock === 0}
               aria-expanded={purchaseDetailsVisible}
               onClick={() => setPurchaseDetailsVisible(true)}
             >
-              Quero comprar este relógio <span aria-hidden="true">→</span>
+              {product.stock === 0 ? "Produto esgotado" : "Quero comprar este relógio"} <span aria-hidden="true">→</span>
             </button>
-            <small>Preço e disponibilidade devem ser confirmados antes do pagamento.</small>
+            <small>{product.stock === 0 ? "Este modelo está indisponível no momento." : `${product.stock} unidade${product.stock === 1 ? "" : "s"} disponível${product.stock === 1 ? "" : "is"}.`}</small>
           </div>
 
-          {purchaseDetailsVisible && (
+          {purchaseDetailsVisible && product.stock > 0 && (
             <div className="product-dialog-notice" role="status" aria-live="polite">
               <strong>Solicitação de compra</strong>
               <p>

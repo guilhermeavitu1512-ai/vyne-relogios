@@ -69,3 +69,19 @@ test("renders the searchable catalog route", async () => {
   assert.match(html, /Adicionar.+favoritos/i);
   assert.match(html, /Ver detalhes e comprar SEIKO 5 Sports/i);
 });
+
+for (const [path, heading] of [
+  ["/admin", "Administração"],
+  ["/admin/produtos", "PRODUTOS"],
+  ["/admin/estoque", "ESTOQUE"],
+  ["/admin/vendas", "VENDAS"],
+]) {
+  test(`renders the protected admin surface at ${path}`, async () => {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, new RegExp(heading, "i"));
+    assert.match(html, /Validando acesso seguro/i);
+    assert.doesNotMatch(html, /ADMIN_PASSWORD_HASH/i);
+  });
+}
