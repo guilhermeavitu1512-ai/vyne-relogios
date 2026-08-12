@@ -1,0 +1,178 @@
+.recommended-products-grid {
+  display: grid;
+  width: min(var(--content-width), calc(100% - (2 * var(--page-gutter))));
+  margin-inline: auto;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(28px, 3vw, 46px) clamp(20px, 2.5vw, 36px);
+}
+
+.recommended-product {
+  min-width: 0;
+  grid-column: span 4;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.recommended-product[data-featured="true"] {
+  grid-column: span 6;
+}
+
+.recommended-product > button {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.recommended-product-image {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(163, 251, 6, 0.045), transparent 42%),
+    #030403;
+}
+
+.recommended-product-image img {
+  padding: clamp(18px, 3vw, 46px);
+  object-fit: contain !important;
+  object-position: center;
+  filter: brightness(1.08) contrast(1.035);
+  transition: transform 420ms var(--ease-editorial), filter 260ms ease;
+}
+
+.recommended-product:hover .recommended-product-image img,
+.recommended-product:focus-within .recommended-product-image img {
+  transform: scale(1.025);
+  filter: brightness(1.14) contrast(1.04);
+}
+
+.recommended-product-stock {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  right: 16px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.recommended-product-copy {
+  padding: clamp(18px, 2vw, 28px) 0 0;
+}
+
+.recommended-product-copy > div,
+.recommended-product-copy .recommended-product-meta {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recommended-product-copy > div span,
+.recommended-product-copy .recommended-product-meta span {
+  color: var(--green);
+  font-size: clamp(10px, 0.9vw, 12px);
+  letter-spacing: 0.12em !important;
+}
+
+.recommended-product-copy > div small {
+  color: var(--soft);
+  font-size: 10px;
+  letter-spacing: 0.08em !important;
+}
+
+.recommended-product-copy h3 {
+  margin: 12px 0 0;
+  font-size: clamp(2rem, 3.4vw, 3.8rem);
+  line-height: 0.95;
+}
+
+.recommended-product[data-featured="true"] .recommended-product-copy h3 {
+  font-size: clamp(2.35rem, 4.4vw, 4.8rem);
+}
+
+.recommended-product-copy p {
+  max-width: 520px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: clamp(12px, 1vw, 14px);
+  line-height: 1.45;
+}
+
+.recommended-product-copy .recommended-product-meta {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recommended-product-copy .recommended-product-meta strong {
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  letter-spacing: 0.02em !important;
+}
+
+.recommended-product-copy .recommended-product-meta span {
+  position: relative;
+  padding-bottom: 5px;
+  color: #fff;
+}
+
+.recommended-product-copy .recommended-product-meta span::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--green);
+  content: "";
+  transform: scaleX(0.34);
+  transform-origin: left;
+  transition: transform 220ms var(--ease-editorial);
+}
+
+.recommended-product:hover .recommended-product-copy .recommended-product-meta span::after,
+.recommended-product:focus-within .recommended-product-copy .recommended-product-meta span::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 1099px) {
+  .recommended-product,
+  .recommended-product[data-featured="true"] {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 639px) {
+  .recommended-products-grid {
+    width: calc(100% - 40px);
+    gap: 38px;
+  }
+
+  .recommended-product,
+  .recommended-product[data-featured="true"] {
+    grid-column: 1 / -1;
+  }
+
+  .recommended-product-image {
+    aspect-ratio: 1 / 1.05;
+  }
+
+  .recommended-product-copy h3,
+  .recommended-product[data-featured="true"] .recommended-product-copy h3 {
+    font-size: clamp(2.35rem, 13vw, 3.55rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recommended-product-image img,
+  .recommended-product-copy .recommended-product-meta span::after {
+    transition: none;
+  }
+}

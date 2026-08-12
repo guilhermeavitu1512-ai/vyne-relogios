@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import FreeShippingBanner from "@/components/FreeShippingBanner";
 import ProductQuickView from "@/components/ProductQuickView";
 import ResponsiveWatchImage from "@/components/ResponsiveWatchImage";
 import SiteFooter from "@/components/SiteFooter";
@@ -79,7 +78,6 @@ export default function CatalogPage() {
 
   return (
     <div className="site-shell catalog-shell">
-      <FreeShippingBanner />
       <StaggeredMenu
         items={menuItems}
         headerLinks={[
@@ -183,6 +181,7 @@ export default function CatalogPage() {
                           src={product.image}
                           alt={`Imagem ilustrativa do ${product.brand} ${product.model}`}
                           sizes="(max-width: 700px) 100vw, 50vw"
+                          fit="contain"
                         />
                         <span className="catalog-card-tag">{product.tag}</span>
                         {product.stock === 0 && <span className="catalog-card-stock">ESGOTADO</span>}
@@ -200,7 +199,7 @@ export default function CatalogPage() {
                             <strong>{product.price}</strong>
                           </span>
                           <span className="catalog-card-action">
-                            {product.stock === 0 ? "Ver produto" : "Ver detalhes"} <span aria-hidden="true">→</span>
+                            {product.stock === 0 ? "Ver produto" : "Ver detalhes"}
                           </span>
                         </div>
                       </div>
@@ -235,11 +234,6 @@ export default function CatalogPage() {
               </button>
             </div>
           )}
-
-          <p className="catalog-disclaimer">
-            * Produtos, valores e disponibilidade são ilustrativos. A versão comercial
-            deve refletir catálogo, estoque, garantia e condições reais da VYNE.
-          </p>
         </section>
       </main>
 

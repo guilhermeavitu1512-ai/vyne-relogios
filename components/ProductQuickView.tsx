@@ -154,7 +154,7 @@ export default function ProductQuickView({ product, onClose }: ProductQuickViewP
               aria-expanded={purchaseDetailsVisible}
               onClick={() => setPurchaseDetailsVisible(true)}
             >
-              {product.stock === 0 ? "Produto esgotado" : "Quero comprar este relógio"} <span aria-hidden="true">→</span>
+              {product.stock === 0 ? "Produto esgotado" : "Quero comprar este relógio"}
             </button>
             <small>{product.stock === 0 ? "Este modelo está indisponível no momento." : `${product.stock} unidade${product.stock === 1 ? "" : "s"} disponível${product.stock === 1 ? "" : "is"}.`}</small>
           </div>

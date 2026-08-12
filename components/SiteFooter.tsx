@@ -47,7 +47,7 @@ export default function SiteFooter() {
 
         <div className="footer-bottom">
           <span>© 2026 VYNE. Experiência digital independente.</span>
-          <span>Imagens editoriais: Unsplash · Produtos ilustrativos.</span>
+          <span>Imagens editoriais: Unsplash.</span>
           <span>
             Modelo 3D “Seiko Watch” por{" "}
             <a

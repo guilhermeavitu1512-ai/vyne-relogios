@@ -11,9 +11,9 @@ import {
 } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
-import FreeShippingBanner from "@/components/FreeShippingBanner";
 import ProductQuickView from "@/components/ProductQuickView";
 import RecommendedMarquee from "@/components/RecommendedMarquee";
+import RecommendedProducts from "@/components/RecommendedProducts";
 import SiteFooter from "@/components/SiteFooter";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import type { Product } from "@/lib/products";
@@ -104,7 +104,8 @@ function HeroIntro({
     startedRef.current = true;
     video.pause();
     video.currentTime = 0;
-    fallbackRef.current = window.setTimeout(revealContent, 12000);
+    video.playbackRate = 1.25;
+    fallbackRef.current = window.setTimeout(revealContent, 9000);
     window.requestAnimationFrame(() => { video.play().catch(revealContent); });
   }, [reduceMotion, revealContent]);
 
@@ -126,7 +127,7 @@ function HeroIntro({
           className="hero-video-lockup pointer-events-none"
           initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: reduceMotion ? 0 : 0.55, ease: editorialEase }}
+          transition={{ duration: reduceMotion ? 0 : 0.4, ease: editorialEase }}
           onAnimationComplete={startPlayback}
         >
           <video
@@ -151,7 +152,7 @@ function HeroIntro({
               ? { opacity: 1, y: 0, visibility: "visible" }
               : { opacity: 0, y: 18, visibility: "hidden" }
           }
-          transition={{ duration: reduceMotion ? 0 : 0.65, ease: editorialEase }}
+          transition={{ duration: reduceMotion ? 0 : 0.42, ease: editorialEase }}
         >
           <span className="eyebrow">CURADORIA INDEPENDENTE · RELÓGIOS ORIGINAIS</span>
           <h1 id="hero-title">QUEM SOMOS NÓS?</h1>
@@ -160,7 +161,7 @@ function HeroIntro({
             marcas do mundo, com autenticidade, procedência e atendimento especializado.
           </p>
           <a className="button button-primary hero-intro-action" href="/catalogo">
-            VER CATÁLOGO <span aria-hidden="true">→</span>
+            VER CATÁLOGO
           </a>
         </m.div>
       </div>
@@ -234,8 +235,6 @@ export default function Home() {
     <LazyMotion features={domAnimation}>
       <div className="site-shell" data-intro-complete={introComplete ? "true" : "false"}>
         <m.div className="scroll-progress" style={{ scaleX: smoothProgress }} aria-hidden="true" />
-        <FreeShippingBanner />
-
         <StaggeredMenu
           items={menuItems}
           headerLinks={[
@@ -269,10 +268,10 @@ export default function Home() {
                 VALOR.
               </p>
               <a className="button button-secondary recommended-catalog-cta" href="/catalogo">
-                VER CATÁLOGO COMPLETO <span aria-hidden="true">→</span>
+                VER CATÁLOGO COMPLETO
               </a>
             </AnimatedSection>
-            <RecommendedMarquee products={recommendedProducts} onSelectProduct={setSelectedProduct} />
+            <RecommendedProducts products={recommendedProducts} onSelectProduct={setSelectedProduct} />
           </Section>
 
           <Section id="colecao" className="collection-section">
@@ -288,9 +287,8 @@ export default function Home() {
 
             <div className="collection-action">
               <a className="button button-primary collection-primary-cta" href="/catalogo">
-                EXPLORAR COLEÇÃO <span aria-hidden="true">→</span>
+                EXPLORAR COLEÇÃO
               </a>
-              <small>* VALORES E DISPONIBILIDADE SÃO ILUSTRATIVOS.</small>
             </div>
           </Section>
 
@@ -335,9 +333,6 @@ export default function Home() {
               <span className="eyebrow">A ESCOLHA CERTA COMEÇA COM CONFIANÇA</span>
               <h2>ESCOLHA O SEU PRÓXIMO RELÓGIO.</h2>
               <p>ORIGINAIS SELECIONADOS PARA ACOMPANHAR O SEU RITMO.</p>
-              <a className="button button-primary" href="/catalogo">
-                EXPLORAR COLEÇÃO <span aria-hidden="true">→</span>
-              </a>
             </AnimatedSection>
           </Section>
         </main>

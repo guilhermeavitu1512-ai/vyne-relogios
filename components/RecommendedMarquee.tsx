@@ -41,7 +41,7 @@ export default function RecommendedMarquee({
   const navigationRef = useRef({
     active: false,
     startTime: 0,
-    duration: 640,
+    duration: 480,
     distance: 0,
     previousProgress: 0,
   });
@@ -213,7 +213,7 @@ export default function RecommendedMarquee({
     navigationRef.current = {
       active: true,
       startTime: performance.now(),
-      duration: 640,
+      duration: 480,
       distance: direction * distance,
       previousProgress: 0,
     };
@@ -222,7 +222,7 @@ export default function RecommendedMarquee({
     arrowTimerRef.current = window.setTimeout(() => {
       setActiveDirection(null);
       arrowTimerRef.current = null;
-    }, 640);
+    }, 480);
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -362,7 +362,7 @@ export default function RecommendedMarquee({
                       <h3>{product.model}</h3>
                       <div>
                         <strong>{variant === "recommended" ? product.price : "VER RELÓGIO"}</strong>
-                        <i>VISUALIZAR →</i>
+                        <i>VISUALIZAR</i>
                       </div>
                     </div>
                   </button>

@@ -45,11 +45,11 @@
 }
 
 .recommended-marquee-controls button[data-direction="previous"][data-active="true"] span {
-  animation: recommended-arrow-previous 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: recommended-arrow-previous 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .recommended-marquee-controls button[data-direction="next"][data-active="true"] span {
-  animation: recommended-arrow-next 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: recommended-arrow-next 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes recommended-arrow-previous {
@@ -175,7 +175,7 @@
   object-position: center;
   padding: 10px;
   filter: brightness(1.1) contrast(1.04);
-  transition: transform 520ms ease;
+  transition: transform 440ms ease;
 }
 
 .recommended-card:hover .recommended-card-image img,

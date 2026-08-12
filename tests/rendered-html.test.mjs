@@ -37,8 +37,9 @@ test("renders the finished VYNE home page", async () => {
   assert.match(html, /media\/vyne-wordmark-transparent\.webm/i);
   assert.match(html, /Ver cat(?:á|&#xE1;|&aacute;)logo/i);
   assert.match(html, /Explorar cole(?:ç|&#xE7;|&ccedil;)ão/i);
-  assert.match(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
+  assert.doesNotMatch(html, /Frete gr(?:á|&#xE1;|&aacute;)tis na compra de qualquer item/i);
   assert.match(html, /Rel(?:ó|&#xF3;|&oacute;)gios recomendados/i);
+  assert.match(html, /recommended-products-grid/i);
   assert.match(html, /BUILT ON TRUST/i);
   assert.match(html, /vyne-logo-final\.jpg/i);
   assert.match(html, /alt=["']Logo VYNE["']/i);
@@ -68,6 +69,7 @@ test("renders the searchable catalog route", async () => {
   assert.match(html, /CASIO/);
   assert.match(html, /Adicionar.+favoritos/i);
   assert.match(html, /Ver detalhes e comprar SEIKO 5 Sports/i);
+  assert.doesNotMatch(html, /Produtos, valores e disponibilidade são ilustrativos/i);
 });
 
 for (const [path, heading] of [
