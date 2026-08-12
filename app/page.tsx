@@ -105,7 +105,7 @@ function HeroIntro({
     video.pause();
     video.currentTime = 0;
     video.playbackRate = 1.45;
-    window.requestAnimationFrame(() => { video.play().catch(revealContent); });
+    window.requestAnimationFrame(() => { video.play().catch(() => undefined); });
   }, [reduceMotion, revealContent]);
 
   useEffect(() => {
@@ -116,7 +116,7 @@ function HeroIntro({
       const frame = window.requestAnimationFrame(revealContent);
       return () => window.cancelAnimationFrame(frame);
     }
-    fallbackRef.current = window.setTimeout(revealContent, 1000);
+    fallbackRef.current = window.setTimeout(revealContent, 1800);
     return () => { if (fallbackRef.current !== null) window.clearTimeout(fallbackRef.current); };
   }, [reduceMotion, revealContent]);
 
@@ -138,8 +138,6 @@ function HeroIntro({
             playsInline
             preload="auto"
             onCanPlay={() => { if (startRequestedRef.current) startPlayback(); }}
-            onEnded={revealContent}
-            onError={revealContent}
             aria-label="Animação do nome VYNE"
           />
         </m.div>
