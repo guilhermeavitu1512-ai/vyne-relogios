@@ -25,8 +25,7 @@ export const products: Product[] = [
     price: "R$ 2.490*",
     priceValue: 2490,
     promotionalPriceValue: null,
-    image:
-      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1800&q=88",
+    image: "/media/products/seiko-5-sports.jpg",
     tag: "Escolha do curador",
     category: "Automático",
     specs: ["Movimento automático", "Caixa em aço", "Estilo versátil"],
@@ -43,8 +42,7 @@ export const products: Product[] = [
     price: "R$ 349*",
     priceValue: 349,
     promotionalPriceValue: null,
-    image:
-      "https://images.unsplash.com/photo-1622527241521-a48f190a35cc?auto=format&fit=crop&w=1600&q=88",
+    image: "/media/products/casio-vintage.jpg",
     tag: "Ícone acessível",
     category: "Digital",
     specs: ["Display digital", "Bracelete metálico", "Perfil urbano"],
@@ -61,8 +59,7 @@ export const products: Product[] = [
     price: "R$ 2.790*",
     priceValue: 2790,
     promotionalPriceValue: null,
-    image:
-      "https://images.unsplash.com/photo-1753620022899-f0aa1c34e331?auto=format&fit=crop&w=1800&q=88",
+    image: "/media/products/citizen-tsuyosa.jpg",
     tag: "Novo ritmo",
     category: "Automático",
     specs: ["Movimento automático", "Mostrador marcante", "Aço integrado"],
@@ -79,8 +76,7 @@ export const products: Product[] = [
     price: "R$ 1.890*",
     priceValue: 1890,
     promotionalPriceValue: null,
-    image:
-      "https://images.unsplash.com/photo-1654544705636-2b6ddd388d96?auto=format&fit=crop&w=1600&q=88&sat=-22",
+    image: "/media/products/orient-bambino.jpg",
     tag: "Essencial clássico",
     category: "Automático",
     specs: ["Estética clássica", "Perfil refinado", "Uso social"],
@@ -97,8 +93,7 @@ export const products: Product[] = [
     price: "R$ 1.290*",
     priceValue: 1290,
     promotionalPriceValue: null,
-    image:
-      "https://images.unsplash.com/photo-1708651145401-6be804cd02d4?auto=format&fit=crop&w=1600&q=88",
+    image: "/media/products/timex-q-reissue.jpg",
     tag: "Design de arquivo",
     category: "Quartzo",
     specs: ["Movimento a quartzo", "Caixa em aço", "Visual atemporal"],
