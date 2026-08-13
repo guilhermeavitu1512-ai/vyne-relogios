@@ -17,6 +17,7 @@ export default function AdminProductsPage() {
   const [stock, setStock] = useState<StockFilter>("all");
   const [status, setStatus] = useState("all");
   const [recommended, setRecommended] = useState("all");
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -55,10 +56,30 @@ export default function AdminProductsPage() {
     setProducts((current) => current.map((product) => product.id === updated.id ? updated : product));
   };
 
+  const removeProduct = (id: string) => {
+    setProducts((current) => current.filter((product) => product.id !== id));
+  };
+
   return (
     <div className="admin-page">
-      <header className="admin-page-header"><div><span>Catálogo</span><h1>PRODUTOS</h1><p>Edite informações públicas, preço, imagem e estoque.</p></div></header>
+      <header className="admin-page-header"><div><span>Catálogo</span><h1>PRODUTOS</h1><p>Edite informações públicas, preço, imagem e estoque.</p></div><button type="button" className="is-primary admin-add-product" onClick={() => setCreating(true)} disabled={creating}>Adicionar novo relógio</button></header>
       {error && <div className="admin-alert" role="alert">{error}<button type="button" onClick={load}>Tentar novamente</button></div>}
+
+      {creating && (
+        <section className="admin-product-create" aria-label="Adicionar novo relógio">
+          <ProductEditor
+            product={emptyProduct()}
+            isNew
+            onSaved={(created) => {
+              setProducts((current) => [created, ...current]);
+              setCreating(false);
+            }}
+            onDeleted={removeProduct}
+            onCancelNew={() => setCreating(false)}
+            request={request}
+          />
+        </section>
+      )}
 
       <section className="admin-filters" aria-label="Filtros de produtos">
         <label className="admin-search">Buscar<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Marca ou modelo" /></label>
@@ -70,7 +91,7 @@ export default function AdminProductsPage() {
 
       <div className="admin-results-count">{filtered.length} de {products.length} produtos</div>
       <section className="admin-product-list">
-        {filtered.map((product) => <ProductEditor key={product.id} product={product} onSaved={replaceProduct} request={request} />)}
+        {filtered.map((product) => <ProductEditor key={product.id} product={product} onSaved={replaceProduct} onDeleted={removeProduct} request={request} />)}
         {!error && products.length === 0 && <div className="admin-skeleton">Carregando produtos…</div>}
         {products.length > 0 && filtered.length === 0 && <p className="admin-empty">Nenhum produto corresponde aos filtros.</p>}
       </section>
@@ -80,14 +101,20 @@ export default function AdminProductsPage() {
 
 function ProductEditor({
   product,
+  isNew = false,
   onSaved,
+  onDeleted,
+  onCancelNew,
   request,
 }: {
   product: AdminProduct;
+  isNew?: boolean;
   onSaved: (product: AdminProduct) => void;
+  onDeleted: (id: string) => void;
+  onCancelNew?: () => void;
   request: <T>(url: string, init?: RequestInit) => Promise<T>;
 }) {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(isNew);
   const [draft, setDraft] = useState(product);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -103,6 +130,7 @@ function ProductEditor({
     setDraft(product);
     setMessage("");
     setEditing(false);
+    onCancelNew?.();
   };
 
   const selectImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -134,8 +162,9 @@ function ProductEditor({
         const upload = await request<{ url: string }>("/api/admin/uploads", { method: "POST", body: formData });
         imageUrl = upload.url;
       }
-      const payload = await request<{ product: AdminProduct }>(`/api/admin/products/${encodeURIComponent(product.id)}`, {
-        method: "PATCH",
+      if (!imageUrl) throw new Error("Selecione uma foto para o novo relógio.");
+      const payload = await request<{ product: AdminProduct }>(isNew ? "/api/admin/products" : `/api/admin/products/${encodeURIComponent(product.id)}`, {
+        method: isNew ? "POST" : "PATCH",
         body: JSON.stringify({
           name: draft.model,
           brand: draft.brand,
@@ -157,9 +186,24 @@ function ProductEditor({
       setFile(null);
       setPreview(null);
       setEditing(false);
-      setMessage("Alterações salvas e publicadas no catálogo.");
+      setMessage(isNew ? "Relógio criado e publicado no catálogo." : "Alterações salvas e publicadas no catálogo.");
     } catch (saveError) {
       setMessage(saveError instanceof Error ? saveError.message : "Falha ao salvar.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async () => {
+    if (isNew || !window.confirm(`Excluir ${product.brand} ${product.model}? O histórico será preservado quando necessário.`)) return;
+    setSaving(true);
+    setMessage("");
+    try {
+      const payload = await request<{ mode: "deleted" | "archived" }>(`/api/admin/products/${encodeURIComponent(product.id)}`, { method: "DELETE" });
+      onDeleted(product.id);
+      setMessage(payload.mode === "archived" ? "Produto retirado do catálogo; o histórico foi preservado." : "Produto excluído.");
+    } catch (deleteError) {
+      setMessage(deleteError instanceof Error ? deleteError.message : "Falha ao excluir.");
     } finally {
       setSaving(false);
     }
@@ -169,9 +213,9 @@ function ProductEditor({
   return (
     <article className="admin-product-card">
       <div className="admin-product-summary">
-        <div className="admin-product-image"><img src={preview ?? draft.image} alt={`${draft.brand} ${draft.model}`} /></div>
+        <div className="admin-product-image">{preview ?? draft.image ? <img src={preview ?? draft.image} alt={`${draft.brand} ${draft.model}`} /> : <span>Foto do relógio</span>}</div>
         <div><span>{draft.brand}</span><h2>{draft.model}</h2><p>{draft.descriptor}</p><strong>{formatMoney((draft.promotionalPriceValue ?? draft.priceValue) * 100)}</strong></div>
-        <div className="admin-product-state"><span className={`admin-stock-badge is-${stockTone}`}>{stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque"}</span><b>{draft.stock} un.</b><button type="button" onClick={() => setEditing(true)} disabled={editing}>Editar</button></div>
+        <div className="admin-product-state"><span className={`admin-stock-badge is-${stockTone}`}>{stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque"}</span><b>{draft.stock} un.</b>{!isNew && <button type="button" onClick={() => setEditing(true)} disabled={editing}>Editar</button>}</div>
       </div>
 
       {editing && <div className="admin-product-form">
@@ -192,11 +236,33 @@ function ProductEditor({
           <label><input type="checkbox" checked={draft.featured} onChange={(event) => setDraft({ ...draft, featured: event.target.checked })} />Destaque</label>
           <label><input type="checkbox" checked={draft.recommended} onChange={(event) => setDraft({ ...draft, recommended: event.target.checked })} />Recomendado</label>
         </div>
-        <div className="admin-form-actions"><button type="button" className="is-primary" onClick={save} disabled={saving}>{saving ? "Salvando…" : "Salvar"}</button><button type="button" onClick={cancel} disabled={saving}>Cancelar</button></div>
+        <div className="admin-form-actions"><button type="button" className="is-primary" onClick={save} disabled={saving}>{saving ? "Salvando…" : isNew ? "Adicionar relógio" : "Salvar"}</button><button type="button" onClick={cancel} disabled={saving}>Cancelar</button>{!isNew && <button type="button" className="is-danger" onClick={remove} disabled={saving}>Excluir</button>}</div>
       </div>}
-      {message && <p className={message.startsWith("Alterações") ? "admin-form-success" : "admin-form-error"} role="status">{message}</p>}
+      {message && <p className={message.includes("salv") || message.includes("criado") || message.includes("excluído") || message.includes("retirado") ? "admin-form-success" : "admin-form-error"} role="status">{message}</p>}
     </article>
   );
+}
+
+function emptyProduct(): AdminProduct {
+  return {
+    id: "novo",
+    brand: "",
+    model: "",
+    descriptor: "",
+    price: "R$ 0",
+    priceValue: 0,
+    promotionalPriceValue: null,
+    image: "",
+    tag: "",
+    category: "",
+    specs: [],
+    stock: 0,
+    featured: false,
+    recommended: false,
+    active: true,
+    createdAt: "",
+    updatedAt: "",
+  };
 }
 
 async function optimizeImage(file: File) {

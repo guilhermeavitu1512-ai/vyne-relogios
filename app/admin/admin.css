@@ -270,3 +270,41 @@
   .admin-sale-card footer button { width: 100%; }
   .admin-movement-list article { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
 }
+.admin-add-product {
+  min-height: 46px;
+  padding: 0 1.25rem;
+  white-space: nowrap;
+}
+
+.admin-product-create {
+  margin-bottom: 1.5rem;
+}
+
+.admin-product-create .admin-product-card {
+  border-color: color-mix(in srgb, #a3fb06 45%, transparent);
+}
+
+.admin-product-image > span {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 1rem;
+  color: #8d958f;
+  text-align: center;
+}
+
+.admin-form-actions .is-danger {
+  margin-left: auto;
+  border-color: rgba(255, 98, 98, 0.45);
+  color: #ff9d9d;
+}
+
+@media (max-width: 720px) {
+  .admin-add-product {
+    width: 100%;
+  }
+
+  .admin-form-actions .is-danger {
+    margin-left: 0;
+  }
+}

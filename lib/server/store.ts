@@ -173,6 +173,95 @@ export type ProductUpdate = {
   active: boolean;
 };
 
+function productIdFromName(brand: string, name: string) {
+  const base = `${brand}-${name}`
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 72);
+  return `${base || "relogio"}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+export async function createProduct(input: ProductUpdate, responsible: string) {
+  const database = getD1();
+  const id = productIdFromName(input.brand, input.name);
+  const now = new Date().toISOString();
+  const statements: D1PreparedStatement[] = [
+    database
+      .prepare(
+        `INSERT INTO products
+        (id, name, brand, description, price_cents, promotional_price_cents, image_url, stock,
+         category, tag, specs_json, featured, recommended, active, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        id,
+        input.name,
+        input.brand,
+        input.description,
+        input.priceCents,
+        input.promotionalPriceCents,
+        input.imageUrl,
+        input.stock,
+        input.category,
+        input.tag,
+        JSON.stringify(input.specs),
+        input.featured ? 1 : 0,
+        input.recommended ? 1 : 0,
+        input.active ? 1 : 0,
+        now,
+        now,
+      ),
+  ];
+
+  if (input.stock > 0) {
+    statements.push(
+      database
+        .prepare(
+          `INSERT INTO stock_movements
+          (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
+          VALUES (?, ?, NULL, 'ENTRY', ?, 0, ?, ?, 'Estoque inicial do produto', ?)`,
+        )
+        .bind(crypto.randomUUID(), id, input.stock, input.stock, responsible, now),
+    );
+  }
+
+  await database.batch(statements);
+  return getProduct(id);
+}
+
+export async function deleteProduct(id: string) {
+  const database = getD1();
+  const existing = await first<ProductRow>(
+    database.prepare("SELECT * FROM products WHERE id = ?").bind(id),
+  );
+  if (!existing) return null;
+
+  const references = await first<{ count: number }>(
+    database
+      .prepare(
+        `SELECT
+          (SELECT COUNT(*) FROM sale_items WHERE product_id = ?) +
+          (SELECT COUNT(*) FROM stock_movements WHERE product_id = ?) AS count`,
+      )
+      .bind(id, id),
+  );
+
+  if ((references?.count ?? 0) > 0) {
+    const now = new Date().toISOString();
+    await database
+      .prepare("UPDATE products SET active = 0, recommended = 0, featured = 0, updated_at = ? WHERE id = ?")
+      .bind(now, id)
+      .run();
+    return { mode: "archived" as const, product: await getProduct(id) };
+  }
+
+  await database.prepare("DELETE FROM products WHERE id = ?").bind(id).run();
+  return { mode: "deleted" as const, product: productFromRow(existing) };
+}
+
 export async function updateProduct(id: string, input: ProductUpdate, responsible: string) {
   const database = getD1();
   const existing = await first<ProductRow>(
