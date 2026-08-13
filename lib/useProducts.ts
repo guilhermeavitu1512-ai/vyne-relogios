@@ -14,7 +14,13 @@ const legacyImageById = new Map([
 function replaceLegacyProductImage(product: Product) {
   const legacyImageId = legacyImageById.get(product.id);
   const fallbackProduct = fallbackProducts.find((item) => item.id === product.id);
-  if (!legacyImageId || !fallbackProduct || !product.image.includes(legacyImageId)) return product;
+  if (!legacyImageId || !fallbackProduct) return product;
+
+  const previousLocalImage = fallbackProduct.image.replace("-v2.jpg", ".jpg");
+  const usesLegacyImage =
+    product.image.includes(legacyImageId) || product.image === previousLocalImage;
+
+  if (!usesLegacyImage) return product;
   return { ...product, image: fallbackProduct.image };
 }
 
