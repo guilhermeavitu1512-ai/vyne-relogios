@@ -339,28 +339,32 @@ export async function addStockMovement(input: {
   if (newStock < 0) throw new Error("A movimentação deixaria o estoque negativo.");
 
   const now = new Date().toISOString();
-  await database.batch([
+  const results = await database.batch([
     database
-      .prepare("UPDATE products SET stock = ?, updated_at = ? WHERE id = ?")
-      .bind(newStock, now, input.productId),
+      .prepare("UPDATE products SET stock = stock + ?, updated_at = ? WHERE id = ? AND stock + ? >= 0")
+      .bind(input.quantity, now, input.productId, input.quantity),
     database
       .prepare(
         `INSERT INTO stock_movements
         (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-        VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?)`,
+        SELECT ?, id, NULL, ?, ?, stock - ?, stock, ?, ?, ?
+        FROM products WHERE id = ? AND updated_at = ?`,
       )
       .bind(
         crypto.randomUUID(),
-        input.productId,
         input.type,
         input.quantity,
-        product.stock,
-        newStock,
+        input.quantity,
         input.responsible,
         input.note,
         now,
+        input.productId,
+        now,
       ),
   ]);
+  if ((results[0]?.meta?.changes ?? 0) !== 1 || (results[1]?.meta?.changes ?? 0) !== 1) {
+    throw new Error("Não foi possível atualizar o estoque. Atualize a página e tente novamente.");
+  }
   return getProduct(input.productId);
 }
 

@@ -164,8 +164,8 @@ function AdminLogin({ onAuthenticated }: { onAuthenticated: (session: { username
         <h1 id="admin-login-title">ACESSO RESTRITO.</h1>
         <p>Gerencie catálogo, estoque e vendas em uma área protegida.</p>
         <form onSubmit={submit}>
-          <label>Usuário<input name="username" autoComplete="username" required /></label>
-          <label>Senha<input name="password" type="password" autoComplete="current-password" required /></label>
+          <label htmlFor="admin-username">Usuário<input id="admin-username" name="username" type="text" inputMode="text" autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="username" enterKeyHint="next" autoFocus required /></label>
+          <label htmlFor="admin-password">Senha<input id="admin-password" name="password" type="password" autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="current-password" enterKeyHint="go" required /></label>
           {error && <p className="admin-form-error" role="alert">{error}</p>}
           <button type="submit" disabled={submitting}>{submitting ? "Verificando…" : "Entrar"}</button>
         </form>

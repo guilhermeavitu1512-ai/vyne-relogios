@@ -33,6 +33,7 @@ export default function AdminStockPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [movements, setMovements] = useState<Movement[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [quickActionId, setQuickActionId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
   const load = useCallback(async () => {
@@ -79,13 +80,36 @@ export default function AdminStockPage() {
     }
   };
 
+  const quickAdjust = async (product: Product, quantity: 1 | -1) => {
+    setQuickActionId(product.id);
+    setMessage("");
+    try {
+      await request("/api/admin/stock-movements", {
+        method: "POST",
+        body: JSON.stringify({
+          productId: product.id,
+          type: quantity > 0 ? "ENTRY" : "MANUAL_ADJUSTMENT",
+          quantity,
+          note: quantity > 0 ? "Entrada rápida de uma unidade" : "Retirada rápida de uma unidade",
+        }),
+      });
+      setMessage(quantity > 0 ? "Uma unidade foi adicionada ao estoque." : "Uma unidade foi retirada do estoque.");
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Falha ao atualizar estoque.");
+    } finally {
+      setQuickActionId(null);
+    }
+  };
+
   return (
     <div className="admin-page">
       <header className="admin-page-header"><div><span>Inventário</span><h1>ESTOQUE</h1><p>Cada alteração gera um registro auditável com saldo anterior e atual.</p></div></header>
       <section className="admin-stock-overview">
         {products.map((product) => {
           const tone = product.stock === 0 ? "out" : product.stock <= 3 ? "low" : "available";
-          return <article key={product.id}><img src={product.image} alt="" /><div><span>{product.brand}</span><strong>{product.model}</strong></div><b>{product.stock}</b><small className={`is-${tone}`}>{tone === "out" ? "Esgotado" : tone === "low" ? "Baixo" : "Em estoque"}</small></article>;
+          const updating = quickActionId === product.id;
+          return <article key={product.id}><img src={product.image} alt="" /><div><span>{product.brand}</span><strong>{product.model}</strong></div><b aria-label={`${product.stock} unidades em estoque`}>{product.stock}</b><small className={`is-${tone}`}>{tone === "out" ? "Esgotado" : tone === "low" ? "Baixo" : "Em estoque"}</small><div className="admin-stock-actions"><button type="button" className="is-primary" disabled={updating} onClick={() => void quickAdjust(product, 1)}>+ Adicionar 1</button><button type="button" disabled={updating || product.stock === 0} onClick={() => void quickAdjust(product, -1)}>− Retirar 1</button></div></article>;
         })}
       </section>
 

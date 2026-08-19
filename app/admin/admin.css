@@ -18,6 +18,9 @@
 
 .admin-app *,
 .admin-login * { letter-spacing: 0; text-transform: none; }
+.admin-app,
+.admin-login,
+.admin-loading { position: relative; z-index: 10001; isolation: isolate; pointer-events: auto; }
 .admin-app button,
 .admin-app input,
 .admin-app select,
@@ -44,7 +47,7 @@
 .admin-login input,
 .admin-app input,
 .admin-app select,
-.admin-app textarea { width: 100%; min-width: 0; min-height: 48px; padding: 12px 14px; border: 1px solid var(--admin-line); border-radius: 0; background: #070907; color: #fff; outline: none; }
+.admin-app textarea { position: relative; z-index: 1; width: 100%; min-width: 0; min-height: 48px; padding: 12px 14px; border: 1px solid var(--admin-line); border-radius: 0; background: #070907; color: #fff; outline: none; pointer-events: auto; touch-action: manipulation; user-select: text; -webkit-user-select: text; }
 .admin-app textarea { resize: vertical; }
 .admin-login input:focus,
 .admin-app input:focus,
@@ -196,6 +199,8 @@
 .admin-stock-overview small.is-available { color: var(--admin-green); }
 .admin-stock-overview small.is-low { color: #f1c85b; }
 .admin-stock-overview small.is-out { color: #ff8585; }
+.admin-stock-actions { display: grid !important; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 8px !important; width: 100%; margin-top: 8px; }
+.admin-stock-actions button { min-height: 42px; padding: 8px 10px; font-size: 10px; }
 .admin-movement-history { margin-top: 18px; }
 .admin-movement-list { display: grid; margin-top: 22px; }
 .admin-movement-list article { display: grid; grid-template-columns: minmax(180px, 1.1fr) 60px minmax(120px, .5fr) minmax(200px, 1fr); gap: 16px; align-items: center; padding: 16px 0; border-top: 1px solid var(--admin-line); }
@@ -239,6 +244,10 @@
 
 @media (max-width: 620px) {
   .admin-login { padding: 16px; }
+  .admin-login input,
+  .admin-app input,
+  .admin-app select,
+  .admin-app textarea { font-size: 16px; }
   .admin-page-header h1 { font-size: clamp(44px, 18vw, 66px); }
   .admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-metrics article { padding: 18px 14px; }
@@ -257,6 +266,7 @@
   .admin-ranking img { width: 46px; height: 50px; }
   .admin-ranking em { grid-column: 3; }
   .admin-stock-overview { grid-template-columns: 1fr; }
+  .admin-stock-actions button { min-height: 48px; font-size: 12px; }
   .admin-sale-create form,
   .admin-stock-entry form { grid-template-columns: 1fr; }
   .admin-stock-entry .admin-field-wide,
