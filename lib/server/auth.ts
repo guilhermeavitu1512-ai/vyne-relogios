@@ -56,7 +56,10 @@ export async function validateAdminCredentials(username: string, password: strin
     throw new Error("As credenciais administrativas ainda não foram configuradas.");
   }
 
-  const usernameMatches = constantTimeEqual(username, configuredUsername);
+  const usernameMatches = constantTimeEqual(
+    username.trim().toLowerCase(),
+    configuredUsername.trim().toLowerCase(),
+  );
   const passwordMatches = await verifyPassword(password, passwordHash);
   return usernameMatches && passwordMatches;
 }

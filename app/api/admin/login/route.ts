@@ -8,8 +8,8 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as { username?: unknown; password?: unknown };
-    const username = typeof body.username === "string" ? body.username.trim() : "";
-    const password = typeof body.password === "string" ? body.password : "";
+    const username = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+    const password = typeof body.password === "string" ? body.password.trim() : "";
     if (!username || !password) {
       return Response.json({ error: "Informe usuário e senha." }, { status: 400 });
     }
