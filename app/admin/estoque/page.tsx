@@ -37,6 +37,7 @@ export default function AdminStockPage() {
   const [submitting, setSubmitting] = useState(false);
   const [quickActionId, setQuickActionId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [selectedProductId, setSelectedProductId] = useState(() => searchParams.get("produto") ?? "");
 
   const load = useCallback(async () => {
@@ -47,8 +48,9 @@ export default function AdminStockPage() {
       ]);
       setProducts(productPayload.products);
       setMovements(movementPayload.movements);
+      setLoadError("");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Falha ao carregar estoque.");
+      setLoadError(error instanceof Error ? error.message : "Falha ao carregar estoque.");
     }
   }, [request]);
 
@@ -108,6 +110,7 @@ export default function AdminStockPage() {
   return (
     <div className="admin-page">
       <header className="admin-page-header"><div><span>Inventário</span><h1>ESTOQUE</h1><p>Cada alteração gera um registro auditável com saldo anterior e atual.</p></div></header>
+      {loadError && <div className="admin-alert" role="alert">{loadError}<button type="button" onClick={() => void load()}>Tentar novamente</button></div>}
       <section className="admin-stock-overview">
         {products.map((product) => {
           const tone = product.stock === 0 ? "out" : product.stock <= 3 ? "low" : "available";

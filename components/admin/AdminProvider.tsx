@@ -63,15 +63,35 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
       if (!session) throw new Error("Sessão expirada.");
       const headers = new Headers(init.headers);
       if (init.body && !(init.body instanceof FormData)) headers.set("content-type", "application/json");
-      if ((init.method ?? "GET").toUpperCase() !== "GET") headers.set("x-csrf-token", session.csrfToken);
-      const response = await fetch(url, { ...init, headers, cache: "no-store", credentials: "same-origin" });
-      const payload = (await response.json().catch(() => ({}))) as { error?: string } & T;
-      if (response.status === 401) {
-        setSession(null);
-        throw new Error("Sua sessão expirou. Entre novamente.");
+      const method = (init.method ?? "GET").toUpperCase();
+      if (method !== "GET") headers.set("x-csrf-token", session.csrfToken);
+
+      const maxAttempts = method === "GET" ? 3 : 1;
+      let lastError: Error | null = null;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        try {
+          const response = await fetch(url, { ...init, headers, cache: "no-store", credentials: "same-origin" });
+          const payload = (await response.json().catch(() => ({}))) as { error?: string } & T;
+          if (response.status === 401) {
+            setSession(null);
+            throw new Error("Sua sessão expirou. Entre novamente.");
+          }
+          if (response.ok) return payload;
+
+          lastError = new Error(payload.error ?? "Não foi possível concluir a operação.");
+          const transientFailure = response.status === 500 || response.status === 502 || response.status === 503 || response.status === 504;
+          if (!transientFailure || attempt === maxAttempts - 1) throw lastError;
+        } catch (requestError) {
+          if (requestError instanceof DOMException && requestError.name === "AbortError") throw requestError;
+          lastError = requestError instanceof Error ? requestError : new Error("Não foi possível concluir a operação.");
+          if (lastError.message.includes("sessão expirou") || attempt === maxAttempts - 1) throw lastError;
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, attempt === 0 ? 180 : 420));
       }
-      if (!response.ok) throw new Error(payload.error ?? "Não foi possível concluir a operação.");
-      return payload;
+
+      throw lastError ?? new Error("Não foi possível concluir a operação.");
     },
     [session],
   );

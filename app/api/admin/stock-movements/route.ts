@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   try {
     return Response.json({ movements: await listStockMovements() }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    console.error("[admin/stock-movements] Falha ao carregar movimentações", error);
     return Response.json({ error: error instanceof Error ? error.message : "Falha ao carregar movimentações." }, { status: 500 });
   }
 }

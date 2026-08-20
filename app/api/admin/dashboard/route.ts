@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     const period = periods.has(requested) ? requested : "30d";
     return Response.json(await getDashboard(period), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    console.error("[admin/dashboard] Falha ao carregar indicadores", error);
     return Response.json({ error: error instanceof Error ? error.message : "Falha ao carregar o painel." }, { status: 500 });
   }
 }

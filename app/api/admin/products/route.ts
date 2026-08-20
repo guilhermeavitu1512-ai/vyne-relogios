@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   try {
     return Response.json({ products: await listProducts(true) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    console.error("[admin/products] Falha ao carregar produtos", error);
     return Response.json({ error: error instanceof Error ? error.message : "Falha ao carregar produtos." }, { status: 500 });
   }
 }
