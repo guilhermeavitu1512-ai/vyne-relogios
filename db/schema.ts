@@ -6,6 +6,7 @@ export const products = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    model: text("model").notNull().default(""),
     brand: text("brand").notNull(),
     description: text("description").notNull().default(""),
     priceCents: integer("price_cents").notNull(),

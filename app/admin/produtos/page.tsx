@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
+import Link from "next/link";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import type { Product } from "@/lib/products";
 
@@ -17,6 +18,7 @@ export default function AdminProductsPage() {
   const [stock, setStock] = useState<StockFilter>("all");
   const [status, setStatus] = useState("all");
   const [recommended, setRecommended] = useState("all");
+  const [featured, setFeatured] = useState("all");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +41,7 @@ export default function AdminProductsPage() {
   const filtered = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("pt-BR");
     return products.filter((product) => {
-      if (term && !`${product.brand} ${product.model} ${product.descriptor}`.toLocaleLowerCase("pt-BR").includes(term)) return false;
+      if (term && !`${product.name} ${product.brand} ${product.model} ${product.descriptor}`.toLocaleLowerCase("pt-BR").includes(term)) return false;
       if (brand !== "all" && product.brand !== brand) return false;
       if (stock === "available" && product.stock <= 3) return false;
       if (stock === "low" && !(product.stock > 0 && product.stock <= 3)) return false;
@@ -48,9 +50,11 @@ export default function AdminProductsPage() {
       if (status === "inactive" && product.active) return false;
       if (recommended === "yes" && !product.recommended) return false;
       if (recommended === "no" && product.recommended) return false;
+      if (featured === "yes" && !product.featured) return false;
+      if (featured === "no" && product.featured) return false;
       return true;
     });
-  }, [brand, products, recommended, search, status, stock]);
+  }, [brand, featured, products, recommended, search, status, stock]);
 
   const replaceProduct = (updated: AdminProduct) => {
     setProducts((current) => current.map((product) => product.id === updated.id ? updated : product));
@@ -62,7 +66,7 @@ export default function AdminProductsPage() {
 
   return (
     <div className="admin-page">
-      <header className="admin-page-header"><div><span>Catálogo</span><h1>PRODUTOS</h1><p>Edite informações públicas, preço, imagem e estoque.</p></div><button type="button" className="is-primary admin-add-product" onClick={() => setCreating(true)} disabled={creating}>Adicionar novo relógio</button></header>
+      <header className="admin-page-header"><div><span>Catálogo</span><h1>PRODUTOS</h1><p>Edite informações públicas, preço, imagem e estoque.</p></div><button type="button" className="is-primary admin-add-product" onClick={() => setCreating(true)} disabled={creating}>+ Adicionar relógio</button></header>
       {error && <div className="admin-alert" role="alert">{error}<button type="button" onClick={load}>Tentar novamente</button></div>}
 
       {creating && (
@@ -82,11 +86,12 @@ export default function AdminProductsPage() {
       )}
 
       <section className="admin-filters" aria-label="Filtros de produtos">
-        <label className="admin-search">Buscar<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Marca ou modelo" /></label>
+        <label className="admin-search">Buscar<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nome, marca ou modelo" /></label>
         <label>Marca<select value={brand} onChange={(event) => setBrand(event.target.value)}><option value="all">Todas</option>{brands.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Estoque<select value={stock} onChange={(event) => setStock(event.target.value as StockFilter)}><option value="all">Todos</option><option value="available">Em estoque</option><option value="low">Estoque baixo</option><option value="out">Esgotado</option></select></label>
-        <label>Status<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">Todos</option><option value="active">Disponível</option><option value="inactive">Inativo</option></select></label>
+        <label>Status<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">Todos</option><option value="active">Ativos</option><option value="inactive">Inativos</option></select></label>
         <label>Recomendado<select value={recommended} onChange={(event) => setRecommended(event.target.value)}><option value="all">Todos</option><option value="yes">Sim</option><option value="no">Não</option></select></label>
+        <label>Destaque<select value={featured} onChange={(event) => setFeatured(event.target.value)}><option value="all">Todos</option><option value="yes">Sim</option><option value="no">Não</option></select></label>
       </section>
 
       <div className="admin-results-count">{filtered.length} de {products.length} produtos</div>
@@ -120,6 +125,7 @@ function ProductEditor({
   const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
@@ -166,7 +172,8 @@ function ProductEditor({
       const payload = await request<{ product: AdminProduct }>(isNew ? "/api/admin/products" : `/api/admin/products/${encodeURIComponent(product.id)}`, {
         method: isNew ? "POST" : "PATCH",
         body: JSON.stringify({
-          name: draft.model,
+          name: draft.name,
+          model: draft.model,
           brand: draft.brand,
           description: draft.descriptor,
           price: draft.priceValue,
@@ -195,33 +202,36 @@ function ProductEditor({
   };
 
   const remove = async () => {
-    if (isNew || !window.confirm(`Excluir ${product.brand} ${product.model}? O histórico será preservado quando necessário.`)) return;
+    if (isNew) return;
     setSaving(true);
     setMessage("");
     try {
-      const payload = await request<{ mode: "deleted" | "archived" }>(`/api/admin/products/${encodeURIComponent(product.id)}`, { method: "DELETE" });
-      onDeleted(product.id);
+      const payload = await request<{ mode: "deleted" | "archived"; product: AdminProduct }>(`/api/admin/products/${encodeURIComponent(product.id)}`, { method: "DELETE" });
+      if (payload.mode === "archived") onSaved(payload.product);
+      else onDeleted(product.id);
       setMessage(payload.mode === "archived" ? "Produto retirado do catálogo; o histórico foi preservado." : "Produto excluído.");
     } catch (deleteError) {
       setMessage(deleteError instanceof Error ? deleteError.message : "Falha ao excluir.");
     } finally {
       setSaving(false);
+      setConfirmingDelete(false);
     }
   };
 
-  const stockTone = product.stock === 0 ? "out" : product.stock <= 3 ? "low" : "available";
+  const stockTone = draft.stock === 0 ? "out" : draft.stock <= 3 ? "low" : "available";
   return (
     <article className="admin-product-card">
       <div className="admin-product-summary">
         <div className="admin-product-image">{preview ?? draft.image ? <img src={preview ?? draft.image} alt={`${draft.brand} ${draft.model}`} /> : <span>Foto do relógio</span>}</div>
-        <div><span>{draft.brand}</span><h2>{draft.model}</h2><p>{draft.descriptor}</p><strong>{formatMoney((draft.promotionalPriceValue ?? draft.priceValue) * 100)}</strong></div>
-        <div className="admin-product-state"><span className={`admin-stock-badge is-${stockTone}`}>{stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque"}</span><b>{draft.stock} un.</b>{!isNew && <button type="button" onClick={() => setEditing(true)} disabled={editing}>Editar</button>}</div>
+        <div><span>{draft.brand}</span><h2>{draft.name || draft.model}</h2><p className="admin-product-model">Modelo: {draft.model || "—"}</p><p>{draft.descriptor}</p><strong>{formatMoney((draft.promotionalPriceValue ?? draft.priceValue) * 100)}</strong></div>
+        <div className="admin-product-state"><span className={`admin-stock-badge is-${draft.active ? stockTone : "inactive"}`}>{draft.active ? stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque" : "Inativo"}</span><b>{draft.stock} un.</b>{!isNew && <div className="admin-product-actions"><button type="button" onClick={() => setEditing(true)} disabled={editing}>Editar</button><Link href={`/admin/estoque?produto=${encodeURIComponent(product.id)}`}>Estoque</Link><button type="button" className="is-danger" onClick={() => setConfirmingDelete(true)} disabled={saving}>Excluir</button></div>}</div>
       </div>
 
       {editing && <div className="admin-product-form">
         <div className="admin-form-grid">
-          <label>Nome<input value={draft.model} onChange={(event) => setDraft({ ...draft, model: event.target.value })} /></label>
+          <label>Nome<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
           <label>Marca<input value={draft.brand} onChange={(event) => setDraft({ ...draft, brand: event.target.value })} /></label>
+          <label>Modelo<input value={draft.model} onChange={(event) => setDraft({ ...draft, model: event.target.value })} /></label>
           <label>Preço<input type="number" min="0" step="0.01" value={draft.priceValue} onChange={(event) => setDraft({ ...draft, priceValue: Number(event.target.value) })} /></label>
           <label>Preço promocional<input type="number" min="0" step="0.01" value={draft.promotionalPriceValue ?? ""} placeholder="Sem promoção" onChange={(event) => setDraft({ ...draft, promotionalPriceValue: event.target.value === "" ? null : Number(event.target.value) })} /></label>
           <label>Estoque<input type="number" min="0" step="1" value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: Number(event.target.value) })} /></label>
@@ -229,15 +239,16 @@ function ProductEditor({
           <label>Etiqueta<input value={draft.tag} onChange={(event) => setDraft({ ...draft, tag: event.target.value })} /></label>
           <label>Características<input value={draft.specs.join("; ")} onChange={(event) => setDraft({ ...draft, specs: event.target.value.split(";").map((item) => item.trim()).filter(Boolean) })} /><small>Separe por ponto e vírgula.</small></label>
           <label className="admin-field-wide">Descrição<textarea rows={4} value={draft.descriptor} onChange={(event) => setDraft({ ...draft, descriptor: event.target.value })} /></label>
-          <label className="admin-upload admin-field-wide">Alterar foto<input type="file" accept="image/jpeg,image/png,image/webp" onChange={selectImage} /><span>JPG, PNG ou WebP · máximo 5 MB</span></label>
+          <label className="admin-upload admin-field-wide">Alterar foto<input type="file" accept="image/jpeg,image/png,image/webp" onChange={selectImage} /><span>JPG, PNG ou WebP · máximo 5 MB · preview antes de salvar</span></label>
         </div>
         <div className="admin-checks">
           <label><input type="checkbox" checked={draft.active} onChange={(event) => setDraft({ ...draft, active: event.target.checked })} />Disponível no catálogo</label>
           <label><input type="checkbox" checked={draft.featured} onChange={(event) => setDraft({ ...draft, featured: event.target.checked })} />Destaque</label>
           <label><input type="checkbox" checked={draft.recommended} onChange={(event) => setDraft({ ...draft, recommended: event.target.checked })} />Recomendado</label>
         </div>
-        <div className="admin-form-actions"><button type="button" className="is-primary" onClick={save} disabled={saving}>{saving ? "Salvando…" : isNew ? "Adicionar relógio" : "Salvar"}</button><button type="button" onClick={cancel} disabled={saving}>Cancelar</button>{!isNew && <button type="button" className="is-danger" onClick={remove} disabled={saving}>Excluir</button>}</div>
+        <div className="admin-form-actions"><button type="button" className="is-primary" onClick={save} disabled={saving}>{saving ? "Salvando…" : isNew ? "Salvar produto" : "Salvar alterações"}</button><button type="button" onClick={cancel} disabled={saving}>Cancelar</button></div>
       </div>}
+      {confirmingDelete && <div className="admin-confirm-overlay" role="presentation"><div className="admin-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby={`delete-${product.id}`}><span>Confirmação</span><h3 id={`delete-${product.id}`}>EXCLUIR RELÓGIO?</h3><p>Tem certeza que deseja excluir este relógio? Produtos com histórico serão apenas desativados para preservar a auditoria.</p><div><button type="button" onClick={() => setConfirmingDelete(false)} disabled={saving}>Cancelar</button><button type="button" className="is-danger" onClick={() => void remove()} disabled={saving}>{saving ? "Excluindo…" : "Excluir produto"}</button></div></div></div>}
       {message && <p className={message.includes("salv") || message.includes("criado") || message.includes("excluído") || message.includes("retirado") ? "admin-form-success" : "admin-form-error"} role="status">{message}</p>}
     </article>
   );
@@ -246,6 +257,7 @@ function ProductEditor({
 function emptyProduct(): AdminProduct {
   return {
     id: "novo",
+    name: "",
     brand: "",
     model: "",
     descriptor: "",

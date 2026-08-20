@@ -12,6 +12,7 @@ export type StockMovementType =
 type ProductRow = {
   id: string;
   name: string;
+  model: string;
   brand: string;
   description: string;
   price_cents: number;
@@ -73,8 +74,9 @@ function productFromRow(row: ProductRow): AdminProduct {
   const currentPrice = row.promotional_price_cents ?? row.price_cents;
   return {
     id: row.id,
+    name: row.name,
     brand: row.brand,
-    model: row.name,
+    model: row.model,
     descriptor: row.description,
     price: formatPrice(currentPrice),
     priceValue: row.price_cents / 100,
@@ -115,11 +117,12 @@ export async function ensureSeedProducts() {
       database
         .prepare(
           `INSERT OR IGNORE INTO products
-          (id, name, brand, description, price_cents, promotional_price_cents, image_url, stock, category, tag, specs_json, featured, recommended, active, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, NULL, ?, 0, ?, ?, ?, ?, ?, 1, ?, ?)`,
+          (id, name, model, brand, description, price_cents, promotional_price_cents, image_url, stock, category, tag, specs_json, featured, recommended, active, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, NULL, ?, 0, ?, ?, ?, ?, ?, 1, ?, ?)`,
         )
         .bind(
           product.id,
+          product.name,
           product.model,
           product.brand,
           product.descriptor,
@@ -143,7 +146,7 @@ export async function listProducts(includeInactive = true) {
   const rows = await all<ProductRow>(
     database.prepare(
       `SELECT * FROM products ${includeInactive ? "" : "WHERE active = 1"}
-       ORDER BY recommended DESC, featured DESC, brand ASC, name ASC`,
+       ORDER BY recommended DESC, featured DESC, brand ASC, model ASC`,
     ),
   );
   return rows.map(productFromRow);
@@ -159,6 +162,7 @@ export async function getProduct(id: string) {
 
 export type ProductUpdate = {
   name: string;
+  model: string;
   brand: string;
   description: string;
   priceCents: number;
@@ -186,19 +190,20 @@ function productIdFromName(brand: string, name: string) {
 
 export async function createProduct(input: ProductUpdate, responsible: string) {
   const database = getD1();
-  const id = productIdFromName(input.brand, input.name);
+  const id = productIdFromName(input.brand, input.model);
   const now = new Date().toISOString();
   const statements: D1PreparedStatement[] = [
     database
       .prepare(
         `INSERT INTO products
-        (id, name, brand, description, price_cents, promotional_price_cents, image_url, stock,
+        (id, name, model, brand, description, price_cents, promotional_price_cents, image_url, stock,
          category, tag, specs_json, featured, recommended, active, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         id,
         input.name,
+        input.model,
         input.brand,
         input.description,
         input.priceCents,
@@ -274,13 +279,14 @@ export async function updateProduct(id: string, input: ProductUpdate, responsibl
     database
       .prepare(
         `UPDATE products SET
-          name = ?, brand = ?, description = ?, price_cents = ?, promotional_price_cents = ?,
+          name = ?, model = ?, brand = ?, description = ?, price_cents = ?, promotional_price_cents = ?,
           image_url = ?, stock = ?, category = ?, tag = ?, specs_json = ?, featured = ?,
           recommended = ?, active = ?, updated_at = ?
          WHERE id = ?`,
       )
       .bind(
         input.name,
+        input.model,
         input.brand,
         input.description,
         input.priceCents,

@@ -1,5 +1,6 @@
 export type Product = {
   id: string;
+  name: string;
   brand: string;
   model: string;
   descriptor: string;
@@ -19,6 +20,7 @@ export type Product = {
 export const products: Product[] = [
   {
     id: "seiko-5-sports",
+    name: "Seiko 5 Sports",
     brand: "SEIKO",
     model: "5 Sports",
     descriptor: "Automático · presença esportiva",
@@ -36,6 +38,7 @@ export const products: Product[] = [
   },
   {
     id: "casio-vintage",
+    name: "Casio Vintage",
     brand: "CASIO",
     model: "Vintage",
     descriptor: "Digital · design que atravessa gerações",
@@ -53,6 +56,7 @@ export const products: Product[] = [
   },
   {
     id: "citizen-tsuyosa",
+    name: "Citizen Tsuyosa",
     brand: "CITIZEN",
     model: "Tsuyosa",
     descriptor: "Automático · cor e precisão",
@@ -70,6 +74,7 @@ export const products: Product[] = [
   },
   {
     id: "orient-bambino",
+    name: "Orient Bambino",
     brand: "ORIENT",
     model: "Bambino",
     descriptor: "Automático · elegância sem excesso",
@@ -87,6 +92,7 @@ export const products: Product[] = [
   },
   {
     id: "timex-q-reissue",
+    name: "Timex Q Reissue",
     brand: "TIMEX",
     model: "Q Reissue",
     descriptor: "Quartzo · herança reinterpretada",

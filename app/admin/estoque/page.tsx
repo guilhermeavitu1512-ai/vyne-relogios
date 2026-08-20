@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import type { Product } from "@/lib/products";
 
@@ -30,11 +31,13 @@ const movementLabels = {
 
 export default function AdminStockPage() {
   const { request } = useAdmin();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [movements, setMovements] = useState<Movement[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [quickActionId, setQuickActionId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [selectedProductId, setSelectedProductId] = useState(() => searchParams.get("produto") ?? "");
 
   const load = useCallback(async () => {
     try {
@@ -109,14 +112,14 @@ export default function AdminStockPage() {
         {products.map((product) => {
           const tone = product.stock === 0 ? "out" : product.stock <= 3 ? "low" : "available";
           const updating = quickActionId === product.id;
-          return <article key={product.id}><img src={product.image} alt="" /><div><span>{product.brand}</span><strong>{product.model}</strong></div><b aria-label={`${product.stock} unidades em estoque`}>{product.stock}</b><small className={`is-${tone}`}>{tone === "out" ? "Esgotado" : tone === "low" ? "Baixo" : "Em estoque"}</small><div className="admin-stock-actions"><button type="button" className="is-primary" disabled={updating} onClick={() => void quickAdjust(product, 1)}>+ Adicionar 1</button><button type="button" disabled={updating || product.stock === 0} onClick={() => void quickAdjust(product, -1)}>− Retirar 1</button></div></article>;
+          return <article key={product.id}><img src={product.image} alt={`${product.brand} ${product.model}`} /><div><span>{product.brand}</span><strong>{product.model}</strong></div><b aria-label={`${product.stock} unidades em estoque`}>{product.stock}</b><small className={`is-${tone}`}>{tone === "out" ? "Esgotado" : tone === "low" ? "Baixo" : "Em estoque"}</small><div className="admin-stock-actions"><button type="button" className="is-primary" disabled={updating} onClick={() => void quickAdjust(product, 1)}>+ Adicionar 1</button><button type="button" disabled={updating || product.stock === 0} onClick={() => void quickAdjust(product, -1)}>− Retirar 1</button></div></article>;
         })}
       </section>
 
       <section className="admin-panel admin-stock-entry">
         <header><span>Novo lançamento</span><h2>MOVIMENTAR ESTOQUE</h2></header>
         <form onSubmit={submit}>
-          <label>Produto<select name="productId" required defaultValue=""><option value="" disabled>Selecione</option>{products.map((product) => <option key={product.id} value={product.id}>{product.brand} {product.model} · saldo {product.stock}</option>)}</select></label>
+          <label>Produto<select name="productId" required value={selectedProductId} onChange={(event) => setSelectedProductId(event.target.value)}><option value="" disabled>Selecione</option>{products.map((product) => <option key={product.id} value={product.id}>{product.brand} {product.model} · saldo {product.stock}</option>)}</select></label>
           <label>Tipo<select name="type" required defaultValue="ENTRY"><option value="ENTRY">Entrada</option><option value="RETURN">Devolução</option><option value="MANUAL_ADJUSTMENT">Ajuste manual</option></select></label>
           <label>Quantidade<input name="quantity" type="number" step="1" required placeholder="Ex.: 5 ou -2" /></label>
           <label className="admin-field-wide">Observação<input name="note" maxLength={300} placeholder="Motivo ou referência" /></label>
@@ -128,7 +131,7 @@ export default function AdminStockPage() {
       {message && <div className="admin-alert" role="status">{message}</div>}
       <section className="admin-panel admin-movement-history">
         <header><span>Auditoria</span><h2>HISTÓRICO DE MOVIMENTAÇÕES</h2></header>
-        <div className="admin-movement-list">{movements.map((movement) => <article key={movement.id}><div><strong>{movement.productName}</strong><span>{movementLabels[movement.type]}{movement.saleId ? ` · venda #${movement.saleId.slice(0, 8)}` : ""}</span></div><b className={movement.quantity >= 0 ? "is-positive" : "is-negative"}>{movement.quantity >= 0 ? "+" : ""}{movement.quantity}</b><div><span>Anterior {movement.previousStock}</span><strong>Atual {movement.newStock}</strong></div><div><time>{new Date(movement.createdAt).toLocaleString("pt-BR")}</time><small>{movement.responsible}{movement.note ? ` · ${movement.note}` : ""}</small></div></article>)}</div>
+        <div className="admin-movement-list">{movements.map((movement) => <article key={movement.id}><div><strong>{movement.productName}</strong><span>{movement.type === "MANUAL_ADJUSTMENT" && movement.quantity < 0 ? "Saída" : movementLabels[movement.type]}{movement.saleId ? ` · venda #${movement.saleId.slice(0, 8)}` : ""}</span></div><b className={movement.quantity >= 0 ? "is-positive" : "is-negative"}>{movement.quantity >= 0 ? "+" : ""}{movement.quantity}</b><div><span>Anterior {movement.previousStock}</span><strong>Atual {movement.newStock}</strong></div><div><time>{new Date(movement.createdAt).toLocaleString("pt-BR")}</time><small>{movement.responsible}{movement.note ? ` · ${movement.note}` : ""}</small></div></article>)}</div>
         {movements.length === 0 && <p className="admin-empty">Nenhuma movimentação registrada.</p>}
       </section>
     </div>
