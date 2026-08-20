@@ -4,6 +4,9 @@ export type RuntimeBindings = {
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD_HASH?: string;
   ADMIN_SESSION_SECRET?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_SECRET_KEY?: string;
+  SUPABASE_STORAGE_BUCKET?: string;
 };
 
 function bindings(): RuntimeBindings {
@@ -23,7 +26,17 @@ export function getProductImagesBucket(): R2Bucket {
   return bucket;
 }
 
-export function getRuntimeSecret(name: keyof Pick<RuntimeBindings, "ADMIN_USERNAME" | "ADMIN_PASSWORD_HASH" | "ADMIN_SESSION_SECRET">) {
+export function getRuntimeSecret(
+  name: keyof Pick<
+    RuntimeBindings,
+    | "ADMIN_USERNAME"
+    | "ADMIN_PASSWORD_HASH"
+    | "ADMIN_SESSION_SECRET"
+    | "SUPABASE_URL"
+    | "SUPABASE_SECRET_KEY"
+    | "SUPABASE_STORAGE_BUCKET"
+  >,
+) {
   const fromWorker = bindings()[name];
   if (typeof fromWorker === "string" && fromWorker.length > 0) return fromWorker;
   const fromNode = process.env[name];

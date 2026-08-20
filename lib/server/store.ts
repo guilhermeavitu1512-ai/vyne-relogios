@@ -1,5 +1,5 @@
-import { getD1 } from "@/db/runtime";
 import { products as seedProducts, type Product } from "@/lib/products";
+import { supabaseRequest, supabaseRpc } from "@/lib/server/supabase";
 
 export type SaleStatus = "PENDING" | "CONFIRMED" | "CANCELED";
 export type StockMovementType =
@@ -21,12 +21,31 @@ type ProductRow = {
   stock: number;
   category: string;
   tag: string;
-  specs_json: string;
-  featured: number;
-  recommended: number;
-  active: number;
+  specs_json: unknown;
+  featured: boolean;
+  recommended: boolean;
+  active: boolean;
   created_at: string;
   updated_at: string;
+};
+
+type SaleRow = {
+  id: string;
+  total_cents: number;
+  status: SaleStatus;
+  created_at: string;
+  updated_at: string;
+  confirmed_at: string | null;
+};
+
+type SaleItemRow = {
+  id: string;
+  sale_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price_cents: number;
+  total_cents: number;
 };
 
 export type AdminProduct = Product & {
@@ -53,113 +72,6 @@ export type SaleRecord = {
   items: SaleItemRecord[];
 };
 
-function formatPrice(cents: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
-  }).format(cents / 100);
-}
-
-function safeSpecs(value: string) {
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
-function productFromRow(row: ProductRow): AdminProduct {
-  const currentPrice = row.promotional_price_cents ?? row.price_cents;
-  return {
-    id: row.id,
-    name: row.name,
-    brand: row.brand,
-    model: row.model,
-    descriptor: row.description,
-    price: formatPrice(currentPrice),
-    priceValue: row.price_cents / 100,
-    promotionalPriceValue:
-      row.promotional_price_cents === null ? null : row.promotional_price_cents / 100,
-    image: row.image_url,
-    tag: row.tag,
-    category: row.category,
-    specs: safeSpecs(row.specs_json),
-    stock: row.stock,
-    featured: Boolean(row.featured),
-    recommended: Boolean(row.recommended),
-    active: Boolean(row.active),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-async function all<T>(statement: D1PreparedStatement) {
-  const result = await statement.all<T>();
-  return result.results ?? [];
-}
-
-async function first<T>(statement: D1PreparedStatement) {
-  return statement.first<T>();
-}
-
-export async function ensureSeedProducts() {
-  const database = getD1();
-  const count = await first<{ count: number }>(
-    database.prepare("SELECT COUNT(*) AS count FROM products"),
-  );
-  if ((count?.count ?? 0) > 0) return;
-
-  const now = new Date().toISOString();
-  await database.batch(
-    seedProducts.map((product) =>
-      database
-        .prepare(
-          `INSERT OR IGNORE INTO products
-          (id, name, model, brand, description, price_cents, promotional_price_cents, image_url, stock, category, tag, specs_json, featured, recommended, active, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, NULL, ?, 0, ?, ?, ?, ?, ?, 1, ?, ?)`,
-        )
-        .bind(
-          product.id,
-          product.name,
-          product.model,
-          product.brand,
-          product.descriptor,
-          Math.round(product.priceValue * 100),
-          product.image,
-          product.category,
-          product.tag,
-          JSON.stringify(product.specs),
-          product.featured ? 1 : 0,
-          product.recommended ? 1 : 0,
-          now,
-          now,
-        ),
-    ),
-  );
-}
-
-export async function listProducts(includeInactive = true) {
-  await ensureSeedProducts();
-  const database = getD1();
-  const rows = await all<ProductRow>(
-    database.prepare(
-      `SELECT * FROM products ${includeInactive ? "" : "WHERE active = 1"}
-       ORDER BY recommended DESC, featured DESC, brand ASC, model ASC`,
-    ),
-  );
-  return rows.map(productFromRow);
-}
-
-export async function getProduct(id: string) {
-  await ensureSeedProducts();
-  const row = await first<ProductRow>(
-    getD1().prepare("SELECT * FROM products WHERE id = ?").bind(id),
-  );
-  return row ? productFromRow(row) : null;
-}
-
 export type ProductUpdate = {
   name: string;
   model: string;
@@ -177,6 +89,75 @@ export type ProductUpdate = {
   active: boolean;
 };
 
+function formatPrice(cents: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);
+}
+
+function safeSpecs(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  if (typeof value !== "string") return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function productFromRow(row: ProductRow): AdminProduct {
+  const currentPrice = row.promotional_price_cents ?? row.price_cents;
+  return {
+    id: row.id,
+    name: row.name,
+    brand: row.brand,
+    model: row.model,
+    descriptor: row.description,
+    price: formatPrice(currentPrice),
+    priceValue: Number(row.price_cents) / 100,
+    promotionalPriceValue:
+      row.promotional_price_cents === null
+        ? null
+        : Number(row.promotional_price_cents) / 100,
+    image: row.image_url,
+    tag: row.tag,
+    category: row.category,
+    specs: safeSpecs(row.specs_json),
+    stock: row.stock,
+    featured: Boolean(row.featured),
+    recommended: Boolean(row.recommended),
+    active: Boolean(row.active),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function productPayload(input: ProductUpdate) {
+  return {
+    name: input.name,
+    model: input.model,
+    brand: input.brand,
+    description: input.description,
+    price_cents: input.priceCents,
+    promotional_price_cents: input.promotionalPriceCents,
+    image_url: input.imageUrl,
+    stock: input.stock,
+    category: input.category,
+    tag: input.tag,
+    specs_json: input.specs,
+    featured: input.featured,
+    recommended: input.recommended,
+    active: input.active,
+  };
+}
+
 function productIdFromName(brand: string, name: string) {
   const base = `${brand}-${name}`
     .normalize("NFD")
@@ -188,145 +169,84 @@ function productIdFromName(brand: string, name: string) {
   return `${base || "relogio"}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
-export async function createProduct(input: ProductUpdate, responsible: string) {
-  const database = getD1();
-  const id = productIdFromName(input.brand, input.model);
+export async function ensureSeedProducts() {
+  const current = await supabaseRequest<Array<{ id: string }>>(
+    "/rest/v1/products?select=id&limit=1",
+  );
+  if (current.length > 0) return;
+
   const now = new Date().toISOString();
-  const statements: D1PreparedStatement[] = [
-    database
-      .prepare(
-        `INSERT INTO products
-        (id, name, model, brand, description, price_cents, promotional_price_cents, image_url, stock,
-         category, tag, specs_json, featured, recommended, active, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        id,
-        input.name,
-        input.model,
-        input.brand,
-        input.description,
-        input.priceCents,
-        input.promotionalPriceCents,
-        input.imageUrl,
-        input.stock,
-        input.category,
-        input.tag,
-        JSON.stringify(input.specs),
-        input.featured ? 1 : 0,
-        input.recommended ? 1 : 0,
-        input.active ? 1 : 0,
-        now,
-        now,
-      ),
-  ];
-
-  if (input.stock > 0) {
-    statements.push(
-      database
-        .prepare(
-          `INSERT INTO stock_movements
-          (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-          VALUES (?, ?, NULL, 'ENTRY', ?, 0, ?, ?, 'Estoque inicial do produto', ?)`,
-        )
-        .bind(crypto.randomUUID(), id, input.stock, input.stock, responsible, now),
-    );
-  }
-
-  await database.batch(statements);
-  return getProduct(id);
+  const rows = seedProducts.map((product) => ({
+    id: product.id,
+    name: product.name,
+    model: product.model,
+    brand: product.brand,
+    description: product.descriptor,
+    price_cents: Math.round(product.priceValue * 100),
+    promotional_price_cents: product.promotionalPriceValue === null
+      ? null
+      : Math.round(product.promotionalPriceValue * 100),
+    image_url: product.image,
+    stock: product.stock,
+    category: product.category,
+    tag: product.tag,
+    specs_json: product.specs,
+    featured: product.featured,
+    recommended: product.recommended,
+    active: product.active,
+    created_at: now,
+    updated_at: now,
+  }));
+  await supabaseRequest<void>("/rest/v1/products?on_conflict=id", {
+    method: "POST",
+    headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify(rows),
+  });
 }
 
-export async function deleteProduct(id: string) {
-  const database = getD1();
-  const existing = await first<ProductRow>(
-    database.prepare("SELECT * FROM products WHERE id = ?").bind(id),
+export async function listProducts(includeInactive = true) {
+  await ensureSeedProducts();
+  const activeFilter = includeInactive ? "" : "&active=eq.true";
+  const rows = await supabaseRequest<ProductRow[]>(
+    `/rest/v1/products?select=*${activeFilter}&order=recommended.desc,featured.desc,brand.asc,model.asc`,
   );
-  if (!existing) return null;
+  return rows.map(productFromRow);
+}
 
-  const references = await first<{ count: number }>(
-    database
-      .prepare(
-        `SELECT
-          (SELECT COUNT(*) FROM sale_items WHERE product_id = ?) +
-          (SELECT COUNT(*) FROM stock_movements WHERE product_id = ?) AS count`,
-      )
-      .bind(id, id),
+export async function getProduct(id: string) {
+  await ensureSeedProducts();
+  const rows = await supabaseRequest<ProductRow[]>(
+    `/rest/v1/products?select=*&id=eq.${encodeURIComponent(id)}&limit=1`,
   );
+  return rows[0] ? productFromRow(rows[0]) : null;
+}
 
-  if ((references?.count ?? 0) > 0) {
-    const now = new Date().toISOString();
-    await database
-      .prepare("UPDATE products SET active = 0, recommended = 0, featured = 0, updated_at = ? WHERE id = ?")
-      .bind(now, id)
-      .run();
-    return { mode: "archived" as const, product: await getProduct(id) };
-  }
-
-  await database.prepare("DELETE FROM products WHERE id = ?").bind(id).run();
-  return { mode: "deleted" as const, product: productFromRow(existing) };
+export async function createProduct(input: ProductUpdate, responsible: string) {
+  const id = productIdFromName(input.brand, input.model);
+  const rows = await supabaseRpc<ProductRow[]>("vyne_create_product", {
+    p_id: id,
+    p_payload: productPayload(input),
+    p_responsible: responsible,
+  });
+  return rows[0] ? productFromRow(rows[0]) : null;
 }
 
 export async function updateProduct(id: string, input: ProductUpdate, responsible: string) {
-  const database = getD1();
-  const existing = await first<ProductRow>(
-    database.prepare("SELECT * FROM products WHERE id = ?").bind(id),
-  );
-  if (!existing) return null;
+  const rows = await supabaseRpc<ProductRow[]>("vyne_update_product", {
+    p_id: id,
+    p_payload: productPayload(input),
+    p_responsible: responsible,
+  });
+  return rows[0] ? productFromRow(rows[0]) : null;
+}
 
-  const now = new Date().toISOString();
-  const statements: D1PreparedStatement[] = [
-    database
-      .prepare(
-        `UPDATE products SET
-          name = ?, model = ?, brand = ?, description = ?, price_cents = ?, promotional_price_cents = ?,
-          image_url = ?, stock = ?, category = ?, tag = ?, specs_json = ?, featured = ?,
-          recommended = ?, active = ?, updated_at = ?
-         WHERE id = ?`,
-      )
-      .bind(
-        input.name,
-        input.model,
-        input.brand,
-        input.description,
-        input.priceCents,
-        input.promotionalPriceCents,
-        input.imageUrl,
-        input.stock,
-        input.category,
-        input.tag,
-        JSON.stringify(input.specs),
-        input.featured ? 1 : 0,
-        input.recommended ? 1 : 0,
-        input.active ? 1 : 0,
-        now,
-        id,
-      ),
-  ];
-
-  if (input.stock !== existing.stock) {
-    statements.push(
-      database
-        .prepare(
-          `INSERT INTO stock_movements
-          (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-          VALUES (?, ?, NULL, 'MANUAL_ADJUSTMENT', ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          crypto.randomUUID(),
-          id,
-          input.stock - existing.stock,
-          existing.stock,
-          input.stock,
-          responsible,
-          "Ajuste realizado na edição do produto",
-          now,
-        ),
-    );
-  }
-
-  await database.batch(statements);
-  return getProduct(id);
+export async function deleteProduct(id: string) {
+  const result = await supabaseRpc<{
+    mode: "archived" | "deleted";
+    product: ProductRow;
+  } | null>("vyne_delete_product", { p_id: id });
+  if (!result) return null;
+  return { mode: result.mode, product: productFromRow(result.product) };
 }
 
 export async function addStockMovement(input: {
@@ -336,122 +256,64 @@ export async function addStockMovement(input: {
   responsible: string;
   note: string;
 }) {
-  const database = getD1();
-  const product = await first<ProductRow>(
-    database.prepare("SELECT * FROM products WHERE id = ?").bind(input.productId),
-  );
-  if (!product) throw new Error("Produto não encontrado.");
-  const newStock = product.stock + input.quantity;
-  if (newStock < 0) throw new Error("A movimentação deixaria o estoque negativo.");
-
-  const now = new Date().toISOString();
-  const results = await database.batch([
-    database
-      .prepare("UPDATE products SET stock = stock + ?, updated_at = ? WHERE id = ? AND stock + ? >= 0")
-      .bind(input.quantity, now, input.productId, input.quantity),
-    database
-      .prepare(
-        `INSERT INTO stock_movements
-        (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-        SELECT ?, id, NULL, ?, ?, stock - ?, stock, ?, ?, ?
-        FROM products WHERE id = ? AND updated_at = ?`,
-      )
-      .bind(
-        crypto.randomUUID(),
-        input.type,
-        input.quantity,
-        input.quantity,
-        input.responsible,
-        input.note,
-        now,
-        input.productId,
-        now,
-      ),
-  ]);
-  if ((results[0]?.meta?.changes ?? 0) !== 1 || (results[1]?.meta?.changes ?? 0) !== 1) {
-    throw new Error("Não foi possível atualizar o estoque. Atualize a página e tente novamente.");
-  }
-  return getProduct(input.productId);
+  const rows = await supabaseRpc<ProductRow[]>("vyne_adjust_stock", {
+    p_product_id: input.productId,
+    p_type: input.type,
+    p_quantity: input.quantity,
+    p_responsible: input.responsible,
+    p_note: input.note,
+  });
+  return rows[0] ? productFromRow(rows[0]) : null;
 }
 
 export async function listStockMovements(limit = 100) {
-  return all<{
+  const safeLimit = Math.min(Math.max(limit, 1), 250);
+  const rows = await supabaseRequest<Array<{
     id: string;
-    productId: string;
-    productName: string;
-    saleId: string | null;
+    product_id: string;
+    sale_id: string | null;
     type: StockMovementType;
     quantity: number;
-    previousStock: number;
-    newStock: number;
+    previous_stock: number;
+    new_stock: number;
     responsible: string;
     note: string;
-    createdAt: string;
-  }>(
-    getD1()
-      .prepare(
-        `SELECT m.id, m.product_id AS productId, p.name AS productName,
-          m.sale_id AS saleId, m.type, m.quantity, m.previous_stock AS previousStock,
-          m.new_stock AS newStock, m.responsible, m.note, m.created_at AS createdAt
-         FROM stock_movements m
-         JOIN products p ON p.id = m.product_id
-         ORDER BY m.created_at DESC, m.id DESC LIMIT ?`,
-      )
-      .bind(Math.min(Math.max(limit, 1), 250)),
+    created_at: string;
+    products: { name: string } | null;
+  }>>(
+    `/rest/v1/stock_movements?select=id,product_id,sale_id,type,quantity,previous_stock,new_stock,responsible,note,created_at,products!inner(name)&order=created_at.desc,id.desc&limit=${safeLimit}`,
   );
+  return rows.map((row) => ({
+    id: row.id,
+    productId: row.product_id,
+    productName: row.products?.name ?? "Produto",
+    saleId: row.sale_id,
+    type: row.type,
+    quantity: row.quantity,
+    previousStock: row.previous_stock,
+    newStock: row.new_stock,
+    responsible: row.responsible,
+    note: row.note,
+    createdAt: row.created_at,
+  }));
+}
+
+function saleItemFromRow(row: SaleItemRow): SaleItemRecord {
+  return {
+    id: row.id,
+    productId: row.product_id,
+    productName: row.product_name,
+    quantity: row.quantity,
+    unitPriceCents: Number(row.unit_price_cents),
+    totalCents: Number(row.total_cents),
+  };
 }
 
 export async function createSale(items: Array<{ productId: string; quantity: number }>) {
   await ensureSeedProducts();
-  const database = getD1();
-  const uniqueItems = new Map<string, number>();
-  for (const item of items) {
-    uniqueItems.set(item.productId, (uniqueItems.get(item.productId) ?? 0) + item.quantity);
-  }
-
-  const resolved: Array<{ product: ProductRow; quantity: number; unitPriceCents: number }> = [];
-  for (const [productId, quantity] of uniqueItems) {
-    const product = await first<ProductRow>(
-      database.prepare("SELECT * FROM products WHERE id = ? AND active = 1").bind(productId),
-    );
-    if (!product) throw new Error("Um dos produtos não está disponível.");
-    resolved.push({
-      product,
-      quantity,
-      unitPriceCents: product.promotional_price_cents ?? product.price_cents,
-    });
-  }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-  const totalCents = resolved.reduce(
-    (total, item) => total + item.unitPriceCents * item.quantity,
-    0,
-  );
-  await database.batch([
-    database
-      .prepare(
-        "INSERT INTO sales (id, total_cents, status, created_at, updated_at, confirmed_at) VALUES (?, ?, 'PENDING', ?, ?, NULL)",
-      )
-      .bind(id, totalCents, now, now),
-    ...resolved.map(({ product, quantity, unitPriceCents }) =>
-      database
-        .prepare(
-          `INSERT INTO sale_items
-          (id, sale_id, product_id, product_name, quantity, unit_price_cents, total_cents)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          crypto.randomUUID(),
-          id,
-          product.id,
-          `${product.brand} ${product.name}`,
-          quantity,
-          unitPriceCents,
-          unitPriceCents * quantity,
-        ),
-    ),
-  ]);
+  const id = await supabaseRpc<string>("vyne_create_sale", {
+    p_items: items.map((item) => ({ product_id: item.productId, quantity: item.quantity })),
+  });
   return getSale(id);
 }
 
@@ -461,48 +323,26 @@ export async function getSale(id: string) {
 }
 
 export async function listSales(id?: string) {
-  const database = getD1();
-  const saleRows = await all<{
-    id: string;
-    totalCents: number;
-    status: SaleStatus;
-    createdAt: string;
-    updatedAt: string;
-    confirmedAt: string | null;
-  }>(
-    database
-      .prepare(
-        `SELECT id, total_cents AS totalCents, status, created_at AS createdAt,
-          updated_at AS updatedAt, confirmed_at AS confirmedAt
-         FROM sales ${id ? "WHERE id = ?" : ""}
-         ORDER BY created_at DESC, id DESC ${id ? "" : "LIMIT 200"}`,
-      )
-      .bind(...(id ? [id] : [])),
+  const idFilter = id ? `&id=eq.${encodeURIComponent(id)}` : "";
+  const limit = id ? 1 : 200;
+  const saleRows = await supabaseRequest<SaleRow[]>(
+    `/rest/v1/sales?select=*${idFilter}&order=created_at.desc,id.desc&limit=${limit}`,
   );
   if (saleRows.length === 0) return [];
 
-  const placeholders = saleRows.map(() => "?").join(",");
-  const itemRows = await all<{
-    id: string;
-    saleId: string;
-    productId: string;
-    productName: string;
-    quantity: number;
-    unitPriceCents: number;
-    totalCents: number;
-  }>(
-    database
-      .prepare(
-        `SELECT id, sale_id AS saleId, product_id AS productId, product_name AS productName,
-          quantity, unit_price_cents AS unitPriceCents, total_cents AS totalCents
-         FROM sale_items WHERE sale_id IN (${placeholders}) ORDER BY id`,
-      )
-      .bind(...saleRows.map((sale) => sale.id)),
+  const saleIds = saleRows.map((sale) => sale.id).join(",");
+  const itemRows = await supabaseRequest<SaleItemRow[]>(
+    `/rest/v1/sale_items?select=*&sale_id=in.(${encodeURIComponent(saleIds)})&order=id.asc`,
   );
 
   return saleRows.map((sale): SaleRecord => ({
-    ...sale,
-    items: itemRows.filter((item) => item.saleId === sale.id),
+    id: sale.id,
+    totalCents: Number(sale.total_cents),
+    status: sale.status,
+    createdAt: sale.created_at,
+    updatedAt: sale.updated_at,
+    confirmedAt: sale.confirmed_at,
+    items: itemRows.filter((item) => item.sale_id === sale.id).map(saleItemFromRow),
   }));
 }
 
@@ -511,100 +351,11 @@ export async function updateSaleStatus(
   requestedStatus: Extract<SaleStatus, "CONFIRMED" | "CANCELED">,
   responsible: string,
 ) {
-  const database = getD1();
-  const sale = await getSale(saleId);
-  if (!sale) throw new Error("Venda não encontrada.");
-  if (sale.status === requestedStatus) return sale;
-  const now = new Date().toISOString();
-
-  if (requestedStatus === "CONFIRMED") {
-    if (sale.status !== "PENDING") throw new Error("Somente vendas pendentes podem ser confirmadas.");
-    const statements: D1PreparedStatement[] = [];
-    for (const item of sale.items) {
-      statements.push(
-        database
-          .prepare(
-            `UPDATE products SET stock = stock - ?, updated_at = ?
-             WHERE id = ? AND EXISTS (SELECT 1 FROM sales WHERE id = ? AND status = 'PENDING')`,
-          )
-          .bind(item.quantity, now, item.productId, saleId),
-        database
-          .prepare(
-            `INSERT INTO stock_movements
-            (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-            SELECT ?, p.id, ?, 'SALE', ?, p.stock + ?, p.stock, ?, 'Venda confirmada', ?
-            FROM products p
-            WHERE p.id = ? AND EXISTS (SELECT 1 FROM sales WHERE id = ? AND status = 'PENDING')`,
-          )
-          .bind(
-            crypto.randomUUID(),
-            saleId,
-            -item.quantity,
-            item.quantity,
-            responsible,
-            now,
-            item.productId,
-            saleId,
-          ),
-      );
-    }
-    statements.push(
-      database
-        .prepare(
-          "UPDATE sales SET status = 'CONFIRMED', confirmed_at = ?, updated_at = ? WHERE id = ? AND status = 'PENDING'",
-        )
-        .bind(now, now, saleId),
-    );
-    try {
-      await database.batch(statements);
-    } catch {
-      throw new Error("Estoque insuficiente para confirmar esta venda.");
-    }
-  } else if (sale.status === "CONFIRMED") {
-    const statements: D1PreparedStatement[] = [];
-    for (const item of sale.items) {
-      statements.push(
-        database
-          .prepare(
-            `UPDATE products SET stock = stock + ?, updated_at = ?
-             WHERE id = ? AND EXISTS (SELECT 1 FROM sales WHERE id = ? AND status = 'CONFIRMED')`,
-          )
-          .bind(item.quantity, now, item.productId, saleId),
-        database
-          .prepare(
-            `INSERT INTO stock_movements
-            (id, product_id, sale_id, type, quantity, previous_stock, new_stock, responsible, note, created_at)
-            SELECT ?, p.id, ?, 'CANCELLATION', ?, p.stock - ?, p.stock, ?, 'Venda cancelada', ?
-            FROM products p
-            WHERE p.id = ? AND EXISTS (SELECT 1 FROM sales WHERE id = ? AND status = 'CONFIRMED')`,
-          )
-          .bind(
-            crypto.randomUUID(),
-            saleId,
-            item.quantity,
-            item.quantity,
-            responsible,
-            now,
-            item.productId,
-            saleId,
-          ),
-      );
-    }
-    statements.push(
-      database
-        .prepare("UPDATE sales SET status = 'CANCELED', updated_at = ? WHERE id = ? AND status = 'CONFIRMED'")
-        .bind(now, saleId),
-    );
-    await database.batch(statements);
-  } else if (sale.status === "PENDING") {
-    await database
-      .prepare("UPDATE sales SET status = 'CANCELED', updated_at = ? WHERE id = ? AND status = 'PENDING'")
-      .bind(now, saleId)
-      .run();
-  } else {
-    throw new Error("Esta venda já foi cancelada.");
-  }
-
+  await supabaseRpc<SaleRow[]>("vyne_update_sale_status", {
+    p_sale_id: saleId,
+    p_requested_status: requestedStatus,
+    p_responsible: responsible,
+  });
   return getSale(saleId);
 }
 
@@ -622,81 +373,65 @@ function periodStart(period: string) {
 }
 
 export async function getDashboard(period: string) {
-  await ensureSeedProducts();
-  const database = getD1();
+  const [products, sales] = await Promise.all([listProducts(true), listSales()]);
   const start = periodStart(period);
-  const dateClause = start ? "AND s.confirmed_at >= ?" : "";
-  const dateArgs = start ? [start] : [];
-
-  const inventory = await first<{
-    productsCount: number;
-    stockUnits: number;
-    lowStockCount: number;
-    outOfStockCount: number;
-  }>(
-    database.prepare(
-      `SELECT COUNT(*) AS productsCount, COALESCE(SUM(stock), 0) AS stockUnits,
-        SUM(CASE WHEN stock BETWEEN 1 AND 3 THEN 1 ELSE 0 END) AS lowStockCount,
-        SUM(CASE WHEN stock = 0 THEN 1 ELSE 0 END) AS outOfStockCount
-       FROM products WHERE active = 1`,
-    ),
+  const confirmedSales = sales.filter(
+    (sale) => sale.status === "CONFIRMED" && (!start || (sale.confirmedAt ?? "") >= start),
   );
+  const activeProducts = products.filter((product) => product.active);
+  const productById = new Map(products.map((product) => [product.id, product]));
 
-  const salesMetrics = await first<{ soldUnits: number; revenueCents: number }>(
-    database
-      .prepare(
-        `SELECT COALESCE(SUM(i.quantity), 0) AS soldUnits,
-          COALESCE(SUM(i.total_cents), 0) AS revenueCents
-         FROM sale_items i JOIN sales s ON s.id = i.sale_id
-         WHERE s.status = 'CONFIRMED' ${dateClause}`,
-      )
-      .bind(...dateArgs),
-  );
-
-  const ranking = await all<{
+  const rankingMap = new Map<string, {
     productId: string;
     name: string;
     image: string;
     unitsSold: number;
     revenueCents: number;
     stock: number;
-  }>(
-    database
-      .prepare(
-        `SELECT p.id AS productId, p.brand || ' ' || p.name AS name, p.image_url AS image,
-          SUM(i.quantity) AS unitsSold, SUM(i.total_cents) AS revenueCents, p.stock
-         FROM sale_items i
-         JOIN sales s ON s.id = i.sale_id
-         JOIN products p ON p.id = i.product_id
-         WHERE s.status = 'CONFIRMED' ${dateClause}
-         GROUP BY p.id, p.brand, p.name, p.image_url, p.stock
-         ORDER BY unitsSold DESC, revenueCents DESC, name ASC LIMIT 5`,
-      )
-      .bind(...dateArgs),
-  );
+  }>();
+  let soldUnits = 0;
+  for (const sale of confirmedSales) {
+    for (const item of sale.items) {
+      soldUnits += item.quantity;
+      const product = productById.get(item.productId);
+      const current = rankingMap.get(item.productId) ?? {
+        productId: item.productId,
+        name: product ? `${product.brand} ${product.name}` : item.productName,
+        image: product?.image ?? "",
+        unitsSold: 0,
+        revenueCents: 0,
+        stock: product?.stock ?? 0,
+      };
+      current.unitsSold += item.quantity;
+      current.revenueCents += item.totalCents;
+      rankingMap.set(item.productId, current);
+    }
+  }
+  const ranking = [...rankingMap.values()]
+    .sort((a, b) => b.unitsSold - a.unitsSold || b.revenueCents - a.revenueCents || a.name.localeCompare(b.name))
+    .slice(0, 5);
 
-  const timeline = await all<{ date: string; sales: number; revenueCents: number }>(
-    database
-      .prepare(
-        `SELECT substr(s.confirmed_at, 1, 10) AS date, COUNT(DISTINCT s.id) AS sales,
-          SUM(i.total_cents) AS revenueCents
-         FROM sales s JOIN sale_items i ON i.sale_id = s.id
-         WHERE s.status = 'CONFIRMED' ${dateClause}
-         GROUP BY substr(s.confirmed_at, 1, 10)
-         ORDER BY date ASC LIMIT 60`,
-      )
-      .bind(...dateArgs),
-  );
+  const timelineMap = new Map<string, { date: string; sales: number; revenueCents: number }>();
+  for (const sale of confirmedSales) {
+    const date = (sale.confirmedAt ?? sale.updatedAt).slice(0, 10);
+    const current = timelineMap.get(date) ?? { date, sales: 0, revenueCents: 0 };
+    current.sales += 1;
+    current.revenueCents += sale.totalCents;
+    timelineMap.set(date, current);
+  }
+  const timeline = [...timelineMap.values()]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-60);
 
   return {
     period,
     metrics: {
-      productsCount: inventory?.productsCount ?? 0,
-      stockUnits: inventory?.stockUnits ?? 0,
-      soldUnits: salesMetrics?.soldUnits ?? 0,
-      lowStockCount: inventory?.lowStockCount ?? 0,
-      outOfStockCount: inventory?.outOfStockCount ?? 0,
-      revenueCents: salesMetrics?.revenueCents ?? 0,
+      productsCount: activeProducts.length,
+      stockUnits: activeProducts.reduce((sum, product) => sum + product.stock, 0),
+      soldUnits,
+      lowStockCount: activeProducts.filter((product) => product.stock >= 1 && product.stock <= 3).length,
+      outOfStockCount: activeProducts.filter((product) => product.stock === 0).length,
+      revenueCents: confirmedSales.reduce((sum, sale) => sum + sale.totalCents, 0),
     },
     bestSeller: ranking[0] ?? null,
     ranking,

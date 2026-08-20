@@ -9,6 +9,9 @@ interface Env {
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD_HASH?: string;
   ADMIN_SESSION_SECRET?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_SECRET_KEY?: string;
+  SUPABASE_STORAGE_BUCKET?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {

@@ -16,7 +16,7 @@ function sitesHeaders(input) {
   return headers;
 }
 
-const publicFetch = (path) => fetch(`${baseUrl}${path}`, { headers: sitesHeaders() });
+const publicFetch = (path) => fetch(new URL(path, baseUrl), { headers: sitesHeaders() });
 
 async function json(response) {
   const payload = await response.json().catch(() => ({}));
@@ -57,7 +57,7 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: timeoutMs
   uploadBody.set("file", new Blob([png], { type: "image/png" }), "relogio-teste.png");
   const uploadResult = await json(await adminFetch("/api/admin/uploads", { method: "POST", body: uploadBody }));
   assert.equal(uploadResult.response.status, 201, "upload de imagem funciona");
-  assert.match(uploadResult.payload.url, /^\/api\/product-images\/products\//);
+  assert.match(uploadResult.payload.url, /\/storage\/v1\/object\/public\/product-images\/products\//);
   const imageResponse = await publicFetch(uploadResult.payload.url);
   assert.equal(imageResponse.status, 200, "imagem enviada fica disponível no Storage");
 
