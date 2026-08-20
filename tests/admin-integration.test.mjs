@@ -8,6 +8,7 @@ const sitesBypassToken = process.env.VYNE_INTEGRATION_BYPASS_TOKEN;
 
 const configured = Boolean(baseUrl && username && password);
 const origin = baseUrl ? new URL(baseUrl).origin : "";
+const timeoutMs = Number(process.env.VYNE_INTEGRATION_TIMEOUT_MS ?? 30_000);
 
 function sitesHeaders(input) {
   const headers = new Headers(input);
@@ -22,7 +23,7 @@ async function json(response) {
   return { response, payload };
 }
 
-test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, skip: !configured }, async () => {
+test("fluxo administrativo completo de produtos e estoque", { timeout: timeoutMs, skip: !configured }, async () => {
   const anonymous = await fetch(`${baseUrl}/api/admin/products`, { headers: sitesHeaders() });
   assert.equal(anonymous.status, 401, "rotas administrativas rejeitam visitantes sem sessão");
 
