@@ -1,4 +1,5 @@
 import type { ProductUpdate } from "@/lib/server/store";
+import { isSupabaseProductImageUrl } from "@/lib/server/supabase";
 
 function nonNegativeMoney(value: unknown, nullable = false) {
   if (nullable && (value === null || value === "" || value === undefined)) return null;
@@ -23,7 +24,8 @@ export function parseProduct(body: Record<string, unknown>): ProductUpdate {
   const allowedImage =
     imageUrl.startsWith("https://images.unsplash.com/") ||
     imageUrl.startsWith("/api/product-images/products/") ||
-    imageUrl.startsWith("/media/products/");
+    imageUrl.startsWith("/media/products/") ||
+    isSupabaseProductImageUrl(imageUrl);
   if (!allowedImage) throw new Error("URL da imagem inválida.");
 
   return {

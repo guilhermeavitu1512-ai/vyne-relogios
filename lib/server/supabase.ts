@@ -87,3 +87,15 @@ export async function uploadProductImage(
   }
   return `${url}/storage/v1/object/public/${objectPath(bucket, key)}`;
 }
+
+export function isSupabaseProductImageUrl(value: string) {
+  const { url, bucket } = config();
+  try {
+    const candidate = new URL(value);
+    const projectUrl = new URL(url);
+    const publicProductsPath = `/storage/v1/object/public/${encodeURIComponent(bucket)}/products/`;
+    return candidate.origin === projectUrl.origin && candidate.pathname.startsWith(publicProductsPath);
+  } catch {
+    return false;
+  }
+}

@@ -79,7 +79,11 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: timeoutMs
   };
 
   const createdResult = await json(await adminFetch("/api/admin/products", { method: "POST", body: JSON.stringify(draft) }));
-  assert.equal(createdResult.response.status, 201, "novo relógio é cadastrado");
+  assert.equal(
+    createdResult.response.status,
+    201,
+    `novo relógio é cadastrado: ${JSON.stringify(createdResult.payload)}`,
+  );
   const productId = createdResult.payload.product.id;
   assert.equal(createdResult.payload.product.stock, 5);
   assert.equal(createdResult.payload.product.category, "Relógios", "categoria opcional recebe valor padrão");
