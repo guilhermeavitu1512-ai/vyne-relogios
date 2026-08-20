@@ -3,7 +3,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
-import Link from "next/link";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import type { Product } from "@/lib/products";
 
@@ -126,6 +125,9 @@ function ProductEditor({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [stockOpen, setStockOpen] = useState(false);
+  const [stockAmount, setStockAmount] = useState("1");
+  const [stockSaving, setStockSaving] = useState(false);
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
@@ -160,6 +162,20 @@ function ProductEditor({
     setSaving(true);
     setMessage("");
     try {
+      const requiredFields = [
+        ["nome", draft.name],
+        ["marca", draft.brand],
+        ["modelo", draft.model],
+        ["descrição", draft.descriptor],
+      ] as const;
+      const missingField = requiredFields.find(([, value]) => !value.trim());
+      if (missingField) throw new Error(`Informe ${missingField[0]} do relógio.`);
+      if (!Number.isFinite(draft.priceValue) || draft.priceValue < 0) throw new Error("Informe um preço válido.");
+      if (draft.promotionalPriceValue !== null && (!Number.isFinite(draft.promotionalPriceValue) || draft.promotionalPriceValue < 0)) {
+        throw new Error("Informe um preço promocional válido.");
+      }
+      if (!Number.isSafeInteger(draft.stock) || draft.stock < 0) throw new Error("Informe um estoque válido.");
+
       let imageUrl = draft.image;
       if (file) {
         const optimized = await optimizeImage(file);
@@ -201,6 +217,41 @@ function ProductEditor({
     }
   };
 
+  const adjustStock = async (direction: 1 | -1) => {
+    const amount = Number(stockAmount);
+    setMessage("");
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      setMessage("Informe uma quantidade inteira maior que zero.");
+      return;
+    }
+    if (direction < 0 && amount > draft.stock) {
+      setMessage("A retirada não pode deixar o estoque negativo.");
+      return;
+    }
+
+    setStockSaving(true);
+    try {
+      const quantity = direction * amount;
+      const payload = await request<{ product: AdminProduct }>("/api/admin/stock-movements", {
+        method: "POST",
+        body: JSON.stringify({
+          productId: product.id,
+          type: direction > 0 ? "ENTRY" : "MANUAL_ADJUSTMENT",
+          quantity,
+          note: direction > 0 ? "Entrada realizada na página de produtos" : "Retirada realizada na página de produtos",
+        }),
+      });
+      setDraft(payload.product);
+      onSaved(payload.product);
+      setStockAmount("1");
+      setMessage(direction > 0 ? "Estoque adicionado e salvo." : "Estoque retirado e salvo.");
+    } catch (stockError) {
+      setMessage(stockError instanceof Error ? stockError.message : "Falha ao atualizar estoque.");
+    } finally {
+      setStockSaving(false);
+    }
+  };
+
   const remove = async () => {
     if (isNew) return;
     setSaving(true);
@@ -224,22 +275,28 @@ function ProductEditor({
       <div className="admin-product-summary">
         <div className="admin-product-image">{preview ?? draft.image ? <img src={preview ?? draft.image} alt={`${draft.brand} ${draft.model}`} /> : <span>Foto do relógio</span>}</div>
         <div><span>{draft.brand}</span><h2>{draft.name || draft.model}</h2><p className="admin-product-model">Modelo: {draft.model || "—"}</p><p>{draft.descriptor}</p><strong>{formatMoney((draft.promotionalPriceValue ?? draft.priceValue) * 100)}</strong></div>
-        <div className="admin-product-state"><span className={`admin-stock-badge is-${draft.active ? stockTone : "inactive"}`}>{draft.active ? stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque" : "Inativo"}</span><b>{draft.stock} un.</b>{!isNew && <div className="admin-product-actions"><button type="button" onClick={() => setEditing(true)} disabled={editing}>Editar</button><Link href={`/admin/estoque?produto=${encodeURIComponent(product.id)}`}>Estoque</Link><button type="button" className="is-danger" onClick={() => setConfirmingDelete(true)} disabled={saving}>Excluir</button></div>}</div>
+        <div className="admin-product-state"><span className={`admin-stock-badge is-${stockTone}`}>{stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque"}</span><div className="admin-product-flags"><span className={draft.recommended ? "is-positive" : undefined}>{draft.recommended ? "Recomendado" : "Não recomendado"}</span><span className={draft.active ? "is-positive" : "is-muted"}>{draft.active ? "Ativo" : "Inativo"}</span></div><b>{draft.stock} un.</b>{!isNew && <div className="admin-product-actions"><button type="button" onClick={() => { setStockOpen(false); setEditing(true); }} disabled={editing || stockSaving}>Editar</button><button type="button" onClick={() => setStockOpen((open) => !open)} disabled={editing || saving}>{stockOpen ? "Fechar estoque" : "Estoque"}</button><button type="button" className="is-danger" onClick={() => setConfirmingDelete(true)} disabled={saving || stockSaving}>Excluir</button></div>}</div>
       </div>
+
+      {stockOpen && !isNew && <div className="admin-product-stock-panel">
+        <div><span>Estoque atual</span><strong>{draft.stock}</strong><small>{stockTone === "out" ? "Esgotado" : stockTone === "low" ? "Estoque baixo" : "Em estoque"}</small></div>
+        <label>Quantidade<input type="number" min="1" step="1" inputMode="numeric" value={stockAmount} onChange={(event) => setStockAmount(event.target.value)} /></label>
+        <div><button type="button" className="is-primary" disabled={stockSaving} onClick={() => void adjustStock(1)}>{stockSaving ? "Salvando…" : "Adicionar"}</button><button type="button" disabled={stockSaving || draft.stock === 0} onClick={() => void adjustStock(-1)}>Retirar</button></div>
+      </div>}
 
       {editing && <div className="admin-product-form">
         <div className="admin-form-grid">
-          <label>Nome<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
-          <label>Marca<input value={draft.brand} onChange={(event) => setDraft({ ...draft, brand: event.target.value })} /></label>
-          <label>Modelo<input value={draft.model} onChange={(event) => setDraft({ ...draft, model: event.target.value })} /></label>
-          <label>Preço<input type="number" min="0" step="0.01" value={draft.priceValue} onChange={(event) => setDraft({ ...draft, priceValue: Number(event.target.value) })} /></label>
+          <label>Nome<input required value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+          <label>Marca<input required value={draft.brand} onChange={(event) => setDraft({ ...draft, brand: event.target.value })} /></label>
+          <label>Modelo<input required value={draft.model} onChange={(event) => setDraft({ ...draft, model: event.target.value })} /></label>
+          <label>Preço<input required type="number" min="0" step="0.01" value={draft.priceValue} onChange={(event) => setDraft({ ...draft, priceValue: Number(event.target.value) })} /></label>
           <label>Preço promocional<input type="number" min="0" step="0.01" value={draft.promotionalPriceValue ?? ""} placeholder="Sem promoção" onChange={(event) => setDraft({ ...draft, promotionalPriceValue: event.target.value === "" ? null : Number(event.target.value) })} /></label>
           <label>Estoque<input type="number" min="0" step="1" value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: Number(event.target.value) })} /></label>
-          <label>Categoria<input value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} /></label>
+          <label>Categoria <small>Opcional</small><input value={draft.category} placeholder="Relógios" onChange={(event) => setDraft({ ...draft, category: event.target.value })} /></label>
           <label>Etiqueta<input value={draft.tag} onChange={(event) => setDraft({ ...draft, tag: event.target.value })} /></label>
           <label>Características<input value={draft.specs.join("; ")} onChange={(event) => setDraft({ ...draft, specs: event.target.value.split(";").map((item) => item.trim()).filter(Boolean) })} /><small>Separe por ponto e vírgula.</small></label>
-          <label className="admin-field-wide">Descrição<textarea rows={4} value={draft.descriptor} onChange={(event) => setDraft({ ...draft, descriptor: event.target.value })} /></label>
-          <label className="admin-upload admin-field-wide">Alterar foto<input type="file" accept="image/jpeg,image/png,image/webp" onChange={selectImage} /><span>JPG, PNG ou WebP · máximo 5 MB · preview antes de salvar</span></label>
+          <label className="admin-field-wide">Descrição<textarea required rows={4} value={draft.descriptor} onChange={(event) => setDraft({ ...draft, descriptor: event.target.value })} /></label>
+          <label className="admin-upload admin-field-wide">{isNew ? "Foto" : "Alterar foto"}<input required={isNew && !draft.image} type="file" accept="image/jpeg,image/png,image/webp" onChange={selectImage} /><span>JPG, PNG ou WebP · máximo 5 MB · preview antes de salvar</span></label>
         </div>
         <div className="admin-checks">
           <label><input type="checkbox" checked={draft.active} onChange={(event) => setDraft({ ...draft, active: event.target.checked })} />Disponível no catálogo</label>

@@ -8,7 +8,7 @@ function nonNegativeMoney(value: unknown, nullable = false) {
 }
 
 export function parseProduct(body: Record<string, unknown>): ProductUpdate {
-  const required = ["name", "model", "brand", "description", "imageUrl", "category"] as const;
+  const required = ["name", "model", "brand", "description", "imageUrl"] as const;
   for (const field of required) {
     if (typeof body[field] !== "string" || !body[field].trim()) {
       throw new Error(`O campo ${field} é obrigatório.`);
@@ -35,7 +35,9 @@ export function parseProduct(body: Record<string, unknown>): ProductUpdate {
     promotionalPriceCents: nonNegativeMoney(body.promotionalPrice, true),
     imageUrl,
     stock,
-    category: String(body.category).trim().slice(0, 80),
+    category: typeof body.category === "string" && body.category.trim()
+      ? body.category.trim().slice(0, 80)
+      : "Relógios",
     tag: typeof body.tag === "string" ? body.tag.trim().slice(0, 100) : "",
     specs,
     featured: body.featured === true,

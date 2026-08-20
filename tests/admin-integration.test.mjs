@@ -4,9 +4,18 @@ import test from "node:test";
 const baseUrl = process.env.VYNE_INTEGRATION_BASE_URL;
 const username = process.env.VYNE_INTEGRATION_USERNAME;
 const password = process.env.VYNE_INTEGRATION_PASSWORD;
+const sitesBypassToken = process.env.VYNE_INTEGRATION_BYPASS_TOKEN;
 
 const configured = Boolean(baseUrl && username && password);
 const origin = baseUrl ? new URL(baseUrl).origin : "";
+
+function sitesHeaders(input) {
+  const headers = new Headers(input);
+  if (sitesBypassToken) headers.set("OAI-Sites-Authorization", `Bearer ${sitesBypassToken}`);
+  return headers;
+}
+
+const publicFetch = (path) => fetch(`${baseUrl}${path}`, { headers: sitesHeaders() });
 
 async function json(response) {
   const payload = await response.json().catch(() => ({}));
@@ -14,12 +23,12 @@ async function json(response) {
 }
 
 test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, skip: !configured }, async () => {
-  const anonymous = await fetch(`${baseUrl}/api/admin/products`);
+  const anonymous = await fetch(`${baseUrl}/api/admin/products`, { headers: sitesHeaders() });
   assert.equal(anonymous.status, 401, "rotas administrativas rejeitam visitantes sem sessão");
 
   const login = await fetch(`${baseUrl}/api/admin/login`, {
     method: "POST",
-    headers: { "content-type": "application/json", origin },
+    headers: sitesHeaders({ "content-type": "application/json", origin }),
     body: JSON.stringify({ username, password }),
   });
   const loginPayload = await login.json();
@@ -29,7 +38,7 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   assert.ok(cookie, "login cria cookie de sessão HttpOnly");
 
   const adminFetch = async (path, init = {}) => {
-    const headers = new Headers(init.headers);
+    const headers = sitesHeaders(init.headers);
     headers.set("cookie", cookie);
     headers.set("origin", origin);
     if ((init.method ?? "GET").toUpperCase() !== "GET") {
@@ -48,11 +57,11 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   const uploadResult = await json(await adminFetch("/api/admin/uploads", { method: "POST", body: uploadBody }));
   assert.equal(uploadResult.response.status, 201, "upload de imagem funciona");
   assert.match(uploadResult.payload.url, /^\/api\/product-images\/products\//);
-  const imageResponse = await fetch(`${baseUrl}${uploadResult.payload.url}`);
+  const imageResponse = await publicFetch(uploadResult.payload.url);
   assert.equal(imageResponse.status, 200, "imagem enviada fica disponível no Storage");
 
   const draft = {
-    name: "Relógio de teste administrativo",
+    name: "TESTE VYNE",
     model: "QA-2026",
     brand: "VYNE TEST",
     description: "Descrição inicial para validação do painel.",
@@ -60,7 +69,7 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
     promotionalPrice: null,
     imageUrl: uploadResult.payload.url,
     stock: 5,
-    category: "Integração",
+    category: "",
     tag: "Teste",
     specs: ["Teste automatizado"],
     featured: false,
@@ -72,10 +81,14 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   assert.equal(createdResult.response.status, 201, "novo relógio é cadastrado");
   const productId = createdResult.payload.product.id;
   assert.equal(createdResult.payload.product.stock, 5);
+  assert.equal(createdResult.payload.product.category, "Relógios", "categoria opcional recebe valor padrão");
+
+  let persisted = await (await adminFetch("/api/admin/products")).json();
+  assert.ok(persisted.products.some((product) => product.id === productId && product.name === "TESTE VYNE"), "produto persiste após nova leitura");
 
   const updatedDraft = {
     ...draft,
-    name: "Relógio de teste atualizado",
+    name: "TESTE VYNE",
     description: "Descrição atualizada e persistida no banco.",
     price: 1099,
     promotionalPrice: 999,
@@ -89,7 +102,12 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   assert.equal(updatedResult.payload.product.recommended, true);
   assert.equal(updatedResult.payload.product.featured, true);
 
-  let publicProducts = await (await fetch(`${baseUrl}/api/products`)).json();
+  persisted = await (await adminFetch("/api/admin/products")).json();
+  const persistedAfterEdit = persisted.products.find((product) => product.id === productId);
+  assert.equal(persistedAfterEdit.priceValue, 1099, "preço editado persiste após nova leitura");
+  assert.equal(persistedAfterEdit.descriptor, updatedDraft.description, "descrição editada persiste após nova leitura");
+
+  let publicProducts = await (await publicFetch("/api/products")).json();
   let publicProduct = publicProducts.products.find((product) => product.id === productId);
   assert.equal(publicProduct.name, updatedDraft.name, "catálogo público recebe alterações do banco");
   assert.equal(publicProduct.promotionalPriceValue, 999);
@@ -106,20 +124,36 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   assert.equal(excessive.response.status, 400, "estoque negativo é bloqueado");
   assert.equal((await move(-6)).payload.product.stock, 0, "estoque pode chegar exatamente a zero");
 
-  publicProducts = await (await fetch(`${baseUrl}/api/products`)).json();
+  publicProducts = await (await publicFetch("/api/products")).json();
   publicProduct = publicProducts.products.find((product) => product.id === productId);
   assert.equal(publicProduct.stock, 0, "catálogo informa produto esgotado");
   assert.equal((await move(5, "ENTRY")).payload.product.stock, 5, "produto pode ser reabastecido");
 
+  const replacementUploadBody = new FormData();
+  replacementUploadBody.set("file", new Blob([png], { type: "image/png" }), "relogio-teste-alterado.png");
+  const replacementUploadResult = await json(await adminFetch("/api/admin/uploads", { method: "POST", body: replacementUploadBody }));
+  assert.equal(replacementUploadResult.response.status, 201, "nova foto é enviada ao Storage");
+  assert.notEqual(replacementUploadResult.payload.url, uploadResult.payload.url, "troca de foto gera uma nova URL");
+
+  const photoDraft = { ...updatedDraft, imageUrl: replacementUploadResult.payload.url, stock: 5 };
+  const photoUpdateResult = await json(await adminFetch(`/api/admin/products/${encodeURIComponent(productId)}`, {
+    method: "PATCH",
+    body: JSON.stringify(photoDraft),
+  }));
+  assert.equal(photoUpdateResult.response.status, 200, "URL da nova foto é salva no produto");
+  publicProducts = await (await publicFetch("/api/products")).json();
+  publicProduct = publicProducts.products.find((product) => product.id === productId);
+  assert.equal(publicProduct.image, replacementUploadResult.payload.url, "loja pública recebe a foto atualizada");
+
   const deactivatedResult = await json(await adminFetch(`/api/admin/products/${encodeURIComponent(productId)}`, {
     method: "PATCH",
-    body: JSON.stringify({ ...updatedDraft, stock: 5, active: false }),
+    body: JSON.stringify({ ...photoDraft, active: false }),
   }));
   assert.equal(deactivatedResult.payload.product.active, false, "produto pode ser desativado");
-  publicProducts = await (await fetch(`${baseUrl}/api/products`)).json();
+  publicProducts = await (await publicFetch("/api/products")).json();
   assert.equal(publicProducts.products.some((product) => product.id === productId), false, "produto inativo sai da loja pública");
 
-  const persisted = await (await adminFetch("/api/admin/products")).json();
+  persisted = await (await adminFetch("/api/admin/products")).json();
   assert.ok(persisted.products.some((product) => product.id === productId && product.name === updatedDraft.name), "alterações persistem após nova leitura");
 
   const movementHistory = await (await adminFetch("/api/admin/stock-movements")).json();
@@ -131,4 +165,6 @@ test("fluxo administrativo completo de produtos e estoque", { timeout: 30_000, s
   assert.equal(deletionResult.response.status, 200, "exclusão administrativa funciona");
   assert.equal(deletionResult.payload.mode, "archived", "produto com histórico usa soft delete");
   assert.equal(deletionResult.payload.product.active, false);
+  publicProducts = await (await publicFetch("/api/products")).json();
+  assert.equal(publicProducts.products.some((product) => product.id === productId), false, "produto excluído não reaparece na loja pública");
 });

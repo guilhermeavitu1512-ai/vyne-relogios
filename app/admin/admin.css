@@ -139,6 +139,10 @@
 .admin-product-summary p { margin: 0; color: var(--admin-muted); font-size: 13px; }
 .admin-product-summary strong { display: block; margin-top: 10px; font-size: 15px; }
 .admin-product-state { display: grid; justify-items: end; gap: 8px; }
+.admin-product-flags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.admin-product-flags span { padding: 4px 7px; border: 1px solid var(--admin-line); color: var(--admin-muted); font-size: 8px; font-weight: 700; text-transform: uppercase; }
+.admin-product-flags span.is-positive { border-color: rgba(163, 251, 6, .3); color: var(--admin-green); }
+.admin-product-flags span.is-muted { color: #9ca19c; }
 .admin-stock-badge,
 .admin-sale-status { display: inline-flex; min-height: 26px; align-items: center; padding: 5px 9px; border: 1px solid var(--admin-line); font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .admin-stock-badge.is-available { border-color: rgba(163, 251, 6, .4); color: var(--admin-green); }
@@ -152,6 +156,16 @@
 .admin-product-actions > a { display: inline-flex; min-width: 72px; min-height: 40px; align-items: center; justify-content: center; margin: 0; padding: 8px 12px; border: 1px solid var(--admin-line); color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .admin-product-actions > a:hover { border-color: var(--admin-green); color: var(--admin-green); }
 .admin-product-actions > .is-danger { border-color: rgba(255, 98, 98, .45); color: #ff9d9d; }
+.admin-product-stock-panel { display: grid; grid-template-columns: minmax(160px, .7fr) minmax(150px, .6fr) auto; gap: 16px; align-items: end; margin-top: 18px; padding: 18px; border-top: 1px solid var(--admin-line); background: rgba(163, 251, 6, .025); }
+.admin-product-stock-panel > div:first-child { display: grid; gap: 3px; }
+.admin-product-stock-panel > div:first-child span,
+.admin-product-stock-panel label { color: var(--admin-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.admin-product-stock-panel > div:first-child strong { font-family: var(--font-display); font-size: 42px; line-height: .9; }
+.admin-product-stock-panel > div:first-child small { color: var(--admin-green); font-size: 9px; text-transform: uppercase; }
+.admin-product-stock-panel label { display: grid; gap: 7px; }
+.admin-product-stock-panel input { min-height: 44px; }
+.admin-product-stock-panel > div:last-child { display: flex; gap: 8px; }
+.admin-product-stock-panel button { min-width: 120px; min-height: 44px; padding-inline: 16px; }
 .admin-product-form { margin-top: 18px; padding-top: 22px; border-top: 1px solid var(--admin-line); }
 .admin-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 12px; }
 .admin-field-wide { grid-column: 1 / -1; }
@@ -275,6 +289,10 @@
   .admin-product-actions { width: 100%; justify-content: stretch; }
   .admin-product-actions > button,
   .admin-product-actions > a { min-height: 44px; flex: 1; }
+  .admin-product-flags { justify-content: flex-start; }
+  .admin-product-stock-panel { grid-template-columns: 1fr 1fr; }
+  .admin-product-stock-panel > div:last-child { grid-column: 1 / -1; }
+  .admin-product-stock-panel button { flex: 1; min-width: 0; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-field-wide { grid-column: 1; }
   .admin-form-actions button { min-width: 0; flex: 1; }
